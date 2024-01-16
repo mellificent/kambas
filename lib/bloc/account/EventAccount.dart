@@ -120,3 +120,8 @@ class RequestDisplayBetAmount extends EventAccount {
   List<Object> get props => ['RequestDisplayBetAmount', Random().nextInt(5000)];
 }
 
+class RequestExportCSV extends EventAccount {
+  @override
+  List<Object> get props => ['RequestExportCSV'];
+}
+

@@ -22,6 +22,7 @@ import 'package:flutter/services.dart';
 
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:to_csv/to_csv.dart' as exportCSV;
 
 class BlocAccount extends Bloc<EventAccount, StateAccount> {
   final ProviderAccount providerAccount;
@@ -45,6 +46,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestDisplayBetNumber>(_mapDisplayBetNumber);
     on<RequestPostBetAmount>(_mapPostBetAmount);
     on<RequestDisplayBetAmount>(_mapRequestDisplayBetAmount);
+    on<RequestExportCSV>(_mapRequestExportCSV);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -56,7 +58,9 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       emit(DisplayDrawTime(drawTime));
     });
     on<PostBetPage>((event, emit) async {
-      emit(UpdateSwipeLabel(event.isInitialPage ? AppStrings.swipeLabel1 : AppStrings.swipeLabel2));
+      emit(UpdateSwipeLabel(event.isInitialPage
+          ? AppStrings.swipeLabel1
+          : AppStrings.swipeLabel2));
     });
 
     //todo:
@@ -64,7 +68,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       // final currentDate = await getAfricaDateTime();
       final currentDate = DateTime.now();
       String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
-      String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
+      String datePlaced =
+          DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
       String drawTime = DateFormat('h a').format(currentDate);
 
       //todo: ticket no based on admin and random per transaction starting at
@@ -80,17 +85,19 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         AppStrings.p_initialDate: initialDate,
         AppStrings.p_processedDate: datePlaced,
         AppStrings.p_ticketNumber: "N/A",
-        AppStrings.p_betNumber: (selectedNumberResponse != null) ? "${selectedNumberResponse[0]} and ${selectedNumberResponse[1]}" : "",
+        AppStrings.p_betNumber: (selectedNumberResponse != null)
+            ? "${selectedNumberResponse[0]} and ${selectedNumberResponse[1]}"
+            : "",
         AppStrings.p_stallName: "N/A",
         AppStrings.p_drawSchedule: drawTime,
         AppStrings.p_betAmount: betAmountResponse,
-        AppStrings.p_priceAmount: ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
+        AppStrings.p_priceAmount:
+            ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
       });
 
       await providerAccount.deleteUserBetInput();
       emit(const RequestGoToHome());
     });
-
   }
 
   // Future<DateTime> getAfricaDateTime() async {
@@ -152,6 +159,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapPostLogin(
       PostLoginCredentials event, Emitter<StateAccount> emit) async {
+    emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
+
     // try {
     //   emit(const RequestLoadingAccount("logging in"));
     //
@@ -170,7 +179,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     //     /**load user details after successful login**/
     //     // await providerAccount.getUser();
     //
-    emit(const RequestPostLoginSuccess());
+    // emit(const RequestPostLoginSuccess());
     //   } else {
     //     providerAccount.logout();
     //     emit(RequestPostAccountFailed(response.error!.errorMsg));
@@ -190,12 +199,13 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapPostBetNumber(
       PostBetNumber event, Emitter<StateAccount> emit) async {
-    if (betNumber1 == "0"){
+    if (betNumber1 == "0") {
       betNumber1 = event.selectedNumber;
       debugPrint(" betNumber1 $betNumber1");
       emit(const UpdateBetChooseLabel(AppStrings.chooseNumberLabel2));
     } else {
-      debugPrint(" betNumber1 $betNumber1 and betnumber2 ${event.selectedNumber}");
+      debugPrint(
+          " betNumber1 $betNumber1 and betnumber2 ${event.selectedNumber}");
       await providerAccount.saveBetNumbers([betNumber1, event.selectedNumber]);
       emit(RequestBetNumbersDone());
     }
@@ -211,13 +221,14 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapRequestUpdateBetAmount(
       RequestUpdateBetAmount event, Emitter<StateAccount> emit) async {
-    if(event.amount != "0"){
+    if (event.amount != "0") {
       betAmount = event.amount;
       emit(DisplayBetAmount(betAmount));
     }
   }
 
-  Future<void> _mapDisplayBetNumber(RequestDisplayBetNumber event, Emitter<StateAccount> emit) async {
+  Future<void> _mapDisplayBetNumber(
+      RequestDisplayBetNumber event, Emitter<StateAccount> emit) async {
     try {
       var response = await providerAccount.getBetNumbers();
       if (response != null && response.length == 2) {
@@ -231,7 +242,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapRequestDisplayBetAmount(RequestDisplayBetAmount event, Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestDisplayBetAmount(
+      RequestDisplayBetAmount event, Emitter<StateAccount> emit) async {
     try {
       var response = await providerAccount.getBetAmount();
       if (response != null) {
@@ -245,6 +257,50 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
+  Future<void> _mapRequestExportCSV(
+      RequestExportCSV event, Emitter<StateAccount> emit) async {
+    try {
+      List<String> header = [
+        "stall_name",
+        "location",
+        "date/time placed",
+        "ticket_number",
+        "cut-off",
+        "bet_number1",
+        "bet_number2",
+        "bet_amount",
+        "bet_prize",
+        "encoded_by_username"
+      ];
+      List<List<String>> listOfLists = [header];
+
+      List<String> data1 = [
+        'stall sample',
+        'africa',
+        'dec2 2023 6am',
+        '123456789',
+        '2pm',
+        '4',
+        '5',
+        '100',
+        '20,000',
+        'testuser'
+      ];
+
+      listOfLists.add(data1);
+      var response = await exportCSV.myCSV(header, listOfLists, sharing: true);
+
+
+      // var response = await providerAccount.getBetAmount();
+      // if (response != null) {
+      //   // emit(DisplayBetAmount(response));
+      // } else {
+      //   // emit(const DisplayBetAmount(''));
+      // }
+    } catch (e) {
+      // emit(const DisplayBetAmount(''));
+    }
+  }
 }
 
 class FormInput {

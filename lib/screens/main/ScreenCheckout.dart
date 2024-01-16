@@ -85,6 +85,23 @@ class MainLayout extends StatelessWidget
       margin: EdgeInsets.zero,
     );
 
+    Widget buildPaymentOptionBtn(String label, VoidCallback onPressed) => InkWell(
+      onTap: onPressed,
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(9),
+          color: AppColors.PrimaryColor.withOpacity(0.8),
+        ),
+        height: 40.0,
+        width: double.infinity,
+        margin: const EdgeInsets.only(top: 5.0),
+        child: Text(label,
+          style: TextStyle(color: AppColors.TextColorBlack56, fontSize: 14),
+        ),
+      ),
+    );
+
     Widget checkoutbtns = Container(
       padding: const EdgeInsets.only(left: 41, right:41, top: 26.0, bottom: 20.0),
       child: Column(
@@ -100,19 +117,15 @@ class MainLayout extends StatelessWidget
                   letterSpacing: 1.1,
                   height: 1.2,
                   fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
-          Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(9),
-              color: AppColors.PrimaryColor.withOpacity(0.8),
-            ),
-            height: 40.0,
-            width: double.infinity,
-            margin: const EdgeInsets.only(top: 5.0),
-            child: const Text("Cash",
-              style: TextStyle(color: AppColors.TextColorBlack56, fontSize: 14),
-            ),
-          ),
+          buildPaymentOptionBtn("Cash", (){
+
+          }),
+          buildPaymentOptionBtn("Multibanco", (){
+
+          }),
+          buildPaymentOptionBtn("Transferencia", (){
+
+          }),
           Expanded(child: Container(alignment: Alignment.bottomCenter,child: printButton)),
         ],
       ),

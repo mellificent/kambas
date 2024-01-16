@@ -78,10 +78,11 @@ class UpdateFormField extends StateAccount {
 }
 
 class RequestPostLoginSuccess extends StateAccount {
-  const RequestPostLoginSuccess();
+  final bool isAdminUser;
+  const RequestPostLoginSuccess({required this.isAdminUser});
 
   @override
-  List<Object> get props => ['RequestPostLoginSuccess'];
+  List<Object> get props => ['RequestPostLoginSuccess', isAdminUser];
 }
 
 class RequestPostAccountFailed extends StateAccount {

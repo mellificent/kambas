@@ -271,7 +271,11 @@ class MainLayout extends StatelessWidget with FormMixins<BlocAccount, StateAccou
         }
 
         if (state is RequestPostLoginSuccess) {
-          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.of(context).mainScreen, (r) => false);
+          if(state.isAdminUser){
+            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.of(context).mainAdminScreen, (r) => false);
+          }else{
+            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.of(context).mainScreen, (r) => false);
+          }
         }
       },
       child: mainBody,

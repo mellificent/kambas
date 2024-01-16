@@ -25,6 +25,7 @@ class AppStrings {
 
   static const swipeLabel1 = 'Swipe to Next Page >>>';
   static const swipeLabel2 = '<<< Previous  Next >>>';
+  static const export_data = 'Export Data';
 
 
   // ERROR MESSAGES

@@ -13,6 +13,7 @@ class AppRoutes extends InheritedWidget {
   final String betPageScreen = '/betPageScreen';
   final String amountPageScreen = '/amountPageScreen';
   final String checkoutScreen = '/checkoutScreen';
+  final String mainAdminScreen = '/mainAdminScreen';
 
   @override
   bool updateShouldNotify(AppRoutes oldWidget) => false;
