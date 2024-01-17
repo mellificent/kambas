@@ -272,7 +272,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         "bet_prize",
         "encoded_by_username"
       ];
-      List<List<String>> listOfLists = [header];
+      List<List<String>> listOfLists = [];
 
       List<String> data1 = [
         'stall sample',
@@ -286,9 +286,22 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         '20,000',
         'testuser'
       ];
+      List<String> data2 = [
+        'stall2 sample',
+        'africa2',
+        'dec3 2023 6am',
+        '123456789',
+        '4pm',
+        '4',
+        '5',
+        '100',
+        '20,000',
+        'okkkkk'
+      ];
 
       listOfLists.add(data1);
-      var response = await exportCSV.myCSV(header, listOfLists, sharing: true);
+      listOfLists.add(data2);
+      var response = await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
 
 
       // var response = await providerAccount.getBetAmount();
