@@ -25,7 +25,9 @@ class BlocSplash extends Bloc<EventSplash, StateSplash> {
     final bool hasLogoutToken = await providerAccount.hasLogoutToken();
     await _mapGetAppVersion();
 
-    if (hasToken) {
+    final bool isDbReady = await providerAccount.initDatabase();
+
+    if (hasToken && isDbReady) {
       await providerAccount.initTokenHeader();
       if (hasLogoutToken) {
         providerAccount.logout();

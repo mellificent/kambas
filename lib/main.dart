@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kambas/providers/ProviderAccount.dart';
 import 'package:kambas/providers/ProviderSelections.dart';
+import 'package:kambas/repository/DatabaseRepository.dart';
 import 'package:kambas/repository/HardCodeRepository.dart';
 import 'package:kambas/repository/PreferenceRepository.dart';
 import 'package:kambas/repository/RemoteRepository.dart';
@@ -52,6 +53,7 @@ void main() async {
   PreferenceRepository preferenceRepository = PreferenceRepository();
   HardCodeRepository hardCodeRepository = HardCodeRepository();
   RemoteRepository remoteRepository = RemoteRepository(preferenceRepository: preferenceRepository, navigator: GlobalKey<NavigatorState>());
+  DatabaseRepository databaseRepository = DatabaseRepository();
 
   //hide status bar and navigation bar
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);

@@ -5,6 +5,7 @@ import 'package:fimber/fimber.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_strings.dart';
+import 'package:kambas/models/request/database/DbTransactions.dart';
 import 'package:kambas/models/responses/ResponseUserDetails.dart';
 import '../../../providers/ProviderAccount.dart';
 import '../../models/request/RequestOAuth.dart';
@@ -47,6 +48,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestPostBetAmount>(_mapPostBetAmount);
     on<RequestDisplayBetAmount>(_mapRequestDisplayBetAmount);
     on<RequestExportCSV>(_mapRequestExportCSV);
+    on<RequestReprintTicket>(_mapRequestReprintTicket);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -61,42 +63,6 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       emit(UpdateSwipeLabel(event.isInitialPage
           ? AppStrings.swipeLabel1
           : AppStrings.swipeLabel2));
-    });
-
-    //todo:
-    on<RequestReprintTicket>((event, emit) async {
-      // final currentDate = await getAfricaDateTime();
-      final currentDate = DateTime.now();
-      String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
-      String datePlaced =
-          DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
-      String drawTime = DateFormat('h a').format(currentDate);
-
-      //todo: ticket no based on admin and random per transaction starting at
-      // int min = pow(10, 6 - 1).toInt();
-      // int max = (pow(10, 6) - 1).toInt();
-      // final randomTicketNumber = min + Random().nextInt(max - min);
-
-      var selectedNumberResponse = await providerAccount.getBetNumbers();
-      var betAmountResponse = await providerAccount.getBetAmount();
-
-      const platformMethodChannel = MethodChannel('com.methodchannel/test');
-      platformMethodChannel.invokeMethod(AppStrings.printMethod, {
-        AppStrings.p_initialDate: initialDate,
-        AppStrings.p_processedDate: datePlaced,
-        AppStrings.p_ticketNumber: "N/A",
-        AppStrings.p_betNumber: (selectedNumberResponse != null)
-            ? "${selectedNumberResponse[0]} and ${selectedNumberResponse[1]}"
-            : "",
-        AppStrings.p_stallName: "N/A",
-        AppStrings.p_drawSchedule: drawTime,
-        AppStrings.p_betAmount: betAmountResponse,
-        AppStrings.p_priceAmount:
-            ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
-      });
-
-      await providerAccount.deleteUserBetInput();
-      emit(const RequestGoToHome());
     });
   }
 
@@ -314,6 +280,54 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       // emit(const DisplayBetAmount(''));
     }
   }
+
+
+  Future<void> _mapRequestReprintTicket(RequestReprintTicket event, Emitter<StateAccount> emit) async {
+    // final currentDate = await getAfricaDateTime();
+    final currentDate = DateTime.now();
+    String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
+    String datePlaced =
+    DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
+    String drawTime = DateFormat('h a').format(currentDate);
+
+    //todo: ticket no based on admin and random per transaction starting at
+    // int min = pow(10, 6 - 1).toInt();
+    // int max = (pow(10, 6) - 1).toInt();
+    // final randomTicketNumber = min + Random().nextInt(max - min);
+
+    var selectedNumberResponse = await providerAccount.getBetNumbers();
+    var betAmountResponse = await providerAccount.getBetAmount();
+    var prizeAmount = ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0);
+
+    const platformMethodChannel = MethodChannel('com.methodchannel/test');
+    platformMethodChannel.invokeMethod(AppStrings.printMethod, {
+      AppStrings.p_initialDate: initialDate,
+      AppStrings.p_processedDate: datePlaced,
+      AppStrings.p_ticketNumber: "N/A",
+      AppStrings.p_betNumber: (selectedNumberResponse != null)
+          ? "${selectedNumberResponse[0]} and ${selectedNumberResponse[1]}"
+          : "",
+      AppStrings.p_stallName: "N/A",
+      AppStrings.p_drawSchedule: drawTime,
+      AppStrings.p_betAmount: betAmountResponse,
+      AppStrings.p_priceAmount: prizeAmount,
+    });
+
+    await providerAccount.storeDBTransaction(DBTransactions(
+        createdDate: currentDate,
+        stallName: "N/A",
+        location: "N/A",
+        ticketNo: "N/A",
+        betNumber1: selectedNumberResponse![0],
+        betNumber2: selectedNumberResponse[1],
+        betAmount: betAmountResponse,
+        betPrize: prizeAmount,
+        userName: "testUser"));
+
+    await providerAccount.deleteUserBetInput();
+    emit(const RequestGoToHome());
+  }
+
 }
 
 class FormInput {

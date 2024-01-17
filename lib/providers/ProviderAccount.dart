@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:kambas/models/request/database/DbTransactions.dart';
 import 'package:kambas/models/responses/ResponseUserDetails.dart';
+import 'package:kambas/repository/DatabaseRepository.dart';
 
 import '../constants/app_strings.dart';
 import '../models/request/RequestOAuth.dart';
@@ -15,11 +17,13 @@ import 'BaseProvider.dart';
 class ProviderAccount extends BaseProvider {
   final PreferenceRepository preferenceRepository;
   final RemoteRepository remoteRepository;
+  final DatabaseRepository databaseRepository;
 
-  ProviderAccount(
-      {required this.remoteRepository,
-        required this.preferenceRepository});
-
+  ProviderAccount({
+    required this.remoteRepository,
+    required this.preferenceRepository,
+    required this.databaseRepository,
+  });
 
   // Future<ResponseBundle<ResponseOAuth, ResponseErrorMessage>> postLogin(RequestOAuth request, [bool fromRegister = false]) async {
   //   try {
@@ -56,13 +60,22 @@ class ProviderAccount extends BaseProvider {
   //   }
   // }
 
+
+  Future<bool> storeDBTransaction(DBTransactions data) async {
+    return await databaseRepository.storeTransactionData(data);
+  }
+
+  Future<bool> initDatabase() async {
+    return await databaseRepository.initDatabase();
+  }
+
   Future<ResponseUserDetails?> getLocalUserData() async {
     // await preferenceRepository.saveUserdetails(response.data);
     try {
       String userDataString = await preferenceRepository.getUserdetails();
       Map<String, dynamic> data = jsonDecode(userDataString);
       return ResponseUserDetails.fromJson(data);
-    } catch(e){
+    } catch (e) {
       return null;
     }
   }
@@ -70,7 +83,7 @@ class ProviderAccount extends BaseProvider {
   Future<bool> getLocalOnboardingStatus() async {
     try {
       return await preferenceRepository.getUserOnboardStatus();
-    } catch(e){
+    } catch (e) {
       return false;
     }
   }
@@ -79,7 +92,7 @@ class ProviderAccount extends BaseProvider {
     try {
       return await preferenceRepository.getNewLaunchStatus();
       // await preferenceRepository.saveNewLaunch(false);
-    } catch(e){
+    } catch (e) {
       return true;
     }
   }
@@ -114,6 +127,7 @@ class ProviderAccount extends BaseProvider {
   }
 
   void logout() async {
+    databaseRepository.clearDatabase();
     remoteRepository.clearDioCache();
     preferenceRepository.deleteToken();
 
@@ -139,5 +153,4 @@ class ProviderAccount extends BaseProvider {
   Future<void> deleteUserBetInput() async {
     await preferenceRepository.deleteUserInputData();
   }
-
 }
