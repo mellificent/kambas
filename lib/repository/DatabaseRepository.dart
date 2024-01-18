@@ -20,21 +20,39 @@ class DatabaseRepository {
     return true;
   }
 
-  ///modules
   Future<bool> storeTransactionData(DBTransactions data) async {
     if (!isDbInitialized) return false;
 
-    await KambasTransaction.withFields(data.createdDate, data.userName, true, jsonEncode(data), false).save();
+    await KambasTransaction.withFields(DateTime.parse(data.createdDate), data.userName, true, jsonEncode(data), false).save();
 
     ///(print results)
     var dataStored = await KambasTransaction().select().toList();
     dataStored.forEach((element) async {
       if (kDebugMode) {
-        print("DATABASE ID : ${element.id!}\nresponse : \n${element.jsonResponse!}\n--------------\n");
+        print("DATABASE ID : ${element.id!}\nresponse : \n${element.jsonResponse ?? ""}\n--------------\n");
       }
     });
 
     return true;
+  }
+
+  Future<List<DBTransactions>> getStoredTransactions() async {
+    if (!isDbInitialized) return [];
+
+    List<DBTransactions> readContents = [];
+
+    var storedModule = await KambasTransaction()
+        .select()
+        .and
+        .orderBy("id")
+        .toList();
+
+    for (var e in storedModule) {
+      var rawData = json.decode(e.jsonResponse!);
+      readContents.add(DBTransactions.fromJson(rawData));
+    }
+
+    return readContents;
   }
 
 }

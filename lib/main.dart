@@ -65,6 +65,7 @@ void main() async {
           create: (context) => ProviderAccount(
             remoteRepository: remoteRepository,
             preferenceRepository: preferenceRepository,
+            databaseRepository: databaseRepository,
           ),
         ),
         RepositoryProvider<ProviderSelections>(

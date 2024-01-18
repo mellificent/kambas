@@ -60,13 +60,17 @@ class ProviderAccount extends BaseProvider {
   //   }
   // }
 
+  Future<bool> initDatabase() async {
+    return await databaseRepository.initDatabase();
+  }
 
   Future<bool> storeDBTransaction(DBTransactions data) async {
     return await databaseRepository.storeTransactionData(data);
   }
 
-  Future<bool> initDatabase() async {
-    return await databaseRepository.initDatabase();
+  //todo: filter with date
+  Future<List<DBTransactions>> getStoredDBTransactions() async {
+    return await databaseRepository.getStoredTransactions();
   }
 
   Future<ResponseUserDetails?> getLocalUserData() async {

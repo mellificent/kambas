@@ -238,35 +238,27 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         "bet_prize",
         "encoded_by_username"
       ];
+
+      final storedData = await providerAccount.getStoredDBTransactions();
       List<List<String>> listOfLists = [];
 
-      List<String> data1 = [
-        'stall sample',
-        'africa',
-        'dec2 2023 6am',
-        '123456789',
-        '2pm',
-        '4',
-        '5',
-        '100',
-        '20,000',
-        'testuser'
-      ];
-      List<String> data2 = [
-        'stall2 sample',
-        'africa2',
-        'dec3 2023 6am',
-        '123456789',
-        '4pm',
-        '4',
-        '5',
-        '100',
-        '20,000',
-        'okkkkk'
-      ];
+      for (var element in storedData) {
+        List<String> data1 = [
+          element.stallName,
+          element.location,
+          element.createdDate.toString(), //todo: 'dec2 2023 6am',
+          element.ticketNo,
+          element.createdDate.toString(), //todo: '2pm',
+          element.betNumber1,
+          element.betNumber2,
+          element.betAmount,
+          element.betPrize,
+          element.userName
+        ];
 
-      listOfLists.add(data1);
-      listOfLists.add(data2);
+        listOfLists.add(data1);
+      }
+
       var response = await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
 
 
@@ -314,7 +306,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     });
 
     await providerAccount.storeDBTransaction(DBTransactions(
-        createdDate: currentDate,
+        createdDate: currentDate.toString(),
         stallName: "N/A",
         location: "N/A",
         ticketNo: "N/A",
