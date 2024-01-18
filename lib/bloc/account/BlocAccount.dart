@@ -243,12 +243,16 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       List<List<String>> listOfLists = [];
 
       for (var element in storedData) {
+        final date = DateTime.parse(element.createdDate);
+        String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(date);
+        String drawTime = DateFormat('h a').format(date);
+
         List<String> data1 = [
           element.stallName,
           element.location,
-          element.createdDate.toString(), //todo: 'dec2 2023 6am',
+          datePlaced,
           element.ticketNo,
-          element.createdDate.toString(), //todo: '2pm',
+          drawTime,
           element.betNumber1,
           element.betNumber2,
           element.betAmount,
