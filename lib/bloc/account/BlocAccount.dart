@@ -31,6 +31,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   String betNumber1 = "0";
   String betAmount = "0";
+  DateTime selectedFilteredDate = DateTime.now();
 
   BlocAccount({
     required this.providerAccount,
@@ -49,6 +50,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestDisplayBetAmount>(_mapRequestDisplayBetAmount);
     on<RequestExportCSV>(_mapRequestExportCSV);
     on<RequestReprintTicket>(_mapRequestReprintTicket);
+    on<RequestSelectedFilterDate>(_mapRequestSelectedFilterDate);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -223,6 +225,14 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
+  Future<void> _mapRequestSelectedFilterDate(
+      RequestSelectedFilterDate event, Emitter<StateAccount> emit) async {
+    selectedFilteredDate = event.selectedDatetime;
+    final label = DateFormat('EEE MMM dd ha').format(selectedFilteredDate);
+
+    emit(DisplayFilterDate(label));
+  }
+
   Future<void> _mapRequestExportCSV(
       RequestExportCSV event, Emitter<StateAccount> emit) async {
     try {
@@ -239,12 +249,12 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         "encoded_by_username"
       ];
 
-      final storedData = await providerAccount.getStoredDBTransactions();
+      final storedData = await providerAccount.getFilteredDBTransactions(selectedFilteredDate);
       List<List<String>> listOfLists = [];
 
       for (var element in storedData) {
         final date = DateTime.parse(element.createdDate);
-        String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(date);
+        String datePlaced = DateFormat('MMM dd, yyyy hh a').format(date);
         String drawTime = DateFormat('h a').format(date);
 
         List<String> data1 = [
@@ -263,8 +273,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         listOfLists.add(data1);
       }
 
-      var response = await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
-
+      var response =
+          await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
 
       // var response = await providerAccount.getBetAmount();
       // if (response != null) {
@@ -277,13 +287,12 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-
-  Future<void> _mapRequestReprintTicket(RequestReprintTicket event, Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestReprintTicket(
+      RequestReprintTicket event, Emitter<StateAccount> emit) async {
     // final currentDate = await getAfricaDateTime();
     final currentDate = DateTime.now();
     String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
-    String datePlaced =
-    DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
+    String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
     String drawTime = DateFormat('h a').format(currentDate);
 
     //todo: ticket no based on admin and random per transaction starting at
@@ -299,22 +308,28 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       AppStrings.p_initialDate: initialDate,
       AppStrings.p_processedDate: datePlaced,
       AppStrings.p_ticketNumber: "N/A",
-      AppStrings.p_betNumber: "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
+      AppStrings.p_betNumber:
+          "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
       AppStrings.p_stallName: "N/A",
       AppStrings.p_drawSchedule: drawTime,
       AppStrings.p_betAmount: betAmountResponse ?? "N/A",
-      AppStrings.p_priceAmount: ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
+      AppStrings.p_priceAmount:
+          ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
     }).then((value) async {
-      await providerAccount.storeDBTransaction(DBTransactions(
-          createdDate: currentDate.toString(),
-          stallName: "N/A",
-          location: "N/A",
-          ticketNo: randomTicketNumber.toString(),
-          betNumber1: selectedNumberResponse[0].toString(),
-          betNumber2: selectedNumberResponse[1].toString(),
-          betAmount: betAmountResponse,
-          betPrize: ((int.parse(betAmountResponse) / 100) * 20000).toStringAsFixed(0),
-          userName: "testUser"),);
+      final dbCreatedDate = currentDate.copyWith(minute: 0, second: 0, millisecond: 0, microsecond: 0,).toString();
+      await providerAccount.storeDBTransaction(
+        DBTransactions(
+            createdDate: dbCreatedDate,
+            stallName: "N/A",
+            location: "N/A",
+            ticketNo: randomTicketNumber.toString(),
+            betNumber1: selectedNumberResponse[0].toString(),
+            betNumber2: selectedNumberResponse[1].toString(),
+            betAmount: betAmountResponse,
+            betPrize: ((int.parse(betAmountResponse) / 100) * 20000)
+                .toStringAsFixed(0),
+            userName: "testUser"),
+      );
     });
 
     await providerAccount.deleteUserBetInput();

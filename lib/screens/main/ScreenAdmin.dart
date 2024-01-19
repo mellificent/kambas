@@ -1,17 +1,13 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_routes.dart';
 import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
-import 'package:kambas/utils/config/SizeConfig.dart';
-import 'package:kambas/utils/string_extension.dart';
 import 'package:kambas/widgets/buttons/button_raised.dart';
-import 'package:kambas/widgets/textfield/TextFieldStyle1.dart';
-import 'package:kambas/widgets/textfield/TextFieldStyle2.dart';
-import 'package:universal_platform/universal_platform.dart';
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import '../../../bloc/account/BlocAccount.dart';
 import '../../../bloc/account/EventAccount.dart';
 import '../../../bloc/account/StateAccount.dart';
@@ -65,7 +61,6 @@ class MainLayout extends StatelessWidget
       height: 80,
     );
 
-
     Widget exportButton = ButtonRaised(
       onPressed: () {
         //todo: export data
@@ -79,7 +74,21 @@ class MainLayout extends StatelessWidget
           fontFamily: AppStrings.FONT_POPPINS_BOLD),
       borderRadius: 9,
       height: 45.0,
-      margin: EdgeInsets.zero,
+      margin: const EdgeInsets.only(top: 13),
+    );
+
+    Widget backToHomeButton = ButtonRaised(
+      onPressed: () {
+      },
+      text: AppStrings.back_to_home,
+      textStyle: const TextStyle(
+          fontSize: 14.0,
+          color: AppColors.TextColorBlack56,
+          fontWeight: FontWeight.bold,
+          fontFamily: AppStrings.FONT_POPPINS_BOLD),
+      borderRadius: 9,
+      height: 45.0,
+      margin: const EdgeInsets.only(top: 13),
     );
 
     Widget mainBody = SafeArea(
@@ -111,7 +120,7 @@ class MainLayout extends StatelessWidget
                           fontFamily: AppStrings.FONT_POPPINS_REGULAR),
                     ),
                   ),
-
+                  _buildDateTimePicker(context),
                   exportButton,
                 ],
               ),
@@ -194,5 +203,91 @@ class MainLayout extends StatelessWidget
           );
         },
       );
+
+  _buildDateTimePicker(BuildContext context) => buildWidget(
+    context,
+    id: "dateTimePickerView",
+    buildWhen: (id, previous, current) => (current is DisplayFilterDate),
+    builder: (context, state) {
+      if (state is InitStateAccount) {
+        context.read<BlocAccount>().add(RequestSelectedFilterDate(DateTime.now()));
+      }
+
+      return Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Choose Date/Cut-Off",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 13.0,
+                  color: AppColors.TextColorBlack56,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                  fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
+          ButtonRaised(
+            onPressed: () async {
+              DateTime? dateTime = await showOmniDateTimePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                // firstDate: DateTime(1600).subtract(const Duration(days: 3652)),
+                // lastDate: DateTime.now().add(
+                //   const Duration(days: 3652),
+                // ),
+                is24HourMode: false,
+                isShowSeconds: false,
+                minutesInterval: 60,
+                secondsInterval: 1,
+                isForce2Digits: true,
+                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                constraints: const BoxConstraints(
+                  maxWidth: 350,
+                  maxHeight: 650,
+                ),
+                transitionBuilder: (context, anim1, anim2, child) {
+                  return FadeTransition(
+                    opacity: anim1.drive(
+                      Tween(
+                        begin: 0,
+                        end: 1,
+                      ),
+                    ),
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 200),
+                barrierDismissible: true,
+                selectableDayPredicate: (dateTime) {
+                  // Disable 25th Feb 2023
+                  if (dateTime == DateTime(2023, 2, 25)) {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                },
+              );
+              if (kDebugMode) {
+                //2024-01-25 21:00:00.000
+                print("dateTime: $dateTime");
+              }
+              if (dateTime != null && context.mounted){
+                context.read<BlocAccount>().add(RequestSelectedFilterDate(dateTime));
+              }
+            },
+            bgColor: AppColors.DisabledPrimaryColor,
+            text: (state is DisplayFilterDate) ? state.text : DateFormat('EEE MMM dd ha').format(DateTime.now()),
+            textStyle: const TextStyle(
+                fontSize: 14.0,
+                color: AppColors.TextColorBlack56,
+                fontWeight: FontWeight.bold,
+                fontFamily: AppStrings.FONT_POPPINS_BOLD),
+            borderRadius: 9,
+            height: 45.0,
+            margin: const EdgeInsets.only(top: 4.0),
+          ),
+        ],
+      );
+    },
+  );
 
 }

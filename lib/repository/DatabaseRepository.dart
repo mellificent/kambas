@@ -55,4 +55,25 @@ class DatabaseRepository {
     return readContents;
   }
 
+  Future<List<DBTransactions>> getFilteredTransactions(DateTime selectedDatetime) async {
+    if (!isDbInitialized) return [];
+
+    List<DBTransactions> readContents = [];
+
+    var storedModule = await KambasTransaction()
+        .select()
+        .createdAt
+        .equals(selectedDatetime)
+        .and
+        .orderBy("id")
+        .toList();
+
+    for (var e in storedModule) {
+      var rawData = json.decode(e.jsonResponse!);
+      readContents.add(DBTransactions.fromJson(rawData));
+    }
+
+    return readContents;
+  }
+
 }

@@ -153,3 +153,11 @@ class RequestGoToHome extends StateAccount {
   @override
   List<Object> get props => ['RequestGoToHome'];
 }
+
+class DisplayFilterDate extends StateAccount {
+  final String text;
+  const DisplayFilterDate(this.text);
+
+  @override
+  List<Object> get props => ['DisplayFilterDate', text];
+}

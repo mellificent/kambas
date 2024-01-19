@@ -125,3 +125,12 @@ class RequestExportCSV extends EventAccount {
   List<Object> get props => ['RequestExportCSV'];
 }
 
+class RequestSelectedFilterDate extends EventAccount {
+  final DateTime selectedDatetime;
+
+  const RequestSelectedFilterDate(this.selectedDatetime);
+
+  @override
+  List<Object> get props => ['RequestSelectedFilterDate', selectedDatetime];
+}
+

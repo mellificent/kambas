@@ -68,9 +68,12 @@ class ProviderAccount extends BaseProvider {
     return await databaseRepository.storeTransactionData(data);
   }
 
-  //todo: filter with date
   Future<List<DBTransactions>> getStoredDBTransactions() async {
     return await databaseRepository.getStoredTransactions();
+  }
+
+  Future<List<DBTransactions>> getFilteredDBTransactions(DateTime selectedDatetime) async {
+    return await databaseRepository.getFilteredTransactions(selectedDatetime);
   }
 
   Future<ResponseUserDetails?> getLocalUserData() async {
