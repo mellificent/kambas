@@ -293,19 +293,19 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
     var selectedNumberResponse = await providerAccount.getBetNumbers();
     var betAmountResponse = await providerAccount.getBetAmount();
-    var prizeAmount = ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0);
 
     const platformMethodChannel = MethodChannel('com.methodchannel/test');
     platformMethodChannel.invokeMethod(AppStrings.printMethod, {
       AppStrings.p_initialDate: initialDate,
       AppStrings.p_processedDate: datePlaced,
-      AppStrings.p_ticketNumber: randomTicketNumber,
+      AppStrings.p_ticketNumber: "N/A",
       AppStrings.p_betNumber: "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
       AppStrings.p_stallName: "N/A",
       AppStrings.p_drawSchedule: drawTime,
-      AppStrings.p_betAmount: betAmountResponse,
-      AppStrings.p_priceAmount: prizeAmount,
+      AppStrings.p_betAmount: betAmountResponse ?? "N/A",
+      AppStrings.p_priceAmount: ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
     }).then((value) async {
+      var prizeAmount = ((int.parse(betAmountResponse) / 100) * 20000).toStringAsFixed(0);
       await providerAccount.storeDBTransaction(DBTransactions(
           createdDate: currentDate.toString(),
           stallName: "N/A",
