@@ -287,9 +287,9 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     String drawTime = DateFormat('h a').format(currentDate);
 
     //todo: ticket no based on admin and random per transaction starting at
-    // int min = pow(10, 6 - 1).toInt();
-    // int max = (pow(10, 6) - 1).toInt();
-    // final randomTicketNumber = min + Random().nextInt(max - min);
+    int min = pow(10, 6 - 1).toInt();
+    int max = (pow(10, 6) - 1).toInt();
+    final randomTicketNumber = min + Random().nextInt(max - min);
 
     var selectedNumberResponse = await providerAccount.getBetNumbers();
     var betAmountResponse = await providerAccount.getBetAmount();
@@ -299,7 +299,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     platformMethodChannel.invokeMethod(AppStrings.printMethod, {
       AppStrings.p_initialDate: initialDate,
       AppStrings.p_processedDate: datePlaced,
-      AppStrings.p_ticketNumber: "N/A",
+      AppStrings.p_ticketNumber: randomTicketNumber,
       AppStrings.p_betNumber: (selectedNumberResponse != null)
           ? "${selectedNumberResponse[0]} and ${selectedNumberResponse[1]}"
           : "",
@@ -313,12 +313,12 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         createdDate: currentDate.toString(),
         stallName: "N/A",
         location: "N/A",
-        ticketNo: "N/A",
+        ticketNo: randomTicketNumber.toString(),
         betNumber1: selectedNumberResponse![0],
         betNumber2: selectedNumberResponse[1],
         betAmount: betAmountResponse,
         betPrize: prizeAmount,
-        userName: "testUser"));
+        userName: "testUser"),);
 
     await providerAccount.deleteUserBetInput();
     emit(const RequestGoToHome());
