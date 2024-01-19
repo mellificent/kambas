@@ -300,27 +300,25 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       AppStrings.p_initialDate: initialDate,
       AppStrings.p_processedDate: datePlaced,
       AppStrings.p_ticketNumber: randomTicketNumber,
-      AppStrings.p_betNumber: (selectedNumberResponse != null)
-          ? "${selectedNumberResponse[0]} and ${selectedNumberResponse[1]}"
-          : "",
+      AppStrings.p_betNumber: "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
       AppStrings.p_stallName: "N/A",
       AppStrings.p_drawSchedule: drawTime,
       AppStrings.p_betAmount: betAmountResponse,
       AppStrings.p_priceAmount: prizeAmount,
+    }).then((value) async {
+      await providerAccount.storeDBTransaction(DBTransactions(
+          createdDate: currentDate.toString(),
+          stallName: "N/A",
+          location: "N/A",
+          ticketNo: randomTicketNumber.toString(),
+          betNumber1: selectedNumberResponse[0].toString(),
+          betNumber2: selectedNumberResponse[1].toString(),
+          betAmount: betAmountResponse,
+          betPrize: prizeAmount,
+          userName: "testUser"),);
+      await providerAccount.deleteUserBetInput();
     });
 
-    await providerAccount.storeDBTransaction(DBTransactions(
-        createdDate: currentDate.toString(),
-        stallName: "N/A",
-        location: "N/A",
-        ticketNo: randomTicketNumber.toString(),
-        betNumber1: selectedNumberResponse![0],
-        betNumber2: selectedNumberResponse[1],
-        betAmount: betAmountResponse,
-        betPrize: prizeAmount,
-        userName: "testUser"),);
-
-    await providerAccount.deleteUserBetInput();
     emit(const RequestGoToHome());
   }
 
