@@ -305,7 +305,6 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       AppStrings.p_betAmount: betAmountResponse ?? "N/A",
       AppStrings.p_priceAmount: ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
     }).then((value) async {
-      var prizeAmount = ((int.parse(betAmountResponse) / 100) * 20000).toStringAsFixed(0);
       await providerAccount.storeDBTransaction(DBTransactions(
           createdDate: currentDate.toString(),
           stallName: "N/A",
@@ -314,11 +313,11 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
           betNumber1: selectedNumberResponse[0].toString(),
           betNumber2: selectedNumberResponse[1].toString(),
           betAmount: betAmountResponse,
-          betPrize: prizeAmount,
+          betPrize: ((int.parse(betAmountResponse) / 100) * 20000).toStringAsFixed(0),
           userName: "testUser"),);
-      await providerAccount.deleteUserBetInput();
     });
 
+    await providerAccount.deleteUserBetInput();
     emit(const RequestGoToHome());
   }
 
