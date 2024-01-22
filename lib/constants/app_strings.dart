@@ -26,6 +26,9 @@ class AppStrings {
   static const swipeLabel1 = 'Swipe to Next Page >>>';
   static const swipeLabel2 = '<<< Previous  Next >>>';
   static const export_data = 'Export Data';
+  static const user_management = 'User Management';
+  static const add_user = 'Add User';
+  static const general_settings = 'General Settings';
 
 
   // ERROR MESSAGES
@@ -34,7 +37,7 @@ class AppStrings {
   static const error_general_throwable_msg = "Something unexpected happened. Please try again later.";
   static const error_general_inputfields_msg = "Please input email and password.";
   static const error_register_inputfields_msg = "Please input required fields.";
-  static const error_login_invalidfields_msg = "Invalid email/password. Please try again.";
+  static const error_login_invalidfields_msg = "Invalid username/password. Please try again.";
   static const error_login_incorrectfields_msg = "Sorry, your email or password is incorrect. Please try again.";
   static const error_login_usernotfound_msg = "User not found.";
   static const error_relogin_user_msg = "Login status has expired. Please re-login";

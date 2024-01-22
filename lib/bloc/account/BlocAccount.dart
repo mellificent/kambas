@@ -5,8 +5,8 @@ import 'package:fimber/fimber.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_strings.dart';
+import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
-import 'package:kambas/models/responses/ResponseUserDetails.dart';
 import '../../../providers/ProviderAccount.dart';
 import '../../models/request/RequestOAuth.dart';
 import '../../utils/validator/BaseInput.dart';
@@ -51,6 +51,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestExportCSV>(_mapRequestExportCSV);
     on<RequestReprintTicket>(_mapRequestReprintTicket);
     on<RequestSelectedFilterDate>(_mapRequestSelectedFilterDate);
+    on<GetDbUserList>(_mapRequestDbUserList);
+    on<RequestAddUser>(_mapRequestAddUser);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -65,6 +67,9 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       emit(UpdateSwipeLabel(event.isInitialPage
           ? AppStrings.swipeLabel1
           : AppStrings.swipeLabel2));
+    });
+    on<RequestDialog>((event, emit) async {
+      emit(ShowDialog(true));
     });
   }
 
@@ -127,42 +132,27 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapPostLogin(
       PostLoginCredentials event, Emitter<StateAccount> emit) async {
-    emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
+    try {
+      emit(const RequestLoadingAccount("logging in"));
 
-    // try {
-    //   emit(const RequestLoadingAccount("logging in"));
-    //
-    //   final bool hasLogoutToken = await providerAccount.hasLogoutToken();
-    //   if (hasLogoutToken) {
-    //     await providerAccount.initTokenHeader();
-    //     providerAccount.logout();
-    //     providerAccount.setLogoutTag();
-    //     emit(const RequestPostAccountFailed('Your email address is not verified.'));
-    //     return;
-    //   }
+      final storedList = await providerAccount.getStoredDBUsers();
+      final list = storedList.where((element) => (element.name == event.username && element.password == event.password)).toList();
 
-    // var response = await providerAccount.postLogin(RequestOAuth.newToken(email: event.username, password: event.password));
-    //   if (response.error == null) {
-    //
-    //     /**load user details after successful login**/
-    //     // await providerAccount.getUser();
-    //
-    // emit(const RequestPostLoginSuccess());
-    //   } else {
-    //     providerAccount.logout();
-    //     emit(RequestPostAccountFailed(response.error!.errorMsg));
-    //   }
-    // } catch (e) {
-    //   // if (Foundation.kDebugMode) providerAccount.logout();
-    //   emit(RequestPostAccountFailed(e.toString()));
-    // }
+      if(list.isNotEmpty || (event.username == "admin" && event.password == "kambas123")){
+        emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
+      } else {
+        emit(const RequestFailed(AppStrings.error_login_invalidfields_msg));
+      }
+    } catch (e) {
+      emit(RequestFailed(e.toString()));
+    }
   }
 
   Future<void> _mapPostLogoutUser(
       PostLogoutUser event, Emitter<StateAccount> emit) async {
     providerAccount.logout();
     providerAccount.setLogoutTag();
-    emit(const RequestPostAccountFailed(''));
+    emit(const RequestFailed(''));
   }
 
   Future<void> _mapPostBetNumber(
@@ -233,6 +223,29 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     emit(DisplayFilterDate(label));
   }
 
+  Future<void> _mapRequestDbUserList(
+      GetDbUserList event, Emitter<StateAccount> emit) async {
+    // selectedFilteredDate = event.selectedDatetime;
+    // final label = DateFormat('EEE MMM dd ha').format(selectedFilteredDate);
+
+    final list = await providerAccount.getStoredDBUsers();
+    emit(DisplayUserList(list));
+  }
+
+  Future<void> _mapRequestAddUser(
+      RequestAddUser event, Emitter<StateAccount> emit) async {
+    final currentDate = DateTime.now().toString();
+    final isStored = await providerAccount.storeNewUser(UserItemData(
+        Random().nextInt(1000),
+        name: event.username,
+        password: event.password,
+        createdAt: currentDate,
+        updatedAt: currentDate));
+
+    emit(
+        isStored ? RequestSuccess() : const RequestFailed("error adding user"));
+  }
+
   Future<void> _mapRequestExportCSV(
       RequestExportCSV event, Emitter<StateAccount> emit) async {
     try {
@@ -249,7 +262,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         "encoded_by_username"
       ];
 
-      final storedData = await providerAccount.getFilteredDBTransactions(selectedFilteredDate);
+      final storedData =
+          await providerAccount.getFilteredDBTransactions(selectedFilteredDate);
       List<List<String>> listOfLists = [];
 
       for (var element in storedData) {
@@ -316,7 +330,14 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       AppStrings.p_priceAmount:
           ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
     }).then((value) async {
-      final dbCreatedDate = currentDate.copyWith(minute: 0, second: 0, millisecond: 0, microsecond: 0,).toString();
+      final dbCreatedDate = currentDate
+          .copyWith(
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+            microsecond: 0,
+          )
+          .toString();
       await providerAccount.storeDBTransaction(
         DBTransactions(
             createdDate: dbCreatedDate,
@@ -335,7 +356,6 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     await providerAccount.deleteUserBetInput();
     emit(const RequestGoToHome());
   }
-
 }
 
 class FormInput {

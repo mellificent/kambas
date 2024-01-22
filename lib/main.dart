@@ -12,11 +12,12 @@ import 'package:kambas/repository/PreferenceRepository.dart';
 import 'package:kambas/repository/RemoteRepository.dart';
 import 'package:kambas/screens/ScreenSplash.dart';
 import 'package:kambas/screens/account/login/ScreenLogin.dart';
-import 'package:kambas/screens/main/ScreenAdmin.dart';
+import 'package:kambas/screens/main/admin/ScreenAdmin.dart';
 import 'package:kambas/screens/main/ScreenAmount.dart';
 import 'package:kambas/screens/main/ScreenBet.dart';
 import 'package:kambas/screens/main/ScreenCheckout.dart';
 import 'package:kambas/screens/main/ScreenMain.dart';
+import 'package:kambas/screens/main/admin/ScreenExport.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -24,6 +25,8 @@ import 'constants/app_routes.dart';
 import 'constants/app_settings.dart';
 
 import 'package:timezone/data/latest_all.dart' as tz;
+
+import 'screens/main/admin/ScreenUserManagement.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -143,6 +146,8 @@ class App extends StatelessWidget {
           AppRoutes.of(context).amountPageScreen: (context) => const ScreenAmount(),
           AppRoutes.of(context).checkoutScreen: (context) => const ScreenCheckout(),
           AppRoutes.of(context).mainAdminScreen: (context) => const ScreenAdmin(),
+          AppRoutes.of(context).exportScreen: (context) => const ScreenExport(),
+          AppRoutes.of(context).userManagementScreen: (context) => const ScreenUserManagement(),
         },
       ),
     );

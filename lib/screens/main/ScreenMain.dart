@@ -24,25 +24,46 @@ class ScreenMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    ScreenMainSettings args = ScreenMainSettings();
+    var settings = ModalRoute.of(context)?.settings.arguments;
+    if (settings != null) args = settings as ScreenMainSettings;
+
     return Scaffold(
       backgroundColor: AppColors.White,
-
-      //todo: show appbar if admin only
-      appBar: null,
-      // appBar: AppBar(
-      //     backgroundColor: Colors.transparent,
-      //     leading: IconButton(
-      //       onPressed: () {
-      //         Navigator.of(context).pop();
-      //       },
-      //       icon: const Icon(Icons.account_circle, size: 30.0, color: Colors.grey,),
-      //     ),
-      //     actions: const [
-      //       Icon(Icons.settings, size: 30.0, color: AppColors.PrimaryColor,),
-      //       SizedBox(width: 8.0,),
-      //     ],
-      //     elevation: 0,
-      // ),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, AppRoutes.of(context).loginScreen, (r) => false);
+          },
+          icon: const Icon(
+            Icons.account_circle,
+            size: 40.0,
+            color: Colors.grey,
+          ),
+        ),
+        actions: (args.isAdminUser ?? false) ? [
+          InkWell(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.of(context).mainAdminScreen,
+              );
+            },
+            child: const Icon(
+              Icons.settings,
+              size: 40.0,
+              color: AppColors.PrimaryColor,
+            ),
+          ),
+          const SizedBox(
+            width: 8.0,
+          ),
+        ] : null,
+        elevation: 0,
+      ),
       body: BlocProvider(
         create: (_) => BlocAccount(
           providerAccount: RepositoryProvider.of<ProviderAccount>(context),
@@ -116,13 +137,9 @@ class MainLayout extends StatelessWidget
           context,
           AppRoutes.of(context).checkoutScreen,
         ).then((value) {
-          if(value == "betComplete"){
-            context
-                .read<BlocAccount>()
-                .add(RequestDisplayBetNumber());
-            context
-                .read<BlocAccount>()
-                .add(RequestDisplayBetAmount());
+          if (value == "betComplete") {
+            context.read<BlocAccount>().add(RequestDisplayBetNumber());
+            context.read<BlocAccount>().add(RequestDisplayBetAmount());
           }
         });
       },
@@ -161,7 +178,7 @@ class MainLayout extends StatelessWidget
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(
-                  left: 41.0, right: 41.0, top: 20.0, bottom: 20.0),
+                  left: 41.0, right: 41.0, top: 0.0, bottom: 20.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -229,7 +246,7 @@ class MainLayout extends StatelessWidget
           //     });
         }
 
-        if (state is RequestPostAccountFailed) {
+        if (state is RequestFailed) {
           Navigator.of(context).pop();
           // showDialog(
           //     context: context,
@@ -292,26 +309,26 @@ class MainLayout extends StatelessWidget
       );
 
   _buildDrawSchedule(BuildContext context) => buildWidget(
-    context,
-    id: "drawTimeTitle",
-    buildWhen: (id, previous, current) => (current is DisplayDrawTime),
-    builder: (context, state) {
-      if (state is InitStateAccount) {
-        context.read<BlocAccount>().add(RequestCurrentDate());
-      }
+        context,
+        id: "drawTimeTitle",
+        buildWhen: (id, previous, current) => (current is DisplayDrawTime),
+        builder: (context, state) {
+          if (state is InitStateAccount) {
+            context.read<BlocAccount>().add(RequestCurrentDate());
+          }
 
-      return Text(
-        "Draw Schedule - ${(state is DisplayDrawTime) ? state.text : "N/A"}",
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-            fontSize: 14.0,
-            color: AppColors.TextColorBlack56,
-            fontWeight: FontWeight.normal,
-            letterSpacing: 1.4,
-            fontFamily: AppStrings.FONT_POPPINS_REGULAR),
+          return Text(
+            "Draw Schedule - ${(state is DisplayDrawTime) ? state.text : "N/A"}",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                fontSize: 14.0,
+                color: AppColors.TextColorBlack56,
+                fontWeight: FontWeight.normal,
+                letterSpacing: 1.4,
+                fontFamily: AppStrings.FONT_POPPINS_REGULAR),
+          );
+        },
       );
-    },
-  );
 
   _buildBetField(BuildContext context) => buildWidget(
         context,
@@ -349,4 +366,10 @@ class MainLayout extends StatelessWidget
               color: Colors.black),
         ),
       );
+}
+
+class ScreenMainSettings {
+  final bool? isAdminUser;
+
+  const ScreenMainSettings({this.isAdminUser});
 }

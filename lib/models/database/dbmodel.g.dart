@@ -36,6 +36,10 @@ class TableUserAccount extends SqfEntityTableBase {
       SqfEntityFieldBase('userId', DbType.integer),
       SqfEntityFieldBase('username', DbType.text),
       SqfEntityFieldBase('password', DbType.text),
+      SqfEntityFieldBase('createdAt', DbType.datetime,
+          minValue: DateTime.parse('1900-01-01')),
+      SqfEntityFieldBase('updatedAt', DbType.datetime,
+          minValue: DateTime.parse('1900-01-01')),
     ];
     super.init();
   }
@@ -125,16 +129,22 @@ class KambasDB extends SqfEntityModelProvider {
 // region UserAccount
 class UserAccount extends TableBase {
   UserAccount(
-      {this.id, this.userId, this.username, this.password, this.isDeleted}) {
+      {this.id,
+      this.userId,
+      this.username,
+      this.password,
+      this.createdAt,
+      this.updatedAt,
+      this.isDeleted}) {
     _setDefaultValues();
     softDeleteActivated = true;
   }
-  UserAccount.withFields(
-      this.userId, this.username, this.password, this.isDeleted) {
+  UserAccount.withFields(this.userId, this.username, this.password,
+      this.createdAt, this.updatedAt, this.isDeleted) {
     _setDefaultValues();
   }
-  UserAccount.withId(
-      this.id, this.userId, this.username, this.password, this.isDeleted) {
+  UserAccount.withId(this.id, this.userId, this.username, this.password,
+      this.createdAt, this.updatedAt, this.isDeleted) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -152,6 +162,18 @@ class UserAccount extends TableBase {
     if (o['password'] != null) {
       password = o['password'].toString();
     }
+    if (o['createdAt'] != null) {
+      createdAt = int.tryParse(o['createdAt'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['createdAt'].toString())!)
+          : DateTime.tryParse(o['createdAt'].toString());
+    }
+    if (o['updatedAt'] != null) {
+      updatedAt = int.tryParse(o['updatedAt'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['updatedAt'].toString())!)
+          : DateTime.tryParse(o['updatedAt'].toString());
+    }
     isDeleted = o['isDeleted'] != null
         ? o['isDeleted'] == 1 || o['isDeleted'] == true
         : null;
@@ -161,6 +183,8 @@ class UserAccount extends TableBase {
   int? userId;
   String? username;
   String? password;
+  DateTime? createdAt;
+  DateTime? updatedAt;
   bool? isDeleted;
 
   // end FIELDS (UserAccount)
@@ -187,6 +211,24 @@ class UserAccount extends TableBase {
     if (password != null || !forView) {
       map['password'] = password;
     }
+    if (createdAt != null) {
+      map['createdAt'] = forJson
+          ? createdAt!.toString()
+          : forQuery
+              ? createdAt!.millisecondsSinceEpoch
+              : createdAt;
+    } else if (createdAt != null || !forView) {
+      map['createdAt'] = null;
+    }
+    if (updatedAt != null) {
+      map['updatedAt'] = forJson
+          ? updatedAt!.toString()
+          : forQuery
+              ? updatedAt!.millisecondsSinceEpoch
+              : updatedAt;
+    } else if (updatedAt != null || !forView) {
+      map['updatedAt'] = null;
+    }
     if (isDeleted != null) {
       map['isDeleted'] = forQuery ? (isDeleted! ? 1 : 0) : isDeleted;
     }
@@ -210,6 +252,24 @@ class UserAccount extends TableBase {
     if (password != null || !forView) {
       map['password'] = password;
     }
+    if (createdAt != null) {
+      map['createdAt'] = forJson
+          ? createdAt!.toString()
+          : forQuery
+              ? createdAt!.millisecondsSinceEpoch
+              : createdAt;
+    } else if (createdAt != null || !forView) {
+      map['createdAt'] = null;
+    }
+    if (updatedAt != null) {
+      map['updatedAt'] = forJson
+          ? updatedAt!.toString()
+          : forQuery
+              ? updatedAt!.millisecondsSinceEpoch
+              : updatedAt;
+    } else if (updatedAt != null || !forView) {
+      map['updatedAt'] = null;
+    }
     if (isDeleted != null) {
       map['isDeleted'] = forQuery ? (isDeleted! ? 1 : 0) : isDeleted;
     }
@@ -231,12 +291,27 @@ class UserAccount extends TableBase {
 
   @override
   List<dynamic> toArgs() {
-    return [userId, username, password, isDeleted];
+    return [
+      userId,
+      username,
+      password,
+      createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
+      updatedAt != null ? updatedAt!.millisecondsSinceEpoch : null,
+      isDeleted
+    ];
   }
 
   @override
   List<dynamic> toArgsWithIds() {
-    return [id, userId, username, password, isDeleted];
+    return [
+      id,
+      userId,
+      username,
+      password,
+      createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
+      updatedAt != null ? updatedAt!.millisecondsSinceEpoch : null,
+      isDeleted
+    ];
   }
 
   static Future<List<UserAccount>?> fromWebUrl(Uri uri,
@@ -385,8 +460,16 @@ class UserAccount extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnUserAccount.rawInsert(
-          'INSERT OR REPLACE INTO userAccounts (id, userId, username, password,isDeleted)  VALUES (?,?,?,?,?)',
-          [id, userId, username, password, isDeleted],
+          'INSERT OR REPLACE INTO userAccounts (id, userId, username, password, createdAt, updatedAt,isDeleted)  VALUES (?,?,?,?,?,?,?)',
+          [
+            id,
+            userId,
+            username,
+            password,
+            createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
+            updatedAt != null ? updatedAt!.millisecondsSinceEpoch : null,
+            isDeleted
+          ],
           ignoreBatch);
       if (result! > 0) {
         saveResult = BoolResult(
@@ -412,7 +495,7 @@ class UserAccount extends TableBase {
   Future<BoolCommitResult> upsertAll(List<UserAccount> useraccounts,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnUserAccount.rawInsertAll(
-        'INSERT OR REPLACE INTO userAccounts (id, userId, username, password,isDeleted)  VALUES (?,?,?,?,?)',
+        'INSERT OR REPLACE INTO userAccounts (id, userId, username, password, createdAt, updatedAt,isDeleted)  VALUES (?,?,?,?,?,?,?)',
         useraccounts,
         exclusive: exclusive,
         noResult: noResult,
@@ -695,6 +778,16 @@ class UserAccountFilterBuilder extends ConjunctionBase {
     return _password = _setField(_password, 'password', DbType.text);
   }
 
+  UserAccountField? _createdAt;
+  UserAccountField get createdAt {
+    return _createdAt = _setField(_createdAt, 'createdAt', DbType.datetime);
+  }
+
+  UserAccountField? _updatedAt;
+  UserAccountField get updatedAt {
+    return _updatedAt = _setField(_updatedAt, 'updatedAt', DbType.datetime);
+  }
+
   UserAccountField? _isDeleted;
   UserAccountField get isDeleted {
     return _isDeleted = _setField(_isDeleted, 'isDeleted', DbType.bool);
@@ -950,6 +1043,18 @@ class UserAccountFields {
   static TableField get password {
     return _fPassword =
         _fPassword ?? SqlSyntax.setField(_fPassword, 'password', DbType.text);
+  }
+
+  static TableField? _fCreatedAt;
+  static TableField get createdAt {
+    return _fCreatedAt = _fCreatedAt ??
+        SqlSyntax.setField(_fCreatedAt, 'createdAt', DbType.datetime);
+  }
+
+  static TableField? _fUpdatedAt;
+  static TableField get updatedAt {
+    return _fUpdatedAt = _fUpdatedAt ??
+        SqlSyntax.setField(_fUpdatedAt, 'updatedAt', DbType.datetime);
   }
 
   static TableField? _fIsDeleted;

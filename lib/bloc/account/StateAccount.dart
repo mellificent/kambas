@@ -1,5 +1,7 @@
+import 'dart:math';
+
 import 'package:equatable/equatable.dart';
-import 'package:kambas/models/responses/ResponseUserDetails.dart';
+import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../utils/validator/Validator.dart';
@@ -30,16 +32,6 @@ class DisplayDrawTime extends StateAccount {
 
   @override
   List<Object> get props => ['DisplayDrawTime', text];
-}
-
-class RequestGetUserSuccess extends StateAccount {
-  final UserData userData;
-  final bool isAppNewLaunch;
-
-  const RequestGetUserSuccess({required this.userData, required this.isAppNewLaunch});
-
-  @override
-  List<Object> get props => [userData, isAppNewLaunch];
 }
 
 class RequestAccountFailed extends StateAccount {
@@ -85,16 +77,21 @@ class RequestPostLoginSuccess extends StateAccount {
   List<Object> get props => ['RequestPostLoginSuccess', isAdminUser];
 }
 
-class RequestPostAccountFailed extends StateAccount {
+class RequestFailed extends StateAccount {
   final String error;
 
-  const RequestPostAccountFailed(this.error);
+  const RequestFailed(this.error);
 
   @override
   List<Object> get props => [error];
 
   @override
   String toString() => 'RequestPostAccountFailed { error: $error }';
+}
+
+class RequestSuccess extends StateAccount {
+  @override
+  String toString() => 'RequestSuccess';
 }
 
 class RequestLoadingAccount extends StateAccount {
@@ -108,7 +105,7 @@ class ShowDialog extends StateAccount {
   const ShowDialog(this.showDialog);
 
   @override
-  List<Object> get props => [showDialog];
+  List<Object> get props => [showDialog, Random().nextInt(5000)];
 
   @override
   String toString() => 'ShowDialog $showDialog';
@@ -160,4 +157,12 @@ class DisplayFilterDate extends StateAccount {
 
   @override
   List<Object> get props => ['DisplayFilterDate', text];
+}
+
+class DisplayUserList extends StateAccount {
+  final List<UserItemData> list;
+  const DisplayUserList(this.list);
+
+  @override
+  List<Object> get props => ['DisplayUserList', list];
 }

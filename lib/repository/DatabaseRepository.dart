@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
 
 import '../models/database/dbmodel.dart';
@@ -18,6 +19,40 @@ class DatabaseRepository {
     await UserAccount().select().id.greaterThan(0).delete();
     await KambasTransaction().select().id.greaterThan(0).delete();
     return true;
+  }
+
+  Future<bool> storeUserData(UserItemData data) async {
+    if (!isDbInitialized) return false;
+
+    await UserAccount.withFields(data.userId, data.name, data.password, DateTime.parse(data.createdAt), DateTime.parse(data.updatedAt), false).save();
+
+    ///(print results)
+    var dataStored = await UserAccount().select().toList();
+    dataStored.forEach((element) async {
+      if (kDebugMode) {
+        print("DATABASE ID : ${element.id!}\nresponse : \n${element.userId ?? ""}\n${element.username ?? ""}\n${element.password ?? ""}\n--------------\n");
+      }
+    });
+
+    return true;
+  }
+
+  Future<List<UserItemData>> getDBUsers() async {
+    if (!isDbInitialized) return [];
+
+    List<UserItemData> list = [];
+
+    var storedList = await UserAccount()
+        .select()
+        .and
+        .orderBy("id")
+        .toList();
+
+    for (var e in storedList) {
+      list.add(UserItemData(e.userId!, name: e.username!, password: e.password ?? "", createdAt: e.createdAt!.toString(), updatedAt: e.updatedAt!.toString()));
+    }
+
+    return list.reversed.toList();
   }
 
   Future<bool> storeTransactionData(DBTransactions data) async {

@@ -8,37 +8,21 @@ import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
 import 'package:kambas/widgets/buttons/button_raised.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
-import '../../../bloc/account/BlocAccount.dart';
-import '../../../bloc/account/EventAccount.dart';
-import '../../../bloc/account/StateAccount.dart';
-import '../../../constants/app_colors.dart';
-import '../../../constants/app_icons.dart';
-import '../../../providers/ProviderAccount.dart';
+import '../../../../bloc/account/BlocAccount.dart';
+import '../../../../bloc/account/EventAccount.dart';
+import '../../../../bloc/account/StateAccount.dart';
+import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_icons.dart';
+import '../../../../providers/ProviderAccount.dart';
 
-class ScreenAdmin extends StatelessWidget {
-  const ScreenAdmin({super.key});
+class ScreenExport extends StatelessWidget {
+  const ScreenExport({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.White,
-      appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            onPressed: () {
-            },
-            icon: const Icon(Icons.account_circle, size: 40.0, color: Colors.grey,),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-              },
-              icon: const Icon(Icons.settings, size: 40.0, color: Colors.grey,),
-            ),
-            const SizedBox(width: 8.0,),
-          ],
-          elevation: 0,
-      ),
+      appBar: null,
       body: BlocProvider(
         create: (_) => BlocAccount(
           providerAccount: RepositoryProvider.of<ProviderAccount>(context),
@@ -63,7 +47,6 @@ class MainLayout extends StatelessWidget
 
     Widget exportButton = ButtonRaised(
       onPressed: () {
-        //todo: export data
         context.read<BlocAccount>().add(RequestExportCSV());
       },
       text: AppStrings.export_data,
@@ -77,8 +60,10 @@ class MainLayout extends StatelessWidget
       margin: const EdgeInsets.only(top: 13),
     );
 
-    Widget backToHomeButton = ButtonRaised(
+
+    Widget backToHomeBtn = ButtonRaised(
       onPressed: () {
+        Navigator.of(context).popUntil(ModalRoute.withName(AppRoutes.of(context).mainScreen));
       },
       text: AppStrings.back_to_home,
       textStyle: const TextStyle(
@@ -91,53 +76,54 @@ class MainLayout extends StatelessWidget
       margin: const EdgeInsets.only(top: 13),
     );
 
-    Widget mainBody = SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 41.0, right: 41.0, top: 0.0, bottom: 20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  logo,
-                  const SizedBox(
-                    height: 20.0,
+    Widget mainBody = Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(
+                left: 41.0, right: 41.0, top: 20.0, bottom: 30.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                logo,
+                const SizedBox(
+                  height: 20.0,
+                ),
+                _buildTitle(context),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 26.0),
+                  child: Text(
+                    "Export Data Page",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 15.0,
+                        color: AppColors.TextColorBlack56,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1.4,
+                        fontFamily: AppStrings.FONT_POPPINS_REGULAR),
                   ),
-                  _buildTitle(context),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 26.0),
-                    child: Text(
-                      "Admin Page",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 14.0,
-                          color: AppColors.TextColorBlack56,
-                          fontWeight: FontWeight.normal,
-                          letterSpacing: 1.4,
-                          fontFamily: AppStrings.FONT_POPPINS_REGULAR),
-                    ),
+                ),
+                _buildDateTimePicker(context),
+                exportButton,
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.bottomCenter,
+                    child: backToHomeBtn,
                   ),
-                  _buildDateTimePicker(context),
-                  exportButton,
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Container(
-              alignment: Alignment.bottomCenter,
-              child: Image.asset(
-                AppIcons.APP_FOOTER,
-                fit: BoxFit.scaleDown,
-              ),
-            ),
-          )
-        ],
-      ),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          child: Image.asset(
+            AppIcons.APP_FOOTER,
+            fit: BoxFit.scaleDown,
+          ),
+        ),
+      ],
     );
 
     return BlocListener<BlocAccount, StateAccount>(
@@ -156,7 +142,7 @@ class MainLayout extends StatelessWidget
           //     });
         }
 
-        if (state is RequestPostAccountFailed) {
+        if (state is RequestFailed) {
           Navigator.of(context).pop();
           // showDialog(
           //     context: context,

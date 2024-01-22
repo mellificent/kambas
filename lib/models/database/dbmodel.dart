@@ -32,7 +32,9 @@ const tableUsers = SqfEntityTable(
     fields: [
       SqfEntityField('userId', DbType.integer),
       SqfEntityField('username', DbType.text),
-          SqfEntityField('password', DbType.text),
+      SqfEntityField('password', DbType.text),
+      SqfEntityField('createdAt', DbType.datetime),
+      SqfEntityField('updatedAt', DbType.datetime),
     ]);
 
 const tableTransaction = SqfEntityTable(

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
-import 'package:kambas/models/responses/ResponseUserDetails.dart';
 import 'package:kambas/repository/DatabaseRepository.dart';
 
 import '../constants/app_strings.dart';
@@ -25,41 +25,6 @@ class ProviderAccount extends BaseProvider {
     required this.databaseRepository,
   });
 
-  // Future<ResponseBundle<ResponseOAuth, ResponseErrorMessage>> postLogin(RequestOAuth request, [bool fromRegister = false]) async {
-  //   try {
-  //     final response = await remoteRepository.getOauthToken(request);
-  //     ResponseOAuth data = ResponseOAuth.fromJson(response.data);
-  //     if (response.statusCode == 200) {
-  //       await preferenceRepository.saveUserEmail(request.email ?? ""); //todo: move saving of user data in get user
-  //       await preferenceRepository.persistToken(data.accessToken, data.refreshToken ?? data.accessToken, fromRegister);
-  //       remoteRepository.setToken(data.accessToken);
-  //       return ResponseBundle.success(response: ResponseOAuth.fromJson(response.data));
-  //     } else {
-  //       return ResponseBundle.failed(error: ResponseErrorMessage(errorMsg: AppStrings.error_general_throwable_msg));
-  //     }
-  //   } catch (e) {
-  //     return ResponseBundle.failed(
-  //       error: ResponseErrorMessage(
-  //         errorMsg: getErrorMessage(
-  //           e,
-  //           httpErrorHandlers: <HttpErrorHandler>[
-  //             HttpErrorHandler.message(
-  //                 400, AppStrings.error_login_invalidfields_msg),
-  //             HttpErrorHandler.message(
-  //                 401, AppStrings.error_login_incorrectfields_msg),
-  //             HttpErrorHandler.message(
-  //                 404, AppStrings.error_login_usernotfound_msg),
-  //             HttpErrorHandler.message(
-  //                 422, AppStrings.error_login_incorrectfields_msg),
-  //             HttpErrorHandler.message(
-  //                 500, AppStrings.error_general_throwable_msg),
-  //           ],
-  //         ),
-  //       ),
-  //     );
-  //   }
-  // }
-
   Future<bool> initDatabase() async {
     return await databaseRepository.initDatabase();
   }
@@ -76,24 +41,14 @@ class ProviderAccount extends BaseProvider {
     return await databaseRepository.getFilteredTransactions(selectedDatetime);
   }
 
-  Future<ResponseUserDetails?> getLocalUserData() async {
-    // await preferenceRepository.saveUserdetails(response.data);
-    try {
-      String userDataString = await preferenceRepository.getUserdetails();
-      Map<String, dynamic> data = jsonDecode(userDataString);
-      return ResponseUserDetails.fromJson(data);
-    } catch (e) {
-      return null;
-    }
+  Future<bool> storeNewUser(UserItemData data) async {
+    return await databaseRepository.storeUserData(data);
   }
 
-  Future<bool> getLocalOnboardingStatus() async {
-    try {
-      return await preferenceRepository.getUserOnboardStatus();
-    } catch (e) {
-      return false;
-    }
+  Future<List<UserItemData>> getStoredDBUsers() async {
+    return await databaseRepository.getDBUsers();
   }
+
 
   Future<bool> getLocalNewLaunchStatus() async {
     try {

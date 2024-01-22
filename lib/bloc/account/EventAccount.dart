@@ -134,3 +134,26 @@ class RequestSelectedFilterDate extends EventAccount {
   List<Object> get props => ['RequestSelectedFilterDate', selectedDatetime];
 }
 
+class GetDbUserList extends EventAccount {
+  @override
+  List<Object> get props => ["GetDbUserList", Random().nextInt(5000)];
+}
+
+class RequestAddUser extends EventAccount {
+  final String username;
+  final String password;
+
+  const RequestAddUser({required this.username, required this.password,});
+
+  @override
+  List<Object> get props => ['RequestAddUser', username, password];
+}
+
+class RequestDialog extends EventAccount {
+
+  RequestDialog();
+
+  @override
+  List<Object> get props => ["RequestDialog", Random().nextInt(5000)];
+}
+
