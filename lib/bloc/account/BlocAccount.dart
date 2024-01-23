@@ -136,9 +136,13 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       emit(const RequestLoadingAccount("logging in"));
 
       final storedList = await providerAccount.getStoredDBUsers();
-      final list = storedList.where((element) => (element.name == event.username && element.password == event.password)).toList();
+      final list = storedList
+          .where((element) => (element.userName == event.username &&
+              element.password == event.password))
+          .toList();
 
-      if(list.isNotEmpty || (event.username == "admin" && event.password == "kambas123")){
+      if (list.isNotEmpty ||
+          (event.username == "admin" && event.password == "kambas123")) {
         emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
       } else {
         emit(const RequestFailed(AppStrings.error_login_invalidfields_msg));
@@ -234,10 +238,21 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapRequestAddUser(
       RequestAddUser event, Emitter<StateAccount> emit) async {
+    if (event.userName.isEmpty ||
+        event.fullName.isEmpty ||
+        event.email.isEmpty ||
+        event.contactNo.isEmpty ||
+        event.password.isEmpty) {
+      emit(RequestFailed(AppStrings.error_register_inputfields_msg));
+      return;
+    }
     final currentDate = DateTime.now().toString();
     final isStored = await providerAccount.storeNewUser(UserItemData(
         Random().nextInt(1000),
-        name: event.username,
+        userName: event.userName,
+        fullName: event.fullName,
+        email: event.email,
+        contactNo: event.contactNo,
         password: event.password,
         createdAt: currentDate,
         updatedAt: currentDate));

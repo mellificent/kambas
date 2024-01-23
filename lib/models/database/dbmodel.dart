@@ -24,14 +24,13 @@ const tableUsers = SqfEntityTable(
     primaryKeyName: 'id',
     primaryKeyType: PrimaryKeyType.integer_auto_incremental,
     useSoftDeleting: true,
-
-    ///hindi completely nadedelete magstostore sya sa isDeleted table
     modelName: null,
-
-    ///modelName is null then EntityBase uses table name instead of modelName
     fields: [
       SqfEntityField('userId', DbType.integer),
-      SqfEntityField('username', DbType.text),
+      SqfEntityField('userName', DbType.text),
+      SqfEntityField('fullName', DbType.text),
+      SqfEntityField('email', DbType.text),
+      SqfEntityField('contactNo', DbType.text),
       SqfEntityField('password', DbType.text),
       SqfEntityField('createdAt', DbType.datetime),
       SqfEntityField('updatedAt', DbType.datetime),

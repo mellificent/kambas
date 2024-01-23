@@ -25,10 +25,9 @@ class ScreenUserManagement extends StatelessWidget {
       backgroundColor: AppColors.White,
       appBar: null,
       body: BlocProvider(
-        create: (_) =>
-            BlocAccount(
-              providerAccount: RepositoryProvider.of<ProviderAccount>(context),
-            ),
+        create: (_) => BlocAccount(
+          providerAccount: RepositoryProvider.of<ProviderAccount>(context),
+        ),
         child: MainLayout(),
       ),
     );
@@ -49,7 +48,10 @@ class MainLayout extends StatelessWidget
 
     Widget addUserBtn = ButtonRaised(
       onPressed: () {
-        context.read<BlocAccount>().add(RequestDialog());
+        Navigator.pushNamed(
+          context,
+          AppRoutes.of(context).createUserScreen,
+        ).then((value) => context.read<BlocAccount>().add(GetDbUserList()));
       },
       text: AppStrings.add_user,
       textStyle: const TextStyle(
@@ -65,9 +67,7 @@ class MainLayout extends StatelessWidget
     Widget backToHomeBtn = ButtonRaised(
       onPressed: () {
         Navigator.of(context)
-            .popUntil(ModalRoute.withName(AppRoutes
-            .of(context)
-            .mainScreen));
+            .popUntil(ModalRoute.withName(AppRoutes.of(context).mainScreen));
       },
       text: AppStrings.back_to_home,
       textStyle: const TextStyle(
@@ -80,7 +80,7 @@ class MainLayout extends StatelessWidget
       margin: const EdgeInsets.only(top: 13),
     );
 
-    Widget mainBody = Column(
+    return Column(
       children: [
         Expanded(
           child: Padding(
@@ -126,35 +126,9 @@ class MainLayout extends StatelessWidget
         ),
       ],
     );
-
-    return BlocListener<BlocAccount, StateAccount>(
-      listener: (mContext, state) {
-        if (state is RequestSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Successfully Added User"),
-          ));
-          Navigator.of(mContext).pop();
-        }
-
-        if (state is RequestFailed) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(state.error),
-          ));
-          Navigator.of(mContext).pop();
-        }
-
-        if (state is ShowDialog) {
-          showDialog(
-              context: context,
-              builder: (_) => showAddUser(context));
-        }
-      },
-      child: mainBody,
-    );
   }
 
-  _buildTitle(BuildContext context) =>
-      buildWidget(
+  _buildTitle(BuildContext context) => buildWidget(
         context,
         id: "mainTitle",
         buildWhen: (id, previous, current) => (current is DisplayCurrentDate),
@@ -176,154 +150,32 @@ class MainLayout extends StatelessWidget
         },
       );
 
-  _buildUserList(BuildContext context) =>
-      buildWidget(
+  _buildUserList(BuildContext context) => buildWidget(
         context,
         id: "userList",
-        buildWhen: (id, previous, current) => (current is DisplayUserList || current is RequestSuccess),
+        buildWhen: (id, previous, current) => (current is DisplayUserList),
         builder: (context, state) {
-          if (state is InitStateAccount || state is RequestSuccess) {
+          if (state is InitStateAccount) {
             context.read<BlocAccount>().add(GetDbUserList());
           }
 
           return (state is DisplayUserList && state.list.isNotEmpty)
-              ? //todo: editable
-          ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 14.0),
-            itemCount: state.list.length,
-            itemBuilder: (mCtxt, index) {
-              return ButtonStyle1(
-                backgroundColor: AppColors.PrimaryColor.withOpacity(0.5),
-                onPressed: () {
-                  //todo: update user
-                },
-                text: state.list[index].name,
-                margin: const EdgeInsets.only(top: 8),
-                // icon: Icons.mode_edit_outline_outlined,
-              );
-            },
-          )
+              ? ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 14.0),
+                  itemCount: state.list.length,
+                  itemBuilder: (mCtxt, index) {
+                    return ButtonStyle1(
+                      backgroundColor: AppColors.PrimaryColor.withOpacity(0.5),
+                      onPressed: () {
+                        //todo: update user
+                      },
+                      text: state.list[index].fullName,
+                      margin: const EdgeInsets.only(top: 8),
+                      // icon: Icons.mode_edit_outline_outlined,
+                    );
+                  },
+                )
               : Container();
         },
       );
-
-  showAddUser(BuildContext context) {
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController pwController = TextEditingController();
-
-    const borderStyle = OutlineInputBorder(
-      borderSide: BorderSide(color: AppColors.PrimaryColor,),
-      borderRadius: BorderRadius.all(
-        Radius.circular(8),
-      ),
-    );
-
-    return AlertDialog(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(
-            8.0,
-          ),
-        ),
-      ),
-      contentPadding: const EdgeInsets.only(
-        top: 16.0,
-      ),
-      title: const Text(
-        "Add New User",
-        style: TextStyle(fontSize: 21.0),
-      ),
-      content: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextField(
-                onTapOutside: (event) {
-                  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-                  FocusManager.instance.primaryFocus?.unfocus();
-                },
-                controller: usernameController,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  floatingLabelStyle: TextStyle(
-                      fontSize: 14.0,
-                      color: AppColors.PrimaryColor,
-                      fontFamily: AppStrings.FONT_POPPINS_BOLD),
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter Username',
-                  labelText: 'Username',
-                  contentPadding: EdgeInsets.only(
-                    left: 14,
-                    top: 16.0,
-                  ),
-                  enabledBorder: borderStyle,
-                  focusedBorder: borderStyle,
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0, vertical: 12.0),
-              child: TextField(
-                onTapOutside: (event) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-                },
-                controller: pwController,
-                obscureText: true,
-                textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter Password',
-                    floatingLabelStyle: TextStyle(
-                        fontSize: 14.0,
-                        color: AppColors.PrimaryColor,
-                        fontFamily: AppStrings.FONT_POPPINS_BOLD),
-                    contentPadding: EdgeInsets.only(
-                      left: 14,
-                      top: 16.0,
-                    ),
-                    enabledBorder: borderStyle,
-                    focusedBorder: borderStyle,
-                    labelText: 'Password'),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 60,
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (usernameController.text.isNotEmpty &&
-                      pwController.text.isNotEmpty) {
-                    context.read<BlocAccount>().add(RequestAddUser(
-                        username: usernameController.text,
-                        password: pwController.text
-                    ));
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.PrimaryColor,
-                  textStyle: const TextStyle(
-                      fontSize: 14.0,
-                      color: AppColors.TextColorBlack56,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: AppStrings.FONT_POPPINS_BOLD),
-                  // fixedSize: Size(250, 50),
-                ),
-                child: const Text(
-                  "Done",
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

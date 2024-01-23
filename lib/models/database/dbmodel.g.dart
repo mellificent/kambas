@@ -34,7 +34,10 @@ class TableUserAccount extends SqfEntityTableBase {
     // declare fields
     fields = [
       SqfEntityFieldBase('userId', DbType.integer),
-      SqfEntityFieldBase('username', DbType.text),
+      SqfEntityFieldBase('userName', DbType.text),
+      SqfEntityFieldBase('fullName', DbType.text),
+      SqfEntityFieldBase('email', DbType.text),
+      SqfEntityFieldBase('contactNo', DbType.text),
       SqfEntityFieldBase('password', DbType.text),
       SqfEntityFieldBase('createdAt', DbType.datetime,
           minValue: DateTime.parse('1900-01-01')),
@@ -131,7 +134,10 @@ class UserAccount extends TableBase {
   UserAccount(
       {this.id,
       this.userId,
-      this.username,
+      this.userName,
+      this.fullName,
+      this.email,
+      this.contactNo,
       this.password,
       this.createdAt,
       this.updatedAt,
@@ -139,12 +145,29 @@ class UserAccount extends TableBase {
     _setDefaultValues();
     softDeleteActivated = true;
   }
-  UserAccount.withFields(this.userId, this.username, this.password,
-      this.createdAt, this.updatedAt, this.isDeleted) {
+  UserAccount.withFields(
+      this.userId,
+      this.userName,
+      this.fullName,
+      this.email,
+      this.contactNo,
+      this.password,
+      this.createdAt,
+      this.updatedAt,
+      this.isDeleted) {
     _setDefaultValues();
   }
-  UserAccount.withId(this.id, this.userId, this.username, this.password,
-      this.createdAt, this.updatedAt, this.isDeleted) {
+  UserAccount.withId(
+      this.id,
+      this.userId,
+      this.userName,
+      this.fullName,
+      this.email,
+      this.contactNo,
+      this.password,
+      this.createdAt,
+      this.updatedAt,
+      this.isDeleted) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -156,8 +179,17 @@ class UserAccount extends TableBase {
     if (o['userId'] != null) {
       userId = int.tryParse(o['userId'].toString());
     }
-    if (o['username'] != null) {
-      username = o['username'].toString();
+    if (o['userName'] != null) {
+      userName = o['userName'].toString();
+    }
+    if (o['fullName'] != null) {
+      fullName = o['fullName'].toString();
+    }
+    if (o['email'] != null) {
+      email = o['email'].toString();
+    }
+    if (o['contactNo'] != null) {
+      contactNo = o['contactNo'].toString();
     }
     if (o['password'] != null) {
       password = o['password'].toString();
@@ -181,7 +213,10 @@ class UserAccount extends TableBase {
   // FIELDS (UserAccount)
   int? id;
   int? userId;
-  String? username;
+  String? userName;
+  String? fullName;
+  String? email;
+  String? contactNo;
   String? password;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -205,8 +240,17 @@ class UserAccount extends TableBase {
     if (userId != null || !forView) {
       map['userId'] = userId;
     }
-    if (username != null || !forView) {
-      map['username'] = username;
+    if (userName != null || !forView) {
+      map['userName'] = userName;
+    }
+    if (fullName != null || !forView) {
+      map['fullName'] = fullName;
+    }
+    if (email != null || !forView) {
+      map['email'] = email;
+    }
+    if (contactNo != null || !forView) {
+      map['contactNo'] = contactNo;
     }
     if (password != null || !forView) {
       map['password'] = password;
@@ -246,8 +290,17 @@ class UserAccount extends TableBase {
     if (userId != null || !forView) {
       map['userId'] = userId;
     }
-    if (username != null || !forView) {
-      map['username'] = username;
+    if (userName != null || !forView) {
+      map['userName'] = userName;
+    }
+    if (fullName != null || !forView) {
+      map['fullName'] = fullName;
+    }
+    if (email != null || !forView) {
+      map['email'] = email;
+    }
+    if (contactNo != null || !forView) {
+      map['contactNo'] = contactNo;
     }
     if (password != null || !forView) {
       map['password'] = password;
@@ -293,7 +346,10 @@ class UserAccount extends TableBase {
   List<dynamic> toArgs() {
     return [
       userId,
-      username,
+      userName,
+      fullName,
+      email,
+      contactNo,
       password,
       createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
       updatedAt != null ? updatedAt!.millisecondsSinceEpoch : null,
@@ -306,7 +362,10 @@ class UserAccount extends TableBase {
     return [
       id,
       userId,
-      username,
+      userName,
+      fullName,
+      email,
+      contactNo,
       password,
       createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
       updatedAt != null ? updatedAt!.millisecondsSinceEpoch : null,
@@ -460,11 +519,14 @@ class UserAccount extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnUserAccount.rawInsert(
-          'INSERT OR REPLACE INTO userAccounts (id, userId, username, password, createdAt, updatedAt,isDeleted)  VALUES (?,?,?,?,?,?,?)',
+          'INSERT OR REPLACE INTO userAccounts (id, userId, userName, fullName, email, contactNo, password, createdAt, updatedAt,isDeleted)  VALUES (?,?,?,?,?,?,?,?,?,?)',
           [
             id,
             userId,
-            username,
+            userName,
+            fullName,
+            email,
+            contactNo,
             password,
             createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
             updatedAt != null ? updatedAt!.millisecondsSinceEpoch : null,
@@ -495,7 +557,7 @@ class UserAccount extends TableBase {
   Future<BoolCommitResult> upsertAll(List<UserAccount> useraccounts,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnUserAccount.rawInsertAll(
-        'INSERT OR REPLACE INTO userAccounts (id, userId, username, password, createdAt, updatedAt,isDeleted)  VALUES (?,?,?,?,?,?,?)',
+        'INSERT OR REPLACE INTO userAccounts (id, userId, userName, fullName, email, contactNo, password, createdAt, updatedAt,isDeleted)  VALUES (?,?,?,?,?,?,?,?,?,?)',
         useraccounts,
         exclusive: exclusive,
         noResult: noResult,
@@ -768,9 +830,24 @@ class UserAccountFilterBuilder extends ConjunctionBase {
     return _userId = _setField(_userId, 'userId', DbType.integer);
   }
 
-  UserAccountField? _username;
-  UserAccountField get username {
-    return _username = _setField(_username, 'username', DbType.text);
+  UserAccountField? _userName;
+  UserAccountField get userName {
+    return _userName = _setField(_userName, 'userName', DbType.text);
+  }
+
+  UserAccountField? _fullName;
+  UserAccountField get fullName {
+    return _fullName = _setField(_fullName, 'fullName', DbType.text);
+  }
+
+  UserAccountField? _email;
+  UserAccountField get email {
+    return _email = _setField(_email, 'email', DbType.text);
+  }
+
+  UserAccountField? _contactNo;
+  UserAccountField get contactNo {
+    return _contactNo = _setField(_contactNo, 'contactNo', DbType.text);
   }
 
   UserAccountField? _password;
@@ -1033,10 +1110,28 @@ class UserAccountFields {
         _fUserId ?? SqlSyntax.setField(_fUserId, 'userId', DbType.integer);
   }
 
-  static TableField? _fUsername;
-  static TableField get username {
-    return _fUsername =
-        _fUsername ?? SqlSyntax.setField(_fUsername, 'username', DbType.text);
+  static TableField? _fUserName;
+  static TableField get userName {
+    return _fUserName =
+        _fUserName ?? SqlSyntax.setField(_fUserName, 'userName', DbType.text);
+  }
+
+  static TableField? _fFullName;
+  static TableField get fullName {
+    return _fFullName =
+        _fFullName ?? SqlSyntax.setField(_fFullName, 'fullName', DbType.text);
+  }
+
+  static TableField? _fEmail;
+  static TableField get email {
+    return _fEmail =
+        _fEmail ?? SqlSyntax.setField(_fEmail, 'email', DbType.text);
+  }
+
+  static TableField? _fContactNo;
+  static TableField get contactNo {
+    return _fContactNo = _fContactNo ??
+        SqlSyntax.setField(_fContactNo, 'contactNo', DbType.text);
   }
 
   static TableField? _fPassword;

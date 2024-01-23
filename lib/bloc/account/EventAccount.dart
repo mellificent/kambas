@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 abstract class EventAccount extends Equatable {
   const EventAccount();
+
   @override
   List<Object> get props => [];
 }
@@ -29,7 +30,8 @@ class FormFieldValueOnChange extends EventAccount {
   final String fieldName;
   final bool obscure;
 
-  const FormFieldValueOnChange(this.fieldName, this.value, {this.obscure = false});
+  const FormFieldValueOnChange(this.fieldName, this.value,
+      {this.obscure = false});
 
   @override
   List<Object> get props => [fieldName, value, obscure];
@@ -40,12 +42,15 @@ class PostLoginCredentials extends EventAccount {
   final String password;
 
   const PostLoginCredentials(
-      this.username,
-      this.password,
-      );
+    this.username,
+    this.password,
+  );
 
   @override
-  List<Object> get props => [username, password,];
+  List<Object> get props => [
+        username,
+        password,
+      ];
 }
 
 class PostRegistration extends EventAccount {
@@ -78,7 +83,8 @@ class PostBetNumber extends EventAccount {
   PostBetNumber(this.selectedNumber);
 
   @override
-  List<Object> get props => ['PostBetNumber', Random().nextInt(5000), selectedNumber];
+  List<Object> get props =>
+      ['PostBetNumber', Random().nextInt(5000), selectedNumber];
 }
 
 class PostBetPage extends EventAccount {
@@ -94,7 +100,10 @@ class RequestPostBetAmount extends EventAccount {
   const RequestPostBetAmount();
 
   @override
-  List<Object> get props => ['RequestPostBetAmount', Random().nextInt(5000),];
+  List<Object> get props => [
+        'RequestPostBetAmount',
+        Random().nextInt(5000),
+      ];
 }
 
 class RequestUpdateBetAmount extends EventAccount {
@@ -140,20 +149,27 @@ class GetDbUserList extends EventAccount {
 }
 
 class RequestAddUser extends EventAccount {
-  final String username;
+  final String userName;
+  final String fullName;
+  final String email;
+  final String contactNo;
   final String password;
 
-  const RequestAddUser({required this.username, required this.password,});
+  const RequestAddUser({
+    required this.userName,
+    required this.fullName,
+    required this.email,
+    required this.contactNo,
+    required this.password,
+  });
 
   @override
-  List<Object> get props => ['RequestAddUser', username, password];
+  List<Object> get props => [userName, fullName, email, contactNo, password];
 }
 
 class RequestDialog extends EventAccount {
-
   RequestDialog();
 
   @override
   List<Object> get props => ["RequestDialog", Random().nextInt(5000)];
 }
-

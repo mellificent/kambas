@@ -24,13 +24,13 @@ class DatabaseRepository {
   Future<bool> storeUserData(UserItemData data) async {
     if (!isDbInitialized) return false;
 
-    await UserAccount.withFields(data.userId, data.name, data.password, DateTime.parse(data.createdAt), DateTime.parse(data.updatedAt), false).save();
+    await UserAccount.withFields(data.userId, data.userName, data.fullName, data.email, data.contactNo, data.password, DateTime.parse(data.createdAt), DateTime.parse(data.updatedAt), false).save();
 
     ///(print results)
     var dataStored = await UserAccount().select().toList();
     dataStored.forEach((element) async {
       if (kDebugMode) {
-        print("DATABASE ID : ${element.id!}\nresponse : \n${element.userId ?? ""}\n${element.username ?? ""}\n${element.password ?? ""}\n--------------\n");
+        print("DATABASE ID : ${element.id!}\nresponse : \n${element.userId ?? ""}\n${element.userName ?? ""}\n${element.password ?? ""}\n--------------\n");
       }
     });
 
@@ -49,7 +49,7 @@ class DatabaseRepository {
         .toList();
 
     for (var e in storedList) {
-      list.add(UserItemData(e.userId!, name: e.username!, password: e.password ?? "", createdAt: e.createdAt!.toString(), updatedAt: e.updatedAt!.toString()));
+      list.add(UserItemData(e.userId!, userName: e.userName!, fullName: e.fullName!,  email: e.email!, contactNo: e.contactNo!, password: e.password ?? "", createdAt: e.createdAt!.toString(), updatedAt: e.updatedAt!.toString()));
     }
 
     return list.reversed.toList();

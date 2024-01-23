@@ -83,7 +83,7 @@ class RequestFailed extends StateAccount {
   const RequestFailed(this.error);
 
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [error, Random().nextInt(5000)];
 
   @override
   String toString() => 'RequestPostAccountFailed { error: $error }';
