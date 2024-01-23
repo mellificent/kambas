@@ -53,6 +53,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestSelectedFilterDate>(_mapRequestSelectedFilterDate);
     on<GetDbUserList>(_mapRequestDbUserList);
     on<RequestAddUser>(_mapRequestAddUser);
+    on<RequestUpdateUser>(_mapRequestUpdateUser);
+    on<RequestDeleteUser>(_mapRequestDeleteUser);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -81,21 +83,16 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapUserDetails(
       GetUserDetails event, Emitter<StateAccount> emit) async {
-    // try {
-    //   var response = await providerAccount.getUser();
-    //   if (response.error == null) {
-    //     UserData data = response.response!.data!;
-    //     var isAppNewLaunch = await providerAccount.getLocalNewLaunchStatus();
-    //     await providerAccount.setNewLaunchStatus();
-    //     emit(RequestGetUserSuccess(userData: data, isAppNewLaunch: isAppNewLaunch));
-    //   } else {
-    //     if(response.error!.relogin ?? false) providerAccount.logout();
-    //     emit(RequestAccountFailed(response.error!.errorMsg, response.error!.relogin ?? false));
-    //   }
-    // } catch (e) {
-    //   providerAccount.logout();
-    //   emit(RequestAccountFailed(e.toString(), true));
-    // }
+    try {
+      var response = await providerAccount.getStoredDBUserData(event.userID);
+      if (response != null) {
+        emit(RequestGetUserSuccess(response));
+      } else {
+        emit(const RequestFailed(AppStrings.error_general_throwable_msg));
+      }
+    } catch (e) {
+      emit(RequestFailed(e.toString()));
+    }
   }
 
   Future<void> _mapFormFieldValueOnChangeState(
@@ -136,8 +133,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       emit(const RequestLoadingAccount("logging in"));
 
       final storedList = await providerAccount.getStoredDBUsers();
-      final list = storedList
-          .where((element) => (element.userName == event.username &&
+      final list = storedList.where((element) => (element.userName == event.username &&
               element.password == event.password))
           .toList();
 
@@ -259,6 +255,43 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
     emit(
         isStored ? RequestSuccess() : const RequestFailed("error adding user"));
+  }
+
+  Future<void> _mapRequestUpdateUser(
+      RequestUpdateUser event, Emitter<StateAccount> emit) async {
+    if (event.userID == -1){
+      emit(const RequestFailed(AppStrings.error_general_throwable_msg));
+      return;
+    }
+    if (event.userName.isEmpty ||
+        event.fullName.isEmpty ||
+        event.email.isEmpty ||
+        event.contactNo.isEmpty) {
+      emit(const RequestFailed(AppStrings.error_register_inputfields_msg));
+      return;
+    }
+
+    final isUpdated = await providerAccount.updateUser(
+        user_id: event.userID,
+        username: event.userName,
+        fullName: event.fullName,
+        email: event.email,
+        contactNo: event.contactNo,
+        updatedDate: DateTime.now());
+
+    emit(isUpdated ? RequestSuccess() : const RequestFailed("error updating user"));
+  }
+
+  Future<void> _mapRequestDeleteUser(
+      RequestDeleteUser event, Emitter<StateAccount> emit) async {
+    if (event.userID == -1){
+      emit(const RequestFailed(AppStrings.error_general_throwable_msg));
+      return;
+    }
+
+    final isDeleted = await providerAccount.deleteDBUserData(event.userID,);
+
+    emit(isDeleted ? RequestSuccess() : const RequestFailed("error deleting user"));
   }
 
   Future<void> _mapRequestExportCSV(

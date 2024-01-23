@@ -37,6 +37,56 @@ class DatabaseRepository {
     return true;
   }
 
+  Future<bool> updateUserData(UserItemData data) async {
+    if (!isDbInitialized) return false;
+
+    var storedData = await UserAccount()
+        .select()
+        .userId
+        .equals(data.userId)
+        .update({
+      'userName': data.userName,
+      'fullName': data.fullName,
+      'email': data.email,
+      'contactNo': data.contactNo,
+    });
+
+    return storedData.success;
+  }
+
+  Future<UserItemData?> getUserDetails(int user_id) async {
+    if (!isDbInitialized) return null;
+
+    var storedData = await UserAccount()
+        .select()
+        .userId
+        .equals(user_id)
+        .toSingle();
+
+    final userData = UserItemData(
+        storedData?.userId ?? user_id,
+        userName: storedData?.userName ?? "",
+        fullName: storedData?.fullName ?? "",
+        email: storedData?.email ?? "",
+        contactNo: storedData?.contactNo ?? "",
+        password: storedData?.password ?? "",
+        createdAt: storedData?.createdAt.toString() ?? "",
+        updatedAt: storedData?.updatedAt.toString() ?? "",
+    );
+
+    return userData;
+  }
+
+  Future<bool> deleteDBUser(int user_id) async {
+  final isDeleted = await UserAccount()
+      .select()
+      .userId
+      .equals(user_id)
+      .delete();
+
+  return isDeleted.success;
+  }
+
   Future<List<UserItemData>> getDBUsers() async {
     if (!isDbInitialized) return [];
 

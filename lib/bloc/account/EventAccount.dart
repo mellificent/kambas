@@ -15,14 +15,18 @@ class InitEvent extends EventAccount {
   List<Object> get props => [];
 }
 
-class RequestCurrentDate extends EventAccount {
+class GetUserDetails extends EventAccount {
+  final int userID;
+
+  const GetUserDetails(this.userID,);
+
   @override
-  List<Object> get props => ["RequestCurrentDate", Random().nextInt(5000)];
+  List<Object> get props => ["GetUserDetails", userID, Random().nextInt(5000)];
 }
 
-class GetUserDetails extends EventAccount {
+class GetDbUserList extends EventAccount {
   @override
-  List<Object> get props => ["GetUserDetails", Random().nextInt(5000)];
+  List<Object> get props => ["GetDbUserList", Random().nextInt(5000)];
 }
 
 class FormFieldValueOnChange extends EventAccount {
@@ -36,6 +40,17 @@ class FormFieldValueOnChange extends EventAccount {
   @override
   List<Object> get props => [fieldName, value, obscure];
 }
+
+class FormFieldChangeObscurity extends EventAccount {
+  final String fieldName;
+
+  const FormFieldChangeObscurity(this.fieldName);
+
+  @override
+  List<Object> get props => [fieldName];
+}
+
+
 
 class PostLoginCredentials extends EventAccount {
   final String username;
@@ -58,23 +73,9 @@ class PostRegistration extends EventAccount {
   List<Object> get props => ['PostRegistration'];
 }
 
-class FormFieldChangeObscurity extends EventAccount {
-  final String fieldName;
-
-  const FormFieldChangeObscurity(this.fieldName);
-
-  @override
-  List<Object> get props => [fieldName];
-}
-
 class PostLogoutUser extends EventAccount {
   @override
   List<Object> get props => ['PostLogoutUser'];
-}
-
-class RequestReprintTicket extends EventAccount {
-  @override
-  List<Object> get props => ['RequestReprintTicket'];
 }
 
 class PostBetNumber extends EventAccount {
@@ -94,6 +95,18 @@ class PostBetPage extends EventAccount {
 
   @override
   List<Object> get props => ['PostBetPage', isInitialPage];
+}
+
+
+
+class RequestCurrentDate extends EventAccount {
+  @override
+  List<Object> get props => ["RequestCurrentDate", Random().nextInt(5000)];
+}
+
+class RequestReprintTicket extends EventAccount {
+  @override
+  List<Object> get props => ['RequestReprintTicket'];
 }
 
 class RequestPostBetAmount extends EventAccount {
@@ -143,11 +156,6 @@ class RequestSelectedFilterDate extends EventAccount {
   List<Object> get props => ['RequestSelectedFilterDate', selectedDatetime];
 }
 
-class GetDbUserList extends EventAccount {
-  @override
-  List<Object> get props => ["GetDbUserList", Random().nextInt(5000)];
-}
-
 class RequestAddUser extends EventAccount {
   final String userName;
   final String fullName;
@@ -165,6 +173,36 @@ class RequestAddUser extends EventAccount {
 
   @override
   List<Object> get props => [userName, fullName, email, contactNo, password];
+}
+
+class RequestUpdateUser extends EventAccount {
+  final int userID;
+  final String userName;
+  final String fullName;
+  final String email;
+  final String contactNo;
+
+  const RequestUpdateUser({
+    required this.userID,
+    required this.userName,
+    required this.fullName,
+    required this.email,
+    required this.contactNo,
+  });
+
+  @override
+  List<Object> get props => [userID, userName, fullName, email, contactNo,];
+}
+
+class RequestDeleteUser extends EventAccount {
+  final int userID;
+
+  const RequestDeleteUser({
+    required this.userID,
+  });
+
+  @override
+  List<Object> get props => [userID,];
 }
 
 class RequestDialog extends EventAccount {

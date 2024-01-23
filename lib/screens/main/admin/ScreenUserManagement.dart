@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_routes.dart';
 import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
+import 'package:kambas/screens/main/admin/ScreenUpdateUser.dart';
 import 'package:kambas/widgets/buttons/button_raised.dart';
 import 'package:kambas/widgets/buttons/button_style1.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
@@ -167,11 +168,16 @@ class MainLayout extends StatelessWidget
                     return ButtonStyle1(
                       backgroundColor: AppColors.PrimaryColor.withOpacity(0.5),
                       onPressed: () {
-                        //todo: update user
+                        Navigator.pushNamed(
+                                context, AppRoutes.of(context).updateUserScreen,
+                                arguments: ScreenUpdateUserSettings(userID: state.list[index].userId))
+                            .then((value) => context
+                                .read<BlocAccount>()
+                                .add(GetDbUserList()));
                       },
                       text: state.list[index].fullName,
                       margin: const EdgeInsets.only(top: 8),
-                      // icon: Icons.mode_edit_outline_outlined,
+                      icon: Icons.mode_edit_outline_outlined,
                     );
                   },
                 )

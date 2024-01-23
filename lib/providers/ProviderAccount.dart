@@ -37,7 +37,8 @@ class ProviderAccount extends BaseProvider {
     return await databaseRepository.getStoredTransactions();
   }
 
-  Future<List<DBTransactions>> getFilteredDBTransactions(DateTime selectedDatetime) async {
+  Future<List<DBTransactions>> getFilteredDBTransactions(
+      DateTime selectedDatetime) async {
     return await databaseRepository.getFilteredTransactions(selectedDatetime);
   }
 
@@ -45,10 +46,35 @@ class ProviderAccount extends BaseProvider {
     return await databaseRepository.storeUserData(data);
   }
 
+  Future<bool> updateUser({
+    required int user_id,
+    required String username,
+    required String fullName,
+    required String email,
+    required String contactNo,
+    required DateTime updatedDate,
+  }) async {
+    return await databaseRepository.updateUserData(UserItemData(
+        user_id,
+        userName: username,
+        fullName: fullName,
+        email: email,
+        contactNo: contactNo,
+        createdAt: updatedDate.toString(),
+        updatedAt: updatedDate.toString()));
+  }
+
+  Future<bool> deleteDBUserData(int user_id) async {
+    return await databaseRepository.deleteDBUser(user_id);
+  }
+
+  Future<UserItemData?> getStoredDBUserData(int user_id) async {
+    return await databaseRepository.getUserDetails(user_id);
+  }
+
   Future<List<UserItemData>> getStoredDBUsers() async {
     return await databaseRepository.getDBUsers();
   }
-
 
   Future<bool> getLocalNewLaunchStatus() async {
     try {

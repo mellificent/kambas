@@ -8,6 +8,7 @@ import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
 import 'package:kambas/widgets/buttons/button_raised.dart';
 import 'package:kambas/widgets/buttons/button_style1.dart';
+import 'package:kambas/widgets/layout/LayoutLoading.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import '../../../../bloc/account/BlocAccount.dart';
 import '../../../../bloc/account/EventAccount.dart';
@@ -16,8 +17,8 @@ import '../../../../constants/app_colors.dart';
 import '../../../../constants/app_icons.dart';
 import '../../../../providers/ProviderAccount.dart';
 
-class ScreenCreateUser extends StatelessWidget {
-  const ScreenCreateUser({super.key});
+class ScreenUpdateUser extends StatelessWidget {
+  const ScreenUpdateUser({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,7 @@ class MainLayout extends StatelessWidget
   final TextEditingController fullnameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController contactnumberController = TextEditingController();
-  final TextEditingController pwController = TextEditingController();
+  // final TextEditingController pwController = TextEditingController();
 
   final borderStyle = OutlineInputBorder(
     borderSide: BorderSide(
@@ -56,6 +57,36 @@ class MainLayout extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+    ScreenUpdateUserSettings args = ScreenUpdateUserSettings();
+    var settings = ModalRoute.of(context)?.settings.arguments;
+    if (settings != null) args = settings as ScreenUpdateUserSettings;
+
+    Widget initLayout() {
+      context.read<BlocAccount>().add(GetUserDetails(args.userID!));
+      return const LayoutLoading(progressColor: AppColors.PrimaryColor,);
+    }
+
+    Widget submitBtn = ButtonRaised(
+      onPressed: () {
+        context.read<BlocAccount>().add(RequestUpdateUser(
+            userID: args.userID ?? -1,
+            userName: usernameController.text,
+            // password: pwController.text,
+            fullName: fullnameController.text,
+            email: emailController.text,
+            contactNo: contactnumberController.text));
+      },
+      text: "Submit",
+      textStyle: const TextStyle(
+        fontSize: 14.0,
+        color: AppColors.TextColorBlack56,
+        fontWeight: FontWeight.w400,
+      ),
+      bgColor: AppColors.PrimaryColor,
+      borderRadius: 9,
+      height: 45.0,
+      margin: const EdgeInsets.only(top: 13),
+    );
 
     Widget cancelBtn = ButtonRaised(
       onPressed: () {
@@ -73,21 +104,17 @@ class MainLayout extends StatelessWidget
       margin: const EdgeInsets.only(top: 13),
     );
 
-    Widget submitBtn = ButtonRaised(
+    Widget deleteBtn = ButtonRaised(
       onPressed: () {
-        context.read<BlocAccount>().add(RequestAddUser(
-            userName: usernameController.text,
-            password: pwController.text,
-            fullName: fullnameController.text,
-            email: emailController.text,
-            contactNo: contactnumberController.text));
+        context.read<BlocAccount>().add(RequestDeleteUser(userID: args.userID ?? -1,));
       },
-      text: "Submit",
+      text: "Delete User",
       textStyle: const TextStyle(
         fontSize: 14.0,
-        color: AppColors.TextColorBlack56,
-        fontWeight: FontWeight.w500,
+        color: AppColors.White,
+        fontWeight: FontWeight.w400,
       ),
+      bgColor: Colors.deepOrange,
       borderRadius: 9,
       height: 45.0,
       margin: const EdgeInsets.only(top: 13),
@@ -126,15 +153,15 @@ class MainLayout extends StatelessWidget
             label: "Contact Number",
             keybType: TextInputType.phone,
           ),
-          _buildTextField(
-            context,
-            controller: pwController,
-            hint: 'Enter Password',
-            label: "Password",
-            keybType: TextInputType.visiblePassword,
-            isPassword: true,
-            textInput: TextInputAction.done,
-          ),
+          // _buildTextField(
+          //   context,
+          //   controller: pwController,
+          //   hint: 'Enter Password',
+          //   label: "Password",
+          //   keybType: TextInputType.visiblePassword,
+          //   isPassword: true,
+          //   textInput: TextInputAction.done,
+          // ),
         ],
       ),
     );
@@ -149,10 +176,13 @@ class MainLayout extends StatelessWidget
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
+                const SizedBox(
+                  height: 20.0,
+                ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 26.0),
                   child: Text(
-                    "Add New User",
+                    "Update User",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 15.0,
@@ -165,6 +195,7 @@ class MainLayout extends StatelessWidget
                 Expanded(
                   child: formBody,
                 ),
+                submitBtn,
                 Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
@@ -177,7 +208,7 @@ class MainLayout extends StatelessWidget
                     ),
                     Expanded(
                       flex: 3,
-                      child: submitBtn,
+                      child: deleteBtn,
                     ),
                   ],
                 ),
@@ -195,11 +226,11 @@ class MainLayout extends StatelessWidget
       ],
     );
 
-    return BlocListener<BlocAccount, StateAccount>(
+    return BlocConsumer<BlocAccount, StateAccount>(
       listener: (mContext, state) {
         if (state is RequestSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Successfully Added User"),
+            content: Text("Successfully Updated User"),
           ));
           Navigator.of(mContext).pop();
         }
@@ -210,7 +241,20 @@ class MainLayout extends StatelessWidget
           ));
         }
       },
-      child: mainBody,
+      buildWhen: (previous, current) => (current is InitStateAccount || current is RequestGetUserSuccess),
+      builder: (context, state) {
+        if (state is InitStateAccount) return initLayout();
+
+        if (state is RequestGetUserSuccess) {
+          usernameController.text = state.userData.userName;
+          fullnameController.text = state.userData.fullName;
+          emailController.text = state.userData.email;
+          contactnumberController.text = state.userData.contactNo;
+          return mainBody;
+        }
+
+        return Container();
+      },
     );
   }
 
@@ -222,7 +266,6 @@ class MainLayout extends StatelessWidget
       TextInputType? keybType,
       bool? isPassword}) {
     return Container(
-      height: 55,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
       child: TextField(
         onTapOutside: (event) {
@@ -252,4 +295,10 @@ class MainLayout extends StatelessWidget
       ),
     );
   }
+}
+
+class ScreenUpdateUserSettings {
+  final int? userID;
+
+  const ScreenUpdateUserSettings({this.userID});
 }

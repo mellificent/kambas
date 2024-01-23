@@ -34,6 +34,18 @@ class DisplayDrawTime extends StateAccount {
   List<Object> get props => ['DisplayDrawTime', text];
 }
 
+class RequestGetUserSuccess extends StateAccount {
+  final UserItemData userData;
+
+  const RequestGetUserSuccess(this.userData,);
+
+  @override
+  List<Object> get props => [userData];
+
+  @override
+  String toString() => 'RequestGetUserSuccess $userData';
+}
+
 class RequestAccountFailed extends StateAccount {
   final String error;
   final bool relogin;
