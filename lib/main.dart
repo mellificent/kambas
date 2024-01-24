@@ -27,6 +27,7 @@ import 'constants/app_settings.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 
 import 'screens/main/admin/ScreenAddUser.dart';
+import 'screens/main/admin/ScreenSettings.dart';
 import 'screens/main/admin/ScreenUpdateUser.dart';
 import 'screens/main/admin/ScreenUserManagement.dart';
 
@@ -152,6 +153,7 @@ class App extends StatelessWidget {
           AppRoutes.of(context).userManagementScreen: (context) => const ScreenUserManagement(),
           AppRoutes.of(context).createUserScreen: (context) => const ScreenCreateUser(),
           AppRoutes.of(context).updateUserScreen: (context) => const ScreenUpdateUser(),
+          AppRoutes.of(context).generalSettingsScreen: (context) => const ScreenSettings(),
         },
       ),
     );

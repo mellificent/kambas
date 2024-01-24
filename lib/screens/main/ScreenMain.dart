@@ -156,7 +156,7 @@ class MainLayout extends StatelessWidget
 
     Widget reprintButton = ButtonRaised(
       onPressed: () {
-        context.read<BlocAccount>().add(RequestReprintTicket());
+        context.read<BlocAccount>().add(RequestPrintTicket());
         // //todo: data from bloc
         // const platformMethodChannel = MethodChannel('com.methodchannel/test');
         // platformMethodChannel.invokeMethod('getModel');

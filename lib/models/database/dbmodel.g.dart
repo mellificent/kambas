@@ -77,6 +77,30 @@ class TableKambasTransaction extends SqfEntityTableBase {
     return _instance = _instance ?? TableKambasTransaction();
   }
 }
+
+// KambasTerminal TABLE
+class TableKambasTerminal extends SqfEntityTableBase {
+  TableKambasTerminal() {
+    // declare properties of EntityTable
+    tableName = 'kambasTerminal';
+    primaryKeyName = 'id';
+    primaryKeyType = PrimaryKeyType.integer_auto_incremental;
+    useSoftDeleting = true;
+    // when useSoftDeleting is true, creates a field named 'isDeleted' on the table, and set to '1' this field when item deleted (does not hard delete)
+
+    // declare fields
+    fields = [
+      SqfEntityFieldBase('stallName', DbType.text, defaultValue: ''),
+      SqfEntityFieldBase('location', DbType.text, defaultValue: ''),
+      SqfEntityFieldBase('ticketNumber', DbType.text),
+    ];
+    super.init();
+  }
+  static SqfEntityTableBase? _instance;
+  static SqfEntityTableBase get getInstance {
+    return _instance = _instance ?? TableKambasTerminal();
+  }
+}
 // END TABLES
 
 // BEGIN SEQUENCES
@@ -110,6 +134,7 @@ class KambasDB extends SqfEntityModelProvider {
     databaseTables = [
       TableUserAccount.getInstance,
       TableKambasTransaction.getInstance,
+      TableKambasTerminal.getInstance,
     ];
 
     sequences = [
@@ -2102,6 +2127,867 @@ class KambasTransactionManager extends SqfEntityProvider {
 }
 
 //endregion KambasTransactionManager
+// region KambasTerminal
+class KambasTerminal extends TableBase {
+  KambasTerminal(
+      {this.id,
+      this.stallName,
+      this.location,
+      this.ticketNumber,
+      this.isDeleted}) {
+    _setDefaultValues();
+    softDeleteActivated = true;
+  }
+  KambasTerminal.withFields(
+      this.stallName, this.location, this.ticketNumber, this.isDeleted) {
+    _setDefaultValues();
+  }
+  KambasTerminal.withId(this.id, this.stallName, this.location,
+      this.ticketNumber, this.isDeleted) {
+    _setDefaultValues();
+  }
+  // fromMap v2.0
+  KambasTerminal.fromMap(Map<String, dynamic> o,
+      {bool setDefaultValues = true}) {
+    if (setDefaultValues) {
+      _setDefaultValues();
+    }
+    id = int.tryParse(o['id'].toString());
+    if (o['stallName'] != null) {
+      stallName = o['stallName'].toString();
+    }
+    if (o['location'] != null) {
+      location = o['location'].toString();
+    }
+    if (o['ticketNumber'] != null) {
+      ticketNumber = o['ticketNumber'].toString();
+    }
+    isDeleted = o['isDeleted'] != null
+        ? o['isDeleted'] == 1 || o['isDeleted'] == true
+        : null;
+  }
+  // FIELDS (KambasTerminal)
+  int? id;
+  String? stallName;
+  String? location;
+  String? ticketNumber;
+  bool? isDeleted;
+
+  // end FIELDS (KambasTerminal)
+
+  static const bool _softDeleteActivated = true;
+  KambasTerminalManager? __mnKambasTerminal;
+
+  KambasTerminalManager get _mnKambasTerminal {
+    return __mnKambasTerminal = __mnKambasTerminal ?? KambasTerminalManager();
+  }
+
+  // METHODS
+  @override
+  Map<String, dynamic> toMap(
+      {bool forQuery = false, bool forJson = false, bool forView = false}) {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (stallName != null || !forView) {
+      map['stallName'] = stallName;
+    }
+    if (location != null || !forView) {
+      map['location'] = location;
+    }
+    if (ticketNumber != null || !forView) {
+      map['ticketNumber'] = ticketNumber;
+    }
+    if (isDeleted != null) {
+      map['isDeleted'] = forQuery ? (isDeleted! ? 1 : 0) : isDeleted;
+    }
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, dynamic>> toMapWithChildren(
+      [bool forQuery = false,
+      bool forJson = false,
+      bool forView = false]) async {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (stallName != null || !forView) {
+      map['stallName'] = stallName;
+    }
+    if (location != null || !forView) {
+      map['location'] = location;
+    }
+    if (ticketNumber != null || !forView) {
+      map['ticketNumber'] = ticketNumber;
+    }
+    if (isDeleted != null) {
+      map['isDeleted'] = forQuery ? (isDeleted! ? 1 : 0) : isDeleted;
+    }
+
+    return map;
+  }
+
+  /// This method returns Json String [KambasTerminal]
+  @override
+  String toJson() {
+    return json.encode(toMap(forJson: true));
+  }
+
+  /// This method returns Json String [KambasTerminal]
+  @override
+  Future<String> toJsonWithChilds() async {
+    return json.encode(await toMapWithChildren(false, true));
+  }
+
+  @override
+  List<dynamic> toArgs() {
+    return [stallName, location, ticketNumber, isDeleted];
+  }
+
+  @override
+  List<dynamic> toArgsWithIds() {
+    return [id, stallName, location, ticketNumber, isDeleted];
+  }
+
+  static Future<List<KambasTerminal>?> fromWebUrl(Uri uri,
+      {Map<String, String>? headers}) async {
+    try {
+      final response = await http.get(uri, headers: headers);
+      return await fromJson(response.body);
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR KambasTerminal.fromWebUrl: ErrorMessage: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<http.Response> postUrl(Uri uri, {Map<String, String>? headers}) {
+    return http.post(uri, headers: headers, body: toJson());
+  }
+
+  static Future<List<KambasTerminal>> fromJson(String jsonBody) async {
+    final Iterable list = await json.decode(jsonBody) as Iterable;
+    var objList = <KambasTerminal>[];
+    try {
+      objList = list
+          .map((kambasterminal) =>
+              KambasTerminal.fromMap(kambasterminal as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR KambasTerminal.fromJson: ErrorMessage: ${e.toString()}');
+    }
+    return objList;
+  }
+
+  static Future<List<KambasTerminal>> fromMapList(List<dynamic> data,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields,
+      bool setDefaultValues = true}) async {
+    final List<KambasTerminal> objList = <KambasTerminal>[];
+    loadedFields = loadedFields ?? [];
+    for (final map in data) {
+      final obj = KambasTerminal.fromMap(map as Map<String, dynamic>,
+          setDefaultValues: setDefaultValues);
+
+      objList.add(obj);
+    }
+    return objList;
+  }
+
+  /// returns KambasTerminal by ID if exist, otherwise returns null
+  /// Primary Keys: int? id
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: getById(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: getById(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>returns [KambasTerminal] if exist, otherwise returns null
+  Future<KambasTerminal?> getById(int? id,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    if (id == null) {
+      return null;
+    }
+    KambasTerminal? obj;
+    final data = await _mnKambasTerminal.getById([id]);
+    if (data.length != 0) {
+      obj = KambasTerminal.fromMap(data[0] as Map<String, dynamic>);
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// Saves the (KambasTerminal) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> save({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnKambasTerminal.insert(this, ignoreBatch);
+    } else {
+      await _mnKambasTerminal.update(this);
+    }
+
+    return id;
+  }
+
+  /// Saves the (KambasTerminal) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> saveOrThrow({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnKambasTerminal.insertOrThrow(this, ignoreBatch);
+
+      isInsert = true;
+    } else {
+      // id= await _upsert(); // removed in sqfentity_gen 1.3.0+6
+      await _mnKambasTerminal.updateOrThrow(this);
+    }
+
+    return id;
+  }
+
+  /// saveAs KambasTerminal. Returns a new Primary Key value of KambasTerminal
+
+  /// <returns>Returns a new Primary Key value of KambasTerminal
+  @override
+  Future<int?> saveAs({bool ignoreBatch = true}) async {
+    id = null;
+
+    return save(ignoreBatch: ignoreBatch);
+  }
+
+  /// saveAll method saves the sent List<KambasTerminal> as a bulk in one transaction
+  /// Returns a <List<BoolResult>>
+  static Future<List<dynamic>> saveAll(List<KambasTerminal> kambasterminals,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    List<dynamic>? result = [];
+    // If there is no open transaction, start one
+    final isStartedBatch = await KambasDB().batchStart();
+    for (final obj in kambasterminals) {
+      await obj.save(ignoreBatch: false);
+    }
+    if (!isStartedBatch) {
+      result = await KambasDB().batchCommit(
+          exclusive: exclusive,
+          noResult: noResult,
+          continueOnError: continueOnError);
+      for (int i = 0; i < kambasterminals.length; i++) {
+        if (kambasterminals[i].id == null) {
+          kambasterminals[i].id = result![i] as int;
+        }
+      }
+    }
+    return result!;
+  }
+
+  /// Updates if the record exists, otherwise adds a new row
+  /// <returns>Returns id
+  @override
+  Future<int?> upsert({bool ignoreBatch = true}) async {
+    try {
+      final result = await _mnKambasTerminal.rawInsert(
+          'INSERT OR REPLACE INTO kambasTerminal (id, stallName, location, ticketNumber,isDeleted)  VALUES (?,?,?,?,?)',
+          [id, stallName, location, ticketNumber, isDeleted],
+          ignoreBatch);
+      if (result! > 0) {
+        saveResult = BoolResult(
+            success: true,
+            successMessage: 'KambasTerminal id=$id updated successfully');
+      } else {
+        saveResult = BoolResult(
+            success: false,
+            errorMessage: 'KambasTerminal id=$id did not update');
+      }
+      return id;
+    } catch (e) {
+      saveResult = BoolResult(
+          success: false,
+          errorMessage: 'KambasTerminal Save failed. Error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// inserts or replaces the sent List<<KambasTerminal>> as a bulk in one transaction.
+  /// upsertAll() method is faster then saveAll() method. upsertAll() should be used when you are sure that the primary key is greater than zero
+  /// Returns a BoolCommitResult
+  @override
+  Future<BoolCommitResult> upsertAll(List<KambasTerminal> kambasterminals,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    final results = await _mnKambasTerminal.rawInsertAll(
+        'INSERT OR REPLACE INTO kambasTerminal (id, stallName, location, ticketNumber,isDeleted)  VALUES (?,?,?,?,?)',
+        kambasterminals,
+        exclusive: exclusive,
+        noResult: noResult,
+        continueOnError: continueOnError);
+    return results;
+  }
+
+  /// Deletes KambasTerminal
+
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    debugPrint('SQFENTITIY: delete KambasTerminal invoked (id=$id)');
+    if (!_softDeleteActivated || hardDelete || isDeleted!) {
+      return _mnKambasTerminal
+          .delete(QueryParams(whereString: 'id=?', whereArguments: [id]));
+    } else {
+      return _mnKambasTerminal.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 1});
+    }
+  }
+
+  /// Recover KambasTerminal
+
+  /// <returns>BoolResult res.success=Recovered, not res.success=Can not recovered
+  @override
+  Future<BoolResult> recover([bool recoverChilds = true]) async {
+    debugPrint('SQFENTITIY: recover KambasTerminal invoked (id=$id)');
+    {
+      return _mnKambasTerminal.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 0});
+    }
+  }
+
+  @override
+  KambasTerminalFilterBuilder select(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return KambasTerminalFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect;
+  }
+
+  @override
+  KambasTerminalFilterBuilder distinct(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return KambasTerminalFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect
+      ..qparams.distinct = true;
+  }
+
+  void _setDefaultValues() {
+    stallName = stallName ?? '';
+    location = location ?? '';
+    isDeleted = isDeleted ?? false;
+  }
+
+  @override
+  void rollbackPk() {
+    if (isInsert == true) {
+      id = null;
+    }
+  }
+
+  // END METHODS
+  // BEGIN CUSTOM CODE
+  /*
+      you can define customCode property of your SqfEntityTable constant. For example:
+      const tablePerson = SqfEntityTable(
+      tableName: 'person',
+      primaryKeyName: 'id',
+      primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+      fields: [
+        SqfEntityField('firstName', DbType.text),
+        SqfEntityField('lastName', DbType.text),
+      ],
+      customCode: '''
+       String fullName()
+       { 
+         return '$firstName $lastName';
+       }
+      ''');
+     */
+  // END CUSTOM CODE
+}
+// endregion kambasterminal
+
+// region KambasTerminalField
+class KambasTerminalField extends FilterBase {
+  KambasTerminalField(KambasTerminalFilterBuilder kambasterminalFB)
+      : super(kambasterminalFB);
+
+  @override
+  KambasTerminalFilterBuilder equals(dynamic pValue) {
+    return super.equals(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder equalsOrNull(dynamic pValue) {
+    return super.equalsOrNull(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder isNull() {
+    return super.isNull() as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder contains(dynamic pValue) {
+    return super.contains(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder startsWith(dynamic pValue) {
+    return super.startsWith(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder endsWith(dynamic pValue) {
+    return super.endsWith(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder between(dynamic pFirst, dynamic pLast) {
+    return super.between(pFirst, pLast) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder greaterThan(dynamic pValue) {
+    return super.greaterThan(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder lessThan(dynamic pValue) {
+    return super.lessThan(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder greaterThanOrEquals(dynamic pValue) {
+    return super.greaterThanOrEquals(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder lessThanOrEquals(dynamic pValue) {
+    return super.lessThanOrEquals(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalFilterBuilder inValues(dynamic pValue) {
+    return super.inValues(pValue) as KambasTerminalFilterBuilder;
+  }
+
+  @override
+  KambasTerminalField get not {
+    return super.not as KambasTerminalField;
+  }
+}
+// endregion KambasTerminalField
+
+// region KambasTerminalFilterBuilder
+class KambasTerminalFilterBuilder extends ConjunctionBase {
+  KambasTerminalFilterBuilder(KambasTerminal obj, bool? getIsDeleted)
+      : super(obj, getIsDeleted) {
+    _mnKambasTerminal = obj._mnKambasTerminal;
+    _softDeleteActivated = obj.softDeleteActivated;
+  }
+
+  bool _softDeleteActivated = false;
+  KambasTerminalManager? _mnKambasTerminal;
+
+  /// put the sql keyword 'AND'
+  @override
+  KambasTerminalFilterBuilder get and {
+    super.and;
+    return this;
+  }
+
+  /// put the sql keyword 'OR'
+  @override
+  KambasTerminalFilterBuilder get or {
+    super.or;
+    return this;
+  }
+
+  /// open parentheses
+  @override
+  KambasTerminalFilterBuilder get startBlock {
+    super.startBlock;
+    return this;
+  }
+
+  /// String whereCriteria, write raw query without 'where' keyword. Like this: 'field1 like 'test%' and field2 = 3'
+  @override
+  KambasTerminalFilterBuilder where(String? whereCriteria,
+      {dynamic parameterValue}) {
+    super.where(whereCriteria, parameterValue: parameterValue);
+    return this;
+  }
+
+  /// page = page number,
+  /// pagesize = row(s) per page
+  @override
+  KambasTerminalFilterBuilder page(int page, int pagesize) {
+    super.page(page, pagesize);
+    return this;
+  }
+
+  /// int count = LIMIT
+  @override
+  KambasTerminalFilterBuilder top(int count) {
+    super.top(count);
+    return this;
+  }
+
+  /// close parentheses
+  @override
+  KambasTerminalFilterBuilder get endBlock {
+    super.endBlock;
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  KambasTerminalFilterBuilder orderBy(dynamic argFields) {
+    super.orderBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  KambasTerminalFilterBuilder orderByDesc(dynamic argFields) {
+    super.orderByDesc(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  KambasTerminalFilterBuilder groupBy(dynamic argFields) {
+    super.groupBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  KambasTerminalFilterBuilder having(dynamic argFields) {
+    super.having(argFields);
+    return this;
+  }
+
+  KambasTerminalField _setField(
+      KambasTerminalField? field, String colName, DbType dbtype) {
+    return KambasTerminalField(this)
+      ..param = DbParameter(
+          dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
+  }
+
+  KambasTerminalField? _id;
+  KambasTerminalField get id {
+    return _id = _setField(_id, 'id', DbType.integer);
+  }
+
+  KambasTerminalField? _stallName;
+  KambasTerminalField get stallName {
+    return _stallName = _setField(_stallName, 'stallName', DbType.text);
+  }
+
+  KambasTerminalField? _location;
+  KambasTerminalField get location {
+    return _location = _setField(_location, 'location', DbType.text);
+  }
+
+  KambasTerminalField? _ticketNumber;
+  KambasTerminalField get ticketNumber {
+    return _ticketNumber =
+        _setField(_ticketNumber, 'ticketNumber', DbType.text);
+  }
+
+  KambasTerminalField? _isDeleted;
+  KambasTerminalField get isDeleted {
+    return _isDeleted = _setField(_isDeleted, 'isDeleted', DbType.bool);
+  }
+
+  /// Deletes List<KambasTerminal> bulk by query
+  ///
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    buildParameters();
+    var r = BoolResult(success: false);
+
+    if (_softDeleteActivated && !hardDelete) {
+      r = await _mnKambasTerminal!.updateBatch(qparams, {'isDeleted': 1});
+    } else {
+      r = await _mnKambasTerminal!.delete(qparams);
+    }
+    return r;
+  }
+
+  /// Recover List<KambasTerminal> bulk by query
+  @override
+  Future<BoolResult> recover() async {
+    buildParameters(getIsDeleted: true);
+    debugPrint('SQFENTITIY: recover KambasTerminal bulk invoked');
+    return _mnKambasTerminal!.updateBatch(qparams, {'isDeleted': 0});
+  }
+
+  /// using:
+  /// update({'fieldName': Value})
+  /// fieldName must be String. Value is dynamic, it can be any of the (int, bool, String.. )
+  @override
+  Future<BoolResult> update(Map<String, dynamic> values) {
+    buildParameters();
+    if (qparams.limit! > 0 || qparams.offset! > 0) {
+      qparams.whereString =
+          'id IN (SELECT id from kambasTerminal ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+    }
+    return _mnKambasTerminal!.updateBatch(qparams, values);
+  }
+
+  /// This method always returns [KambasTerminal] Obj if exist, otherwise returns null
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> KambasTerminal?
+  @override
+  Future<KambasTerminal?> toSingle(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    buildParameters(pSize: 1);
+    final objFuture = _mnKambasTerminal!.toList(qparams);
+    final data = await objFuture;
+    KambasTerminal? obj;
+    if (data.isNotEmpty) {
+      obj = KambasTerminal.fromMap(data[0] as Map<String, dynamic>);
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// This method always returns [KambasTerminal]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> KambasTerminal?
+  @override
+  Future<KambasTerminal> toSingleOrDefault(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    return await toSingle(
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields) ??
+        KambasTerminal();
+  }
+
+  /// This method returns int. [KambasTerminal]
+  /// <returns>int
+  @override
+  Future<int> toCount(
+      [VoidCallback Function(int c)? kambasterminalCount]) async {
+    buildParameters();
+    qparams.selectColumns = ['COUNT(1) AS CNT'];
+    final kambasterminalsFuture = await _mnKambasTerminal!.toList(qparams);
+    final int count = kambasterminalsFuture[0]['CNT'] as int;
+    if (kambasterminalCount != null) {
+      kambasterminalCount(count);
+    }
+    return count;
+  }
+
+  /// This method returns List<KambasTerminal> [KambasTerminal]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toList(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toList(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>List<KambasTerminal>
+  @override
+  Future<List<KambasTerminal>> toList(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    final data = await toMapList();
+    final List<KambasTerminal> kambasterminalsData =
+        await KambasTerminal.fromMapList(data,
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields,
+            setDefaultValues: qparams.selectColumns == null);
+    return kambasterminalsData;
+  }
+
+  /// This method returns Json String [KambasTerminal]
+  @override
+  Future<String> toJson() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(o.toMap(forJson: true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns Json String. [KambasTerminal]
+  @override
+  Future<String> toJsonWithChilds() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(await o.toMapWithChildren(false, true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns List<dynamic>. [KambasTerminal]
+  /// <returns>List<dynamic>
+  @override
+  Future<List<dynamic>> toMapList() async {
+    buildParameters();
+    return await _mnKambasTerminal!.toList(qparams);
+  }
+
+  /// This method returns Primary Key List SQL and Parameters retVal = Map<String,dynamic>. [KambasTerminal]
+  /// retVal['sql'] = SQL statement string, retVal['args'] = whereArguments List<dynamic>;
+  /// <returns>List<String>
+  @override
+  Map<String, dynamic> toListPrimaryKeySQL([bool buildParams = true]) {
+    final Map<String, dynamic> _retVal = <String, dynamic>{};
+    if (buildParams) {
+      buildParameters();
+    }
+    _retVal['sql'] =
+        'SELECT `id` FROM kambasTerminal WHERE ${qparams.whereString}';
+    _retVal['args'] = qparams.whereArguments;
+    return _retVal;
+  }
+
+  /// This method returns Primary Key List<int>.
+  /// <returns>List<int>
+  @override
+  Future<List<int>> toListPrimaryKey([bool buildParams = true]) async {
+    if (buildParams) {
+      buildParameters();
+    }
+    final List<int> idData = <int>[];
+    qparams.selectColumns = ['id'];
+    final idFuture = await _mnKambasTerminal!.toList(qparams);
+
+    final int count = idFuture.length;
+    for (int i = 0; i < count; i++) {
+      idData.add(idFuture[i]['id'] as int);
+    }
+    return idData;
+  }
+
+  /// Returns List<dynamic> for selected columns. Use this method for 'groupBy' with min,max,avg..  [KambasTerminal]
+  /// Sample usage: (see EXAMPLE 4.2 at https://github.com/hhtokpinar/sqfEntity#group-by)
+  @override
+  Future<List<dynamic>> toListObject() async {
+    buildParameters();
+
+    final objectFuture = _mnKambasTerminal!.toList(qparams);
+
+    final List<dynamic> objectsData = <dynamic>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i]);
+    }
+    return objectsData;
+  }
+
+  /// Returns List<String> for selected first column
+  /// Sample usage: await KambasTerminal.select(columnsToSelect: ['columnName']).toListString()
+  @override
+  Future<List<String>> toListString(
+      [VoidCallback Function(List<String> o)? listString]) async {
+    buildParameters();
+
+    final objectFuture = _mnKambasTerminal!.toList(qparams);
+
+    final List<String> objectsData = <String>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i][qparams.selectColumns![0]].toString());
+    }
+    if (listString != null) {
+      listString(objectsData);
+    }
+    return objectsData;
+  }
+}
+// endregion KambasTerminalFilterBuilder
+
+// region KambasTerminalFields
+class KambasTerminalFields {
+  static TableField? _fId;
+  static TableField get id {
+    return _fId = _fId ?? SqlSyntax.setField(_fId, 'id', DbType.integer);
+  }
+
+  static TableField? _fStallName;
+  static TableField get stallName {
+    return _fStallName = _fStallName ??
+        SqlSyntax.setField(_fStallName, 'stallName', DbType.text);
+  }
+
+  static TableField? _fLocation;
+  static TableField get location {
+    return _fLocation =
+        _fLocation ?? SqlSyntax.setField(_fLocation, 'location', DbType.text);
+  }
+
+  static TableField? _fTicketNumber;
+  static TableField get ticketNumber {
+    return _fTicketNumber = _fTicketNumber ??
+        SqlSyntax.setField(_fTicketNumber, 'ticketNumber', DbType.text);
+  }
+
+  static TableField? _fIsDeleted;
+  static TableField get isDeleted {
+    return _fIsDeleted = _fIsDeleted ??
+        SqlSyntax.setField(_fIsDeleted, 'isDeleted', DbType.integer);
+  }
+}
+// endregion KambasTerminalFields
+
+//region KambasTerminalManager
+class KambasTerminalManager extends SqfEntityProvider {
+  KambasTerminalManager()
+      : super(KambasDB(),
+            tableName: _tableName,
+            primaryKeyList: _primaryKeyList,
+            whereStr: _whereStr);
+  static const String _tableName = 'kambasTerminal';
+  static const List<String> _primaryKeyList = ['id'];
+  static const String _whereStr = 'id=?';
+}
+
+//endregion KambasTerminalManager
 /// Region SEQUENCE IdentitySequence
 class IdentitySequence {
   /// Assigns a new value when it is triggered and returns the new value

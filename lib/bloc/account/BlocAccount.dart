@@ -2,11 +2,14 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:fimber/fimber.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_strings.dart';
+import 'package:kambas/models/object/TerminalData.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
+import 'package:uuid/uuid.dart';
 import '../../../providers/ProviderAccount.dart';
 import '../../models/request/RequestOAuth.dart';
 import '../../utils/validator/BaseInput.dart';
@@ -49,12 +52,13 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestPostBetAmount>(_mapPostBetAmount);
     on<RequestDisplayBetAmount>(_mapRequestDisplayBetAmount);
     on<RequestExportCSV>(_mapRequestExportCSV);
-    on<RequestReprintTicket>(_mapRequestReprintTicket);
+    on<RequestPrintTicket>(_mapRequestPrintTicket);
     on<RequestSelectedFilterDate>(_mapRequestSelectedFilterDate);
     on<GetDbUserList>(_mapRequestDbUserList);
     on<RequestAddUser>(_mapRequestAddUser);
     on<RequestUpdateUser>(_mapRequestUpdateUser);
     on<RequestDeleteUser>(_mapRequestDeleteUser);
+    on<GetTerminalSettings>(_mapGetTerminalSettings);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -133,12 +137,15 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       emit(const RequestLoadingAccount("logging in"));
 
       final storedList = await providerAccount.getStoredDBUsers();
-      final list = storedList.where((element) => (element.userName == event.username &&
+      final list = storedList
+          .where((element) => (element.userName == event.username &&
               element.password == event.password))
           .toList();
 
       if (list.isNotEmpty ||
           (event.username == "admin" && event.password == "kambas123")) {
+
+        await providerAccount.storeUsername(event.username);
         emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
       } else {
         emit(const RequestFailed(AppStrings.error_login_invalidfields_msg));
@@ -232,6 +239,17 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     emit(DisplayUserList(list));
   }
 
+  Future<void> _mapGetTerminalSettings(
+      GetTerminalSettings event, Emitter<StateAccount> emit) async {
+    final response = await providerAccount.getDBTerminalData();
+    final terminalData = TerminalData(
+        stallName: response?.stallName ?? '',
+        location: response?.stallName ?? '',
+        ticketNumber: response?.ticketNumber ?? '');
+
+    emit(DisplayTerminalSettings(data: terminalData));
+  }
+
   Future<void> _mapRequestAddUser(
       RequestAddUser event, Emitter<StateAccount> emit) async {
     if (event.userName.isEmpty ||
@@ -259,7 +277,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapRequestUpdateUser(
       RequestUpdateUser event, Emitter<StateAccount> emit) async {
-    if (event.userID == -1){
+    if (event.userID == -1) {
       emit(const RequestFailed(AppStrings.error_general_throwable_msg));
       return;
     }
@@ -279,19 +297,25 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         contactNo: event.contactNo,
         updatedDate: DateTime.now());
 
-    emit(isUpdated ? RequestSuccess() : const RequestFailed("error updating user"));
+    emit(isUpdated
+        ? RequestSuccess()
+        : const RequestFailed("error updating user"));
   }
 
   Future<void> _mapRequestDeleteUser(
       RequestDeleteUser event, Emitter<StateAccount> emit) async {
-    if (event.userID == -1){
+    if (event.userID == -1) {
       emit(const RequestFailed(AppStrings.error_general_throwable_msg));
       return;
     }
 
-    final isDeleted = await providerAccount.deleteDBUserData(event.userID,);
+    final isDeleted = await providerAccount.deleteDBUserData(
+      event.userID,
+    );
 
-    emit(isDeleted ? RequestSuccess() : const RequestFailed("error deleting user"));
+    emit(isDeleted
+        ? RequestSuccess()
+        : const RequestFailed("error deleting user"));
   }
 
   Future<void> _mapRequestExportCSV(
@@ -349,19 +373,24 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapRequestReprintTicket(
-      RequestReprintTicket event, Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestPrintTicket(
+      RequestPrintTicket event, Emitter<StateAccount> emit) async {
     // final currentDate = await getAfricaDateTime();
     final currentDate = DateTime.now();
     String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
     String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
     String drawTime = DateFormat('h a').format(currentDate);
 
-    //todo: ticket no based on admin and random per transaction starting at
-    int min = pow(10, 6 - 1).toInt();
-    int max = (pow(10, 6) - 1).toInt();
-    final randomTicketNumber = min + Random().nextInt(max - min);
+    final dbCreatedDate = currentDate
+        .copyWith(
+          minute: 0,
+          second: 0,
+          millisecond: 0,
+          microsecond: 0,
+        )
+        .toString();
 
+    var terminalData = await providerAccount.getDBTerminalData();
     var selectedNumberResponse = await providerAccount.getBetNumbers();
     var betAmountResponse = await providerAccount.getBetAmount();
 
@@ -369,36 +398,33 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     platformMethodChannel.invokeMethod(AppStrings.printMethod, {
       AppStrings.p_initialDate: initialDate,
       AppStrings.p_processedDate: datePlaced,
-      AppStrings.p_ticketNumber: "N/A",
+      AppStrings.p_ticketNumber: terminalData?.ticketNumber ?? "",
       AppStrings.p_betNumber:
           "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
-      AppStrings.p_stallName: "N/A",
+      AppStrings.p_stallName: terminalData?.stallName ?? "N/A",
       AppStrings.p_drawSchedule: drawTime,
       AppStrings.p_betAmount: betAmountResponse ?? "N/A",
       AppStrings.p_priceAmount:
           ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
     }).then((value) async {
-      final dbCreatedDate = currentDate
-          .copyWith(
-            minute: 0,
-            second: 0,
-            millisecond: 0,
-            microsecond: 0,
-          )
-          .toString();
       await providerAccount.storeDBTransaction(
         DBTransactions(
             createdDate: dbCreatedDate,
-            stallName: "N/A",
-            location: "N/A",
-            ticketNo: randomTicketNumber.toString(),
+            stallName: terminalData?.stallName ?? "N/A",
+            location: terminalData?.location ?? "N/A",
+            ticketNo: terminalData?.ticketNumber ?? "",
             betNumber1: selectedNumberResponse[0].toString(),
             betNumber2: selectedNumberResponse[1].toString(),
             betAmount: betAmountResponse,
             betPrize: ((int.parse(betAmountResponse) / 100) * 20000)
                 .toStringAsFixed(0),
-            userName: "testUser"),
+            userName: await providerAccount.getCurrentUsername()),
       );
+
+      //sets new ticket series after print success
+      final uuid = const Uuid().v4().substring(0, 4);
+      final ticketNumber = "T${Random().nextInt(5000)}$uuid";
+      await providerAccount.setDBTicketSeriesNo(ticketNumber: ticketNumber);
     });
 
     await providerAccount.deleteUserBetInput();

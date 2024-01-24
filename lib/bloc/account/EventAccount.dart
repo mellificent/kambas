@@ -29,6 +29,11 @@ class GetDbUserList extends EventAccount {
   List<Object> get props => ["GetDbUserList", Random().nextInt(5000)];
 }
 
+class GetTerminalSettings extends EventAccount {
+  @override
+  List<Object> get props => ["GetTerminalSettings", Random().nextInt(5000)];
+}
+
 class FormFieldValueOnChange extends EventAccount {
   final String value;
   final String fieldName;
@@ -104,9 +109,9 @@ class RequestCurrentDate extends EventAccount {
   List<Object> get props => ["RequestCurrentDate", Random().nextInt(5000)];
 }
 
-class RequestReprintTicket extends EventAccount {
+class RequestPrintTicket extends EventAccount {
   @override
-  List<Object> get props => ['RequestReprintTicket'];
+  List<Object> get props => ['RequestPrintTicket'];
 }
 
 class RequestPostBetAmount extends EventAccount {

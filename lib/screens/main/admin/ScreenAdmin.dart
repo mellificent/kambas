@@ -82,8 +82,12 @@ class MainLayout extends StatelessWidget
     );
 
     Widget generalSettingsBtn = ButtonRaised(
-      enabled: false,
-      onPressed: () {},
+      onPressed: () {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.of(context).generalSettingsScreen,
+        );
+      },
       text: AppStrings.general_settings,
       textStyle: const TextStyle(
           fontSize: 14.0,

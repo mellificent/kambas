@@ -44,40 +44,35 @@ const tableTransaction = SqfEntityTable(
 
     ///hindi completely nadedelete magstostore sya sa isDeleted table
     fields: [
-          SqfEntityField('createdAt', DbType.datetime),
-          SqfEntityField('username', DbType.text),
-          SqfEntityField('isSuccessful', DbType.bool, defaultValue: true),
-          SqfEntityField('jsonResponse', DbType.text),
+      SqfEntityField('createdAt', DbType.datetime),
+      SqfEntityField('username', DbType.text),
+      SqfEntityField('isSuccessful', DbType.bool, defaultValue: true),
+      SqfEntityField('jsonResponse', DbType.text),
     ]);
 
-// const tableMoodEntries = SqfEntityTable(
-//     tableName: 'moodEntries',
-//     primaryKeyName: 'id',
-//     primaryKeyType: PrimaryKeyType.integer_auto_incremental,
-//     useSoftDeleting: true,
-//
-//     ///hindi completely nadedelete magstostore sya sa isDeleted table
-//     modelName: null,
-//
-//     ///modelName is null then EntityBase uses table name instead of modelName
-//     fields: [
-//       SqfEntityField('entryId', DbType.integer),
-//       SqfEntityField('uniqueAddEntryId', DbType.text),
-//       SqfEntityField('moodId', DbType.integer),
-//       SqfEntityField('moodDescription', DbType.text),
-//       SqfEntityField('moodDate', DbType.text),
-//       SqfEntityField('isDeleteEntry', DbType.bool, defaultValue: false),
-//     ]);
+const tableTerminal = SqfEntityTable(
+    tableName: 'kambasTerminal',
+    primaryKeyName: 'id',
+    primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+    useSoftDeleting: true,
+    fields: [
+      SqfEntityField('stallName', DbType.text, defaultValue: ""),
+      SqfEntityField('location', DbType.text, defaultValue: ""),
+      SqfEntityField('ticketNumber', DbType.text, defaultValue: ""),
+    ]);
 
 ///database
 @SqfEntityBuilder(mKambasDbModel)
 const mKambasDbModel = SqfEntityModel(
-    modelName: 'KambasDB', // optional
+    modelName: 'KambasDB',
+    // optional
     databaseName: 'Kambas.db',
-    password: null, // You can set a password if you want to use crypted database
+    password: null,
+    // You can set a password if you want to use crypted database
     databaseTables: [
-          tableUsers,
-          tableTransaction,
+      tableUsers,
+      tableTransaction,
+      tableTerminal,
     ],
     sequences: [seqIdentity],
     bundledDatabasePath: null);

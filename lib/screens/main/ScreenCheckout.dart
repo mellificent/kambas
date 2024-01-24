@@ -72,7 +72,7 @@ class MainLayout extends StatelessWidget
 
     Widget printButton = ButtonRaised(
       onPressed: () {
-        context.read<BlocAccount>().add(RequestReprintTicket());
+        context.read<BlocAccount>().add(RequestPrintTicket());
       },
       text: AppStrings.print_ticket,
       textStyle: const TextStyle(

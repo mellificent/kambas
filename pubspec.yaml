@@ -40,7 +40,7 @@ dependencies:
   flutter_bloc: ^8.1.2
 
   # UUID
-  uuid: ^3.0.4
+  uuid: ^3.0.7
 
   # Http
   dio: ^5.3.2

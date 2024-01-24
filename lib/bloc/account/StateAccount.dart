@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
+import 'package:kambas/models/object/TerminalData.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,6 +21,7 @@ class InitStateAccount extends StateAccount {
 
 class DisplayCurrentDate extends StateAccount {
   final String text;
+
   const DisplayCurrentDate(this.text);
 
   @override
@@ -28,6 +30,7 @@ class DisplayCurrentDate extends StateAccount {
 
 class DisplayDrawTime extends StateAccount {
   final String text;
+
   const DisplayDrawTime(this.text);
 
   @override
@@ -37,7 +40,9 @@ class DisplayDrawTime extends StateAccount {
 class RequestGetUserSuccess extends StateAccount {
   final UserItemData userData;
 
-  const RequestGetUserSuccess(this.userData,);
+  const RequestGetUserSuccess(
+    this.userData,
+  );
 
   @override
   List<Object> get props => [userData];
@@ -67,22 +72,25 @@ class UpdateFormField extends StateAccount {
   final String? formPage;
   final ValidationStatus formStatus;
 
-  const UpdateFormField({required this.fieldName,
-        this.value,
-        this.error,
-        this.obscure = false,
-        this.formPage,
-        this.formStatus = ValidationStatus.valid});
+  const UpdateFormField(
+      {required this.fieldName,
+      this.value,
+      this.error,
+      this.obscure = false,
+      this.formPage,
+      this.formStatus = ValidationStatus.valid});
 
   @override
   List<Object> get props => [value, fieldName, obscure];
 
   @override
-  String toString() => 'UpdateFormField { fieldName: $fieldName, value: $value, error: $error, obscure: $obscure, status: $formStatus }';
+  String toString() =>
+      'UpdateFormField { fieldName: $fieldName, value: $value, error: $error, obscure: $obscure, status: $formStatus }';
 }
 
 class RequestPostLoginSuccess extends StateAccount {
   final bool isAdminUser;
+
   const RequestPostLoginSuccess({required this.isAdminUser});
 
   @override
@@ -108,6 +116,7 @@ class RequestSuccess extends StateAccount {
 
 class RequestLoadingAccount extends StateAccount {
   final String message;
+
   const RequestLoadingAccount(this.message);
 }
 
@@ -125,11 +134,13 @@ class ShowDialog extends StateAccount {
 
 class UpdateBetChooseLabel extends StateAccount {
   final String labelText;
+
   const UpdateBetChooseLabel(this.labelText);
 }
 
 class UpdateSwipeLabel extends StateAccount {
   final String labelText;
+
   const UpdateSwipeLabel(this.labelText);
 }
 
@@ -142,6 +153,7 @@ class RequestBetNumbersDone extends StateAccount {
 
 class UpdateBetSelectedNumbers extends StateAccount {
   final String text;
+
   const UpdateBetSelectedNumbers(this.text);
 
   @override
@@ -150,6 +162,7 @@ class UpdateBetSelectedNumbers extends StateAccount {
 
 class DisplayBetAmount extends StateAccount {
   final String text;
+
   const DisplayBetAmount(this.text);
 
   @override
@@ -165,6 +178,7 @@ class RequestGoToHome extends StateAccount {
 
 class DisplayFilterDate extends StateAccount {
   final String text;
+
   const DisplayFilterDate(this.text);
 
   @override
@@ -173,8 +187,19 @@ class DisplayFilterDate extends StateAccount {
 
 class DisplayUserList extends StateAccount {
   final List<UserItemData> list;
+
   const DisplayUserList(this.list);
 
   @override
   List<Object> get props => ['DisplayUserList', list];
+}
+
+class DisplayTerminalSettings extends StateAccount {
+  final TerminalData data;
+
+  const DisplayTerminalSettings(
+      {required this.data,});
+
+  @override
+  List<Object> get props => ['DisplayUserList', data,];
 }

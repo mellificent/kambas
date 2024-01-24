@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:kambas/models/object/TerminalData.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
 import 'package:kambas/repository/DatabaseRepository.dart';
@@ -27,6 +28,13 @@ class ProviderAccount extends BaseProvider {
 
   Future<bool> initDatabase() async {
     return await databaseRepository.initDatabase();
+  }
+
+  Future<void> storeUsername(String name) async {
+    return await preferenceRepository.saveUsername(name);
+  }
+  Future<String> getCurrentUsername() async {
+    return await preferenceRepository.getUsername();
   }
 
   Future<bool> storeDBTransaction(DBTransactions data) async {
@@ -74,6 +82,22 @@ class ProviderAccount extends BaseProvider {
 
   Future<List<UserItemData>> getStoredDBUsers() async {
     return await databaseRepository.getDBUsers();
+  }
+
+  Future<TerminalData?> getDBTerminalData() async {
+    return await databaseRepository.getDBTerminalData();
+  }
+
+  Future<bool> setTerminalData({
+    required TerminalData data
+  }) async {
+    return await databaseRepository.storeDBTerminalData(data);
+  }
+
+  Future<bool> setDBTicketSeriesNo({
+    required String ticketNumber
+  }) async {
+    return await databaseRepository.storeDBTicketSeriesNo(ticketNumber);
   }
 
   Future<bool> getLocalNewLaunchStatus() async {

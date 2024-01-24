@@ -20,6 +20,16 @@ class PreferenceRepository {
   // }
 
   // ACCOUNT
+  Future<void> saveUsername(String user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', user);
+    return;
+  }
+  Future<String> getUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username') ?? '';
+  }
+
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
@@ -32,17 +42,6 @@ class PreferenceRepository {
     await prefs.setString('rtoken', rtoken);
     await prefs.setBool('register', fromRegister);
     return;
-  }
-
-  Future<void> saveUserdetails(Map<String, dynamic> data) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userDetails', json.encode(data));
-    return;
-  }
-
-  Future<String> getUserdetails() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('userDetails') ?? '';
   }
 
   Future<void> saveUserEmail(String email) async {
@@ -101,6 +100,7 @@ class PreferenceRepository {
     await prefs.setString('token', '');
     await prefs.setString('rtoken', '');
     await prefs.setBool('logout', false);
+    await prefs.setString('username', '');
     return;
   }
 

@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:kambas/models/object/TerminalData.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/database/dbmodel.dart';
 
@@ -103,6 +106,50 @@ class DatabaseRepository {
     }
 
     return list.reversed.toList();
+  }
+
+  Future<TerminalData?> getDBTerminalData() async {
+    if (!isDbInitialized) return null;
+
+    var initialTable = await KambasTerminal().select().toSingle();
+    if(initialTable == null){
+      await KambasTerminal.withFields("", "", "T${Random().nextInt(5000)}${const Uuid().v4().substring(0, 4)}", false).save();
+    }
+
+    var storedData = await KambasTerminal()
+        .select().toSingle();
+
+    final data = TerminalData(
+        stallName: storedData?.stallName ?? "",
+        location: storedData?.location ?? "",
+        ticketNumber: storedData?.ticketNumber ?? "");
+
+    return data;
+  }
+
+  Future<bool> storeDBTerminalData(TerminalData data) async {
+    if (!isDbInitialized) return false;
+
+    var storedData = await KambasTerminal()
+        .select()
+        .update({
+      'stallName': data.stallName,
+      'location': data.location,
+    });
+
+    return storedData.success;
+  }
+
+  Future<bool> storeDBTicketSeriesNo(String ticketNumber) async {
+    if (!isDbInitialized) return false;
+
+    var storedData = await KambasTerminal()
+        .select()
+        .update({
+      'ticketNumber': ticketNumber,
+    });
+
+    return storedData.success;
   }
 
   Future<bool> storeTransactionData(DBTransactions data) async {
