@@ -216,3 +216,16 @@ class RequestDialog extends EventAccount {
   @override
   List<Object> get props => ["RequestDialog", Random().nextInt(5000)];
 }
+
+class RequestSaveSettings extends EventAccount {
+  final String stallName;
+  final String location;
+
+  const RequestSaveSettings({
+    required this.stallName,
+    required this.location,
+  });
+
+  @override
+  List<Object> get props => [stallName, location,];
+}

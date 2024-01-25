@@ -70,6 +70,7 @@ class MainLayout extends StatelessWidget
 
     Widget saveBtn = ButtonRaised(
       onPressed: () {
+        context.read<BlocAccount>().add(RequestSaveSettings(stallName: stallNameController.text, location: locationController.text));
       },
       text: "Save",
       textStyle: const TextStyle(
@@ -175,7 +176,7 @@ class MainLayout extends StatelessWidget
       listener: (mContext, state) {
         if (state is RequestSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Successfully Updated User"),
+            content: Text("Successfully Updated Settings"),
           ));
           Navigator.of(mContext).pop();
         }

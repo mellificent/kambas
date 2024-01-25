@@ -24,53 +24,12 @@ class ScreenMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    ScreenMainSettings args = ScreenMainSettings();
-    var settings = ModalRoute.of(context)?.settings.arguments;
-    if (settings != null) args = settings as ScreenMainSettings;
-
-    return Scaffold(
-      backgroundColor: AppColors.White,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushNamedAndRemoveUntil(
-                context, AppRoutes.of(context).loginScreen, (r) => false);
-          },
-          icon: const Icon(
-            Icons.account_circle,
-            size: 40.0,
-            color: Colors.grey,
-          ),
-        ),
-        actions: (args.isAdminUser ?? false) ? [
-          InkWell(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.of(context).mainAdminScreen,
-              );
-            },
-            child: const Icon(
-              Icons.settings,
-              size: 40.0,
-              color: AppColors.PrimaryColor,
-            ),
-          ),
-          const SizedBox(
-            width: 8.0,
-          ),
-        ] : null,
-        elevation: 0,
-      ),
-      body: BlocProvider(
+    return BlocProvider(
         create: (_) => BlocAccount(
           providerAccount: RepositoryProvider.of<ProviderAccount>(context),
         ),
         child: MainLayout(),
-      ),
-    );
+      );
   }
 }
 
@@ -80,31 +39,16 @@ class MainLayout extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+
+    ScreenMainSettings args = const ScreenMainSettings();
+    var settings = ModalRoute.of(context)?.settings.arguments;
+    if (settings != null) args = settings as ScreenMainSettings;
+
     Widget logo = Image.asset(
       AppIcons.APP_LOGO,
       fit: BoxFit.fitHeight,
       height: 80,
     );
-
-    Widget ticketNoText = const Text("Ticket No. N/A",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: 14.0,
-            color: AppColors.TextColorBlack56,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.3,
-            height: 1.5,
-            fontFamily: AppStrings.FONT_POPPINS_REGULAR));
-
-    Widget stallNameText = const Text("Stall Name - N/A",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: 14.0,
-            color: AppColors.TextColorBlack56,
-            fontWeight: FontWeight.normal,
-            letterSpacing: 1.6,
-            height: 1.5,
-            fontFamily: AppStrings.FONT_POPPINS_REGULAR));
 
     Widget placeBetButton = Container(
       margin: const EdgeInsets.only(top: 20.0, bottom: 4.0),
@@ -188,8 +132,7 @@ class MainLayout extends StatelessWidget
                     height: 20.0,
                   ),
                   _buildTitle(context),
-                  ticketNoText,
-                  stallNameText,
+                  _buildTerminalSettingView(context),
                   _buildDrawSchedule(context),
                   placeBetButton,
                   buildLabel(AppStrings.bet_placed.allInCaps()),
@@ -230,45 +173,42 @@ class MainLayout extends StatelessWidget
       ),
     );
 
-    return BlocListener<BlocAccount, StateAccount>(
-      listener: (context, state) {
-        BuildContext dialogContext;
-
-        //todo: setup dialogs (for mobile / desktop)
-        if (state is InitStateAccount) {
-          // showDialog(
-          //     context: context,
-          //     barrierDismissible: false,
-          //     builder: (BuildContext context) {
-          //       return const DialogProgressTitle(
-          //         title: AppStrings.processing_text,
-          //       );
-          //     });
-        }
-
-        if (state is RequestFailed) {
-          Navigator.of(context).pop();
-          // showDialog(
-          //     context: context,
-          //     barrierDismissible: true,
-          //     builder: (BuildContext context) {
-          //       dialogContext = context;
-          //       return DialogContentOptions(
-          //         title: "Sign In Error",
-          //         content: state.error,
-          //         redButtonText: "Okay",
-          //         onOption1Pressed: () {
-          //           Navigator.of(dialogContext).pop();
-          //         },
-          //         onOption2Pressed: () {},
-          //         onCancelled: () {
-          //           Navigator.of(dialogContext).pop();
-          //         },
-          //       );
-          //     });
-        }
-      },
-      child: mainBody,
+    return Scaffold(
+      backgroundColor: AppColors.White,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, AppRoutes.of(context).loginScreen, (r) => false);
+          },
+          icon: const Icon(
+            Icons.account_circle,
+            size: 40.0,
+            color: Colors.grey,
+          ),
+        ),
+        actions: (args.isAdminUser ?? false) ? [
+          InkWell(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.of(context).mainAdminScreen,
+              ).then((value) => context.read<BlocAccount>().add(GetTerminalSettings()));
+            },
+            child: const Icon(
+              Icons.settings,
+              size: 40.0,
+              color: AppColors.PrimaryColor,
+            ),
+          ),
+          const SizedBox(
+            width: 8.0,
+          ),
+        ] : null,
+        elevation: 0,
+      ),
+      body: mainBody,
     );
   }
 
@@ -307,6 +247,42 @@ class MainLayout extends StatelessWidget
           );
         },
       );
+
+  _buildTerminalSettingView(BuildContext context) => buildWidget(
+    context,
+    id: "terminalSettingView",
+    buildWhen: (id, previous, current) => (current is DisplayTerminalSettings),
+    builder: (context, state) {
+      if (state is InitStateAccount) {
+        context.read<BlocAccount>().add(GetTerminalSettings());
+      }
+
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text("Ticket No. ${(state is DisplayTerminalSettings) ? state.data.ticketNumber : ""}",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 14.0,
+                  color: AppColors.TextColorBlack56,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.3,
+                  height: 1.5,
+                  fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
+          Text("Stall Name - ${(state is DisplayTerminalSettings) ? state.data.stallName : "N/A"}",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 14.0,
+                  color: AppColors.TextColorBlack56,
+                  fontWeight: FontWeight.normal,
+                  letterSpacing: 1.6,
+                  height: 1.5,
+                  fontFamily: AppStrings.FONT_POPPINS_REGULAR))
+        ],
+      );
+    },
+  );
 
   _buildDrawSchedule(BuildContext context) => buildWidget(
         context,

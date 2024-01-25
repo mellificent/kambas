@@ -59,6 +59,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestUpdateUser>(_mapRequestUpdateUser);
     on<RequestDeleteUser>(_mapRequestDeleteUser);
     on<GetTerminalSettings>(_mapGetTerminalSettings);
+    on<RequestSaveSettings>(_mapRequestSaveSettings);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -144,7 +145,6 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
       if (list.isNotEmpty ||
           (event.username == "admin" && event.password == "kambas123")) {
-
         await providerAccount.storeUsername(event.username);
         emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
       } else {
@@ -316,6 +316,21 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     emit(isDeleted
         ? RequestSuccess()
         : const RequestFailed("error deleting user"));
+  }
+
+  Future<void> _mapRequestSaveSettings(
+      RequestSaveSettings event, Emitter<StateAccount> emit) async {
+    if (event.stallName.isEmpty || event.location.isEmpty) {
+      emit(const RequestFailed(AppStrings.error_register_inputfields_msg));
+      return;
+    }
+
+    final isUpdated = await providerAccount.setTerminalData(
+        data: TerminalData(stallName: event.stallName, location: event.location, ticketNumber: ''));
+
+    emit(isUpdated
+        ? RequestSuccess()
+        : const RequestFailed("error saving changes"));
   }
 
   Future<void> _mapRequestExportCSV(

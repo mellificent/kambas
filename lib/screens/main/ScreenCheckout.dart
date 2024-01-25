@@ -49,27 +49,6 @@ class MainLayout extends StatelessWidget
       height: 80,
     );
 
-    Widget ticketNoText = const Text("Ticket No. N/A",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: 14.0,
-            color: AppColors.TextColorBlack56,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 1.3,
-            height: 1.5,
-            fontFamily: AppStrings.FONT_POPPINS_REGULAR));
-
-    Widget stallNameText = const Text("Stall Name - N/A",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: 14.0,
-            color: AppColors.TextColorBlack56,
-            fontWeight: FontWeight.normal,
-            letterSpacing: 1.4,
-            height: 1.5,
-            fontFamily: AppStrings.FONT_POPPINS_REGULAR));
-
-
     Widget printButton = ButtonRaised(
       onPressed: () {
         context.read<BlocAccount>().add(RequestPrintTicket());
@@ -148,8 +127,7 @@ class MainLayout extends StatelessWidget
               height: 12.0,
             ),
             _buildBetNumberTitle(context),
-            ticketNoText,
-            stallNameText,
+            _buildTerminalSettingView(context),
             _buildDrawSchedule(context),
             _buildBetAmount(context),
             Expanded(child: checkoutbtns),
@@ -210,6 +188,42 @@ class MainLayout extends StatelessWidget
           );
         },
       );
+
+  _buildTerminalSettingView(BuildContext context) => buildWidget(
+    context,
+    id: "terminalSettingView",
+    buildWhen: (id, previous, current) => (current is DisplayTerminalSettings),
+    builder: (context, state) {
+      if (state is InitStateAccount) {
+        context.read<BlocAccount>().add(GetTerminalSettings());
+      }
+
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text("Ticket No. ${(state is DisplayTerminalSettings) ? state.data.ticketNumber : ""}",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 14.0,
+                  color: AppColors.TextColorBlack56,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.3,
+                  height: 1.5,
+                  fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
+          Text("Stall Name - ${(state is DisplayTerminalSettings) ? state.data.stallName : "N/A"}",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 14.0,
+                  color: AppColors.TextColorBlack56,
+                  fontWeight: FontWeight.normal,
+                  letterSpacing: 1.6,
+                  height: 1.5,
+                  fontFamily: AppStrings.FONT_POPPINS_REGULAR))
+        ],
+      );
+    },
+  );
 
   _buildDrawSchedule(BuildContext context) => buildWidget(
     context,
