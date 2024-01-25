@@ -155,7 +155,7 @@ class DatabaseRepository {
   Future<bool> storeTransactionData(DBTransactions data) async {
     if (!isDbInitialized) return false;
 
-    await KambasTransaction.withFields(DateTime.parse(data.createdDate), data.userName, true, jsonEncode(data), false).save();
+    await KambasTransaction.withFields(DateTime.parse(data.createdDate), data.userName, data.ticketNo, jsonEncode(data), false).save();
 
     ///(print results)
     var dataStored = await KambasTransaction().select().toList();
@@ -206,6 +206,23 @@ class DatabaseRepository {
     }
 
     return readContents;
+  }
+
+  Future<DBTransactions?> getTransactionDetails(String ticketNumber) async {
+    if (!isDbInitialized) return null;
+
+    var data = await KambasTransaction()
+        .select()
+        .ticketSeries
+        .equals(ticketNumber)
+        .toSingle();
+
+    if(data != null){
+      var rawData = json.decode(data.jsonResponse!);
+      return DBTransactions.fromJson(rawData);
+    }
+
+    return null;
   }
 
 }

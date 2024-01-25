@@ -67,7 +67,7 @@ class TableKambasTransaction extends SqfEntityTableBase {
       SqfEntityFieldBase('createdAt', DbType.datetime,
           minValue: DateTime.parse('1900-01-01')),
       SqfEntityFieldBase('username', DbType.text),
-      SqfEntityFieldBase('isSuccessful', DbType.bool, defaultValue: true),
+      SqfEntityFieldBase('ticketSeries', DbType.text),
       SqfEntityFieldBase('jsonResponse', DbType.text),
     ];
     super.init();
@@ -92,7 +92,7 @@ class TableKambasTerminal extends SqfEntityTableBase {
     fields = [
       SqfEntityFieldBase('stallName', DbType.text, defaultValue: ''),
       SqfEntityFieldBase('location', DbType.text, defaultValue: ''),
-      SqfEntityFieldBase('ticketNumber', DbType.text),
+      SqfEntityFieldBase('ticketNumber', DbType.text, defaultValue: ''),
     ];
     super.init();
   }
@@ -1204,18 +1204,18 @@ class KambasTransaction extends TableBase {
       {this.id,
       this.createdAt,
       this.username,
-      this.isSuccessful,
+      this.ticketSeries,
       this.jsonResponse,
       this.isDeleted}) {
     _setDefaultValues();
     softDeleteActivated = true;
   }
-  KambasTransaction.withFields(this.createdAt, this.username, this.isSuccessful,
+  KambasTransaction.withFields(this.createdAt, this.username, this.ticketSeries,
       this.jsonResponse, this.isDeleted) {
     _setDefaultValues();
   }
   KambasTransaction.withId(this.id, this.createdAt, this.username,
-      this.isSuccessful, this.jsonResponse, this.isDeleted) {
+      this.ticketSeries, this.jsonResponse, this.isDeleted) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -1234,9 +1234,8 @@ class KambasTransaction extends TableBase {
     if (o['username'] != null) {
       username = o['username'].toString();
     }
-    if (o['isSuccessful'] != null) {
-      isSuccessful = o['isSuccessful'].toString() == '1' ||
-          o['isSuccessful'].toString() == 'true';
+    if (o['ticketSeries'] != null) {
+      ticketSeries = o['ticketSeries'].toString();
     }
     if (o['jsonResponse'] != null) {
       jsonResponse = o['jsonResponse'].toString();
@@ -1249,7 +1248,7 @@ class KambasTransaction extends TableBase {
   int? id;
   DateTime? createdAt;
   String? username;
-  bool? isSuccessful;
+  String? ticketSeries;
   String? jsonResponse;
   bool? isDeleted;
 
@@ -1281,10 +1280,8 @@ class KambasTransaction extends TableBase {
     if (username != null || !forView) {
       map['username'] = username;
     }
-    if (isSuccessful != null) {
-      map['isSuccessful'] = forQuery ? (isSuccessful! ? 1 : 0) : isSuccessful;
-    } else if (isSuccessful != null || !forView) {
-      map['isSuccessful'] = null;
+    if (ticketSeries != null || !forView) {
+      map['ticketSeries'] = ticketSeries;
     }
     if (jsonResponse != null || !forView) {
       map['jsonResponse'] = jsonResponse;
@@ -1315,10 +1312,8 @@ class KambasTransaction extends TableBase {
     if (username != null || !forView) {
       map['username'] = username;
     }
-    if (isSuccessful != null) {
-      map['isSuccessful'] = forQuery ? (isSuccessful! ? 1 : 0) : isSuccessful;
-    } else if (isSuccessful != null || !forView) {
-      map['isSuccessful'] = null;
+    if (ticketSeries != null || !forView) {
+      map['ticketSeries'] = ticketSeries;
     }
     if (jsonResponse != null || !forView) {
       map['jsonResponse'] = jsonResponse;
@@ -1347,7 +1342,7 @@ class KambasTransaction extends TableBase {
     return [
       createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
       username,
-      isSuccessful,
+      ticketSeries,
       jsonResponse,
       isDeleted
     ];
@@ -1359,7 +1354,7 @@ class KambasTransaction extends TableBase {
       id,
       createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
       username,
-      isSuccessful,
+      ticketSeries,
       jsonResponse,
       isDeleted
     ];
@@ -1514,12 +1509,12 @@ class KambasTransaction extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnKambasTransaction.rawInsert(
-          'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, isSuccessful, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?)',
+          'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, ticketSeries, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?)',
           [
             id,
             createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
             username,
-            isSuccessful,
+            ticketSeries,
             jsonResponse,
             isDeleted
           ],
@@ -1550,7 +1545,7 @@ class KambasTransaction extends TableBase {
   Future<BoolCommitResult> upsertAll(List<KambasTransaction> kambastransactions,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnKambasTransaction.rawInsertAll(
-        'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, isSuccessful, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?)',
+        'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, ticketSeries, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?)',
         kambastransactions,
         exclusive: exclusive,
         noResult: noResult,
@@ -1603,7 +1598,6 @@ class KambasTransaction extends TableBase {
   }
 
   void _setDefaultValues() {
-    isSuccessful = isSuccessful ?? true;
     isDeleted = isDeleted ?? false;
   }
 
@@ -1829,10 +1823,10 @@ class KambasTransactionFilterBuilder extends ConjunctionBase {
     return _username = _setField(_username, 'username', DbType.text);
   }
 
-  KambasTransactionField? _isSuccessful;
-  KambasTransactionField get isSuccessful {
-    return _isSuccessful =
-        _setField(_isSuccessful, 'isSuccessful', DbType.bool);
+  KambasTransactionField? _ticketSeries;
+  KambasTransactionField get ticketSeries {
+    return _ticketSeries =
+        _setField(_ticketSeries, 'ticketSeries', DbType.text);
   }
 
   KambasTransactionField? _jsonResponse;
@@ -2094,10 +2088,10 @@ class KambasTransactionFields {
         _fUsername ?? SqlSyntax.setField(_fUsername, 'username', DbType.text);
   }
 
-  static TableField? _fIsSuccessful;
-  static TableField get isSuccessful {
-    return _fIsSuccessful = _fIsSuccessful ??
-        SqlSyntax.setField(_fIsSuccessful, 'isSuccessful', DbType.bool);
+  static TableField? _fTicketSeries;
+  static TableField get ticketSeries {
+    return _fTicketSeries = _fTicketSeries ??
+        SqlSyntax.setField(_fTicketSeries, 'ticketSeries', DbType.text);
   }
 
   static TableField? _fJsonResponse;
@@ -2478,6 +2472,7 @@ class KambasTerminal extends TableBase {
   void _setDefaultValues() {
     stallName = stallName ?? '';
     location = location ?? '';
+    ticketNumber = ticketNumber ?? '';
     isDeleted = isDeleted ?? false;
   }
 

@@ -101,13 +101,13 @@ class MainLayout extends StatelessWidget
 
     Widget reprintButton = ButtonRaised(
       onPressed: () {
-        context.read<BlocAccount>().add(RequestPrintTicket());
-        // //todo: data from bloc
-        // const platformMethodChannel = MethodChannel('com.methodchannel/test');
-        // platformMethodChannel.invokeMethod('getModel');
+        Navigator.pushNamed(
+          context,
+          AppRoutes.of(context).reprintScreen,
+        );
       },
       text: AppStrings.reprint_ticket,
-      textStyle: TextStyle(
+      textStyle: const TextStyle(
           fontSize: 14.0,
           color: AppColors.TextColorBlack56,
           fontWeight: FontWeight.bold,

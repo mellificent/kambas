@@ -12,6 +12,7 @@ import 'package:kambas/repository/PreferenceRepository.dart';
 import 'package:kambas/repository/RemoteRepository.dart';
 import 'package:kambas/screens/ScreenSplash.dart';
 import 'package:kambas/screens/account/login/ScreenLogin.dart';
+import 'package:kambas/screens/main/ScreenReprint.dart';
 import 'package:kambas/screens/main/admin/ScreenAdmin.dart';
 import 'package:kambas/screens/main/ScreenAmount.dart';
 import 'package:kambas/screens/main/ScreenBet.dart';
@@ -154,6 +155,7 @@ class App extends StatelessWidget {
           AppRoutes.of(context).createUserScreen: (context) => const ScreenCreateUser(),
           AppRoutes.of(context).updateUserScreen: (context) => const ScreenUpdateUser(),
           AppRoutes.of(context).generalSettingsScreen: (context) => const ScreenSettings(),
+          AppRoutes.of(context).reprintScreen: (context) => const ScreenReprint(),
         },
       ),
     );

@@ -50,6 +50,10 @@ class ProviderAccount extends BaseProvider {
     return await databaseRepository.getFilteredTransactions(selectedDatetime);
   }
 
+  Future<DBTransactions?> getTransactionDetails(String ticketNo) async {
+    return await databaseRepository.getTransactionDetails(ticketNo);
+  }
+
   Future<bool> storeNewUser(UserItemData data) async {
     return await databaseRepository.storeUserData(data);
   }

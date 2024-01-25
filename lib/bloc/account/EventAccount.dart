@@ -34,6 +34,15 @@ class GetTerminalSettings extends EventAccount {
   List<Object> get props => ["GetTerminalSettings", Random().nextInt(5000)];
 }
 
+class GetTransactionDetails extends EventAccount {
+  final String ticket;
+
+  const GetTransactionDetails(this.ticket,);
+
+  @override
+  List<Object> get props => ["GetTransactionDetails", ticket, Random().nextInt(5000)];
+}
+
 class FormFieldValueOnChange extends EventAccount {
   final String value;
   final String fieldName;
@@ -112,6 +121,15 @@ class RequestCurrentDate extends EventAccount {
 class RequestPrintTicket extends EventAccount {
   @override
   List<Object> get props => ['RequestPrintTicket'];
+}
+
+class RequestReprintTicket extends EventAccount {
+  final String ticketNo;
+
+  const RequestReprintTicket(this.ticketNo);
+
+  @override
+  List<Object> get props => ['RequestReprintTicket', Random().nextInt(5000), ticketNo];
 }
 
 class RequestPostBetAmount extends EventAccount {

@@ -46,7 +46,7 @@ const tableTransaction = SqfEntityTable(
     fields: [
       SqfEntityField('createdAt', DbType.datetime),
       SqfEntityField('username', DbType.text),
-      SqfEntityField('isSuccessful', DbType.bool, defaultValue: true),
+      SqfEntityField('ticketSeries', DbType.text,),
       SqfEntityField('jsonResponse', DbType.text),
     ]);
 

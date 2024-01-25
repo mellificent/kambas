@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/models/object/TerminalData.dart';
+import 'package:kambas/models/object/TransactionDetails.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
 import 'package:uuid/uuid.dart';
@@ -53,6 +54,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestDisplayBetAmount>(_mapRequestDisplayBetAmount);
     on<RequestExportCSV>(_mapRequestExportCSV);
     on<RequestPrintTicket>(_mapRequestPrintTicket);
+    on<RequestReprintTicket>(_mapRequestReprintTicket);
     on<RequestSelectedFilterDate>(_mapRequestSelectedFilterDate);
     on<GetDbUserList>(_mapRequestDbUserList);
     on<RequestAddUser>(_mapRequestAddUser);
@@ -60,6 +62,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<RequestDeleteUser>(_mapRequestDeleteUser);
     on<GetTerminalSettings>(_mapGetTerminalSettings);
     on<RequestSaveSettings>(_mapRequestSaveSettings);
+    on<GetTransactionDetails>(_mapGetTransactionDetails);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -326,11 +329,42 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
 
     final isUpdated = await providerAccount.setTerminalData(
-        data: TerminalData(stallName: event.stallName, location: event.location, ticketNumber: ''));
+        data: TerminalData(
+            stallName: event.stallName,
+            location: event.location,
+            ticketNumber: ''));
 
     emit(isUpdated
         ? RequestSuccess()
         : const RequestFailed("error saving changes"));
+  }
+
+  Future<void> _mapGetTransactionDetails(
+      GetTransactionDetails event, Emitter<StateAccount> emit) async {
+    if (event.ticket.isEmpty) {
+      emit(const RequestFailed("Please Enter Ticket Number."));
+      return;
+    }
+
+    final dbData = await providerAccount.getTransactionDetails(event.ticket);
+    if(dbData != null){
+      final transactionDate = DateTime.parse(dbData.createdDate);
+      String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(transactionDate);
+      String drawTime = DateFormat('h a').format(transactionDate);
+
+      final data = TransactionDetails(
+          selectedBetNumber: "${dbData.betNumber1} and ${dbData.betNumber2}",
+          placedDate: datePlaced,
+          stallName: dbData.stallName,
+          drawTime: drawTime,
+          betAmount: dbData.betAmount,
+          betPrize: dbData.betPrize);
+
+      emit(DisplayTransactionDetails(data: data));
+    } else {
+      emit(const RequestFailed("No transaction Found."));
+    }
+
   }
 
   Future<void> _mapRequestExportCSV(
@@ -424,7 +458,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }).then((value) async {
       await providerAccount.storeDBTransaction(
         DBTransactions(
-            createdDate: dbCreatedDate,
+            createdDate: currentDate.toString(),
             stallName: terminalData?.stallName ?? "N/A",
             location: terminalData?.location ?? "N/A",
             ticketNo: terminalData?.ticketNumber ?? "",
@@ -444,6 +478,39 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
     await providerAccount.deleteUserBetInput();
     emit(const RequestGoToHome());
+  }
+
+
+  Future<void> _mapRequestReprintTicket(
+      RequestReprintTicket event, Emitter<StateAccount> emit) async {
+    if (event.ticketNo.isEmpty) {
+      emit(const RequestFailed("Please Enter Ticket Number."));
+      return;
+    }
+
+    final dbData = await providerAccount.getTransactionDetails(event.ticketNo);
+    if(dbData != null){
+      final transactionDate = DateTime.parse(dbData.createdDate);
+      String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(transactionDate);
+      String drawTime = DateFormat('h a').format(transactionDate);
+
+      // emit(DisplayTransactionDetails(data: data));
+      const platformMethodChannel = MethodChannel('com.methodchannel/test');
+      platformMethodChannel.invokeMethod(AppStrings.printMethod, {
+        AppStrings.p_initialDate: DateFormat('MMMM dd, yyyy').format(DateTime.now()),
+        AppStrings.p_processedDate: dbData.createdDate,
+        AppStrings.p_ticketNumber: dbData.ticketNo,
+        AppStrings.p_betNumber: "${dbData.betNumber1} and ${dbData.betNumber2}",
+        AppStrings.p_stallName: dbData.stallName,
+        AppStrings.p_drawSchedule: drawTime,
+        AppStrings.p_betAmount: dbData.betAmount,
+        AppStrings.p_priceAmount: dbData.betPrize,
+      });
+
+    } else {
+      emit(const RequestFailed("No transaction Found."));
+    }
+
   }
 }
 

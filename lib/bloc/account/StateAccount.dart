@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:kambas/models/object/TerminalData.dart';
+import 'package:kambas/models/object/TransactionDetails.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:uuid/uuid.dart';
 
@@ -202,4 +203,13 @@ class DisplayTerminalSettings extends StateAccount {
 
   @override
   List<Object> get props => ['DisplayUserList', data,];
+}
+
+class DisplayTransactionDetails extends StateAccount {
+  final TransactionDetails data;
+
+  const DisplayTransactionDetails({required this.data,});
+
+  @override
+  List<Object> get props => ['DisplayTransactionDetails', data,];
 }
