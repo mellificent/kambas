@@ -84,6 +84,7 @@ class MainLayout extends StatelessWidget
           if (value == "betComplete") {
             context.read<BlocAccount>().add(RequestDisplayBetNumber());
             context.read<BlocAccount>().add(RequestDisplayBetAmount());
+            context.read<BlocAccount>().add(GetTerminalSettings());
           }
         });
       },

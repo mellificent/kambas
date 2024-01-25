@@ -265,7 +265,7 @@ public class MainActivity extends FlutterActivity {
                 mIPosPrinterService.printBlankLines(1, 16, callback);
                 mIPosPrinterService.printSpecifiedTypeText("Aposta feita de " + betAmount + " kza", "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
-                mIPosPrinterService.printSpecifiedTypeText("Quantidade do Prêmio - " + priceAmount + " kza", "ST", 24, callback);
+                mIPosPrinterService.printSpecifiedTypeText("Ganhas Possíveis - " + priceAmount + " kza", "ST", 24, callback);
 
                 mIPosPrinterService.printerPerformPrint(160,  callback);
             }catch (RemoteException e){
