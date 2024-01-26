@@ -37,8 +37,8 @@ class ProviderAccount extends BaseProvider {
     return await preferenceRepository.getUsername();
   }
 
-  Future<bool> storeDBTransaction(DBTransactions data) async {
-    return await databaseRepository.storeTransactionData(data);
+  Future<bool> storeDBTransaction({required DateTime createdDate, required DBTransactions data}) async {
+    return await databaseRepository.storeTransactionData(dbCreatedDate: createdDate, data: data);
   }
 
   Future<List<DBTransactions>> getStoredDBTransactions() async {

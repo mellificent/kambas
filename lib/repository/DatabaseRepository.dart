@@ -152,10 +152,10 @@ class DatabaseRepository {
     return storedData.success;
   }
 
-  Future<bool> storeTransactionData(DBTransactions data) async {
+  Future<bool> storeTransactionData({required DateTime dbCreatedDate, required DBTransactions data}) async {
     if (!isDbInitialized) return false;
 
-    await KambasTransaction.withFields(DateTime.parse(data.createdDate), data.userName, data.ticketNo, jsonEncode(data), false).save();
+    await KambasTransaction.withFields(dbCreatedDate, data.userName, data.ticketNo, jsonEncode(data), false).save();
 
     ///(print results)
     var dataStored = await KambasTransaction().select().toList();

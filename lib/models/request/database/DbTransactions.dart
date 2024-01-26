@@ -9,7 +9,8 @@ String responseDBTransactionsContentToJson(DBTransactions data) =>
     json.encode(data.toJson());
 
 class DBTransactions {
-  static const DB_CREATED_DATETIME = 'created_datetime';
+  static const DB_CREATED_DATE = 'created_datetime';
+  static const DB_DRAW_TIME = 'cut_off';
   static const DB_STALL_NAME = 'stall_name';
   static const DB_LOCATION = 'location';
   static const DB_TICKET_NO = 'ticket_number';
@@ -19,7 +20,8 @@ class DBTransactions {
   static const DB_BET_PRIZE = 'bet_prize';
   static const DB_USERNAME = 'encoded_by_username';
 
-  final String createdDate;
+  final String datePlaced;
+  final String drawTime;
   final String stallName;
   final String location;
   final String ticketNo;
@@ -30,7 +32,8 @@ class DBTransactions {
   final String userName;
 
   const DBTransactions({
-    required this.createdDate,
+    required this.datePlaced,
+    required this.drawTime,
     required this.stallName,
     required this.location,
     required this.ticketNo,
@@ -42,7 +45,8 @@ class DBTransactions {
   });
 
   Map<String, String> getData() => {
-        DB_CREATED_DATETIME: createdDate,
+    DB_CREATED_DATE: datePlaced,
+    DB_DRAW_TIME: drawTime,
         DB_STALL_NAME: stallName,
         DB_LOCATION: location,
         DB_TICKET_NO: ticketNo,
@@ -54,7 +58,8 @@ class DBTransactions {
       };
 
   factory DBTransactions.fromJson(Map<String, dynamic> json) => DBTransactions(
-    createdDate: json[DB_CREATED_DATETIME] ?? DateTime.now().toString(),
+    datePlaced: json[DB_CREATED_DATE] ?? DateTime.now().toString(),
+    drawTime: json[DB_DRAW_TIME] ?? "n/a",
     stallName: json[DB_STALL_NAME] ?? "n/a",
     location: json[DB_LOCATION] ?? "n/a",
     ticketNo: json[DB_TICKET_NO] ?? "n/a",
@@ -66,7 +71,8 @@ class DBTransactions {
   );
 
   Map<String, dynamic> toJson() => {
-    DB_CREATED_DATETIME: createdDate,
+    DB_CREATED_DATE: datePlaced,
+    DB_DRAW_TIME: drawTime,
     DB_STALL_NAME: stallName,
     DB_LOCATION: location,
     DB_TICKET_NO: ticketNo,

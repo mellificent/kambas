@@ -171,8 +171,6 @@ dependencies:
   sqfentity: ^2.4.0
   sqfentity_gen: ^2.4.0
 
-  money_formatter: ^0.0.5
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
