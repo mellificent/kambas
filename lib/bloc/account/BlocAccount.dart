@@ -227,7 +227,12 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapRequestSelectedFilterDate(
       RequestSelectedFilterDate event, Emitter<StateAccount> emit) async {
-    selectedFilteredDate = event.selectedDatetime;
+    selectedFilteredDate = event.selectedDatetime.copyWith(
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+    );
     final label = DateFormat('EEE MMM dd ha').format(selectedFilteredDate);
 
     emit(DisplayFilterDate(label));

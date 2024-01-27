@@ -238,11 +238,18 @@ public class MainActivity extends FlutterActivity {
 
     private void printReceipt(String initialDate,String datePlaced, String ticketNumber, String betNumber, String stallName, String drawSched, String betAmount, String priceAmount){
         ThreadPoolManager.getInstance().executeTask(() -> {
+            Bitmap mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.logo);
             try {
                 //font size: 16,24,32,48
 //                    mIPosPrinterService.printSpecifiedTypeText(PrintContentsExamples.KambasFormat(""), "ST", 32, callback);
 
                 mIPosPrinterService.setPrinterPrintAlignment(1,callback);
+
+                mIPosPrinterService.printBitmap(0, 14, mBitmap, callback);
+                mIPosPrinterService.printBlankLines(1, 16, callback);
+                mIPosPrinterService.printBlankLines(1, 16, callback);
+                mIPosPrinterService.printBlankLines(1, 16, callback);
+
                 mIPosPrinterService.printSpecifiedTypeText("Bem-vindo " + initialDate, "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);

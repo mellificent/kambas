@@ -27,27 +27,28 @@ class DatabaseRepository {
   Future<bool> storeUserData(UserItemData data) async {
     if (!isDbInitialized) return false;
 
-    await UserAccount.withFields(data.userId, data.userName, data.fullName, data.email, data.contactNo, data.password, DateTime.parse(data.createdAt), DateTime.parse(data.updatedAt), false).save();
+    await UserAccount.withFields(
+            data.userId,
+            data.userName,
+            data.fullName,
+            data.email,
+            data.contactNo,
+            data.password,
+            DateTime.parse(data.createdAt),
+            DateTime.parse(data.updatedAt),
+            false)
+        .save();
 
-    ///(print results)
-    var dataStored = await UserAccount().select().toList();
-    dataStored.forEach((element) async {
-      if (kDebugMode) {
-        print("DATABASE ID : ${element.id!}\nresponse : \n${element.userId ?? ""}\n${element.userName ?? ""}\n${element.password ?? ""}\n--------------\n");
-      }
-    });
+    var storedData = await UserAccount().select().userId.equals(data.userId).toSingle();
 
-    return true;
+    return (storedData != null);
   }
 
   Future<bool> updateUserData(UserItemData data) async {
     if (!isDbInitialized) return false;
 
-    var storedData = await UserAccount()
-        .select()
-        .userId
-        .equals(data.userId)
-        .update({
+    var storedData =
+        await UserAccount().select().userId.equals(data.userId).update({
       'userName': data.userName,
       'fullName': data.fullName,
       'email': data.email,
@@ -60,34 +61,28 @@ class DatabaseRepository {
   Future<UserItemData?> getUserDetails(int user_id) async {
     if (!isDbInitialized) return null;
 
-    var storedData = await UserAccount()
-        .select()
-        .userId
-        .equals(user_id)
-        .toSingle();
+    var storedData =
+        await UserAccount().select().userId.equals(user_id).toSingle();
 
     final userData = UserItemData(
-        storedData?.userId ?? user_id,
-        userName: storedData?.userName ?? "",
-        fullName: storedData?.fullName ?? "",
-        email: storedData?.email ?? "",
-        contactNo: storedData?.contactNo ?? "",
-        password: storedData?.password ?? "",
-        createdAt: storedData?.createdAt.toString() ?? "",
-        updatedAt: storedData?.updatedAt.toString() ?? "",
+      storedData?.userId ?? user_id,
+      userName: storedData?.userName ?? "",
+      fullName: storedData?.fullName ?? "",
+      email: storedData?.email ?? "",
+      contactNo: storedData?.contactNo ?? "",
+      password: storedData?.password ?? "",
+      createdAt: storedData?.createdAt.toString() ?? "",
+      updatedAt: storedData?.updatedAt.toString() ?? "",
     );
 
     return userData;
   }
 
   Future<bool> deleteDBUser(int user_id) async {
-  final isDeleted = await UserAccount()
-      .select()
-      .userId
-      .equals(user_id)
-      .delete();
+    final isDeleted =
+        await UserAccount().select().userId.equals(user_id).delete();
 
-  return isDeleted.success;
+    return isDeleted.success;
   }
 
   Future<List<UserItemData>> getDBUsers() async {
@@ -95,14 +90,17 @@ class DatabaseRepository {
 
     List<UserItemData> list = [];
 
-    var storedList = await UserAccount()
-        .select()
-        .and
-        .orderBy("id")
-        .toList();
+    var storedList = await UserAccount().select().and.orderBy("id").toList();
 
     for (var e in storedList) {
-      list.add(UserItemData(e.userId!, userName: e.userName!, fullName: e.fullName!,  email: e.email!, contactNo: e.contactNo!, password: e.password ?? "", createdAt: e.createdAt!.toString(), updatedAt: e.updatedAt!.toString()));
+      list.add(UserItemData(e.userId!,
+          userName: e.userName!,
+          fullName: e.fullName!,
+          email: e.email!,
+          contactNo: e.contactNo!,
+          password: e.password ?? "",
+          createdAt: e.createdAt!.toString(),
+          updatedAt: e.updatedAt!.toString()));
     }
 
     return list.reversed.toList();
@@ -112,12 +110,16 @@ class DatabaseRepository {
     if (!isDbInitialized) return null;
 
     var initialTable = await KambasTerminal().select().toSingle();
-    if(initialTable == null){
-      await KambasTerminal.withFields("", "", "T${Random().nextInt(5000)}${const Uuid().v4().substring(0, 4)}", false).save();
+    if (initialTable == null) {
+      await KambasTerminal.withFields(
+              "",
+              "",
+              "T${Random().nextInt(5000)}${const Uuid().v4().substring(0, 4)}",
+              false)
+          .save();
     }
 
-    var storedData = await KambasTerminal()
-        .select().toSingle();
+    var storedData = await KambasTerminal().select().toSingle();
 
     final data = TerminalData(
         stallName: storedData?.stallName ?? "",
@@ -130,9 +132,7 @@ class DatabaseRepository {
   Future<bool> storeDBTerminalData(TerminalData data) async {
     if (!isDbInitialized) return false;
 
-    var storedData = await KambasTerminal()
-        .select()
-        .update({
+    var storedData = await KambasTerminal().select().update({
       'stallName': data.stallName,
       'location': data.location,
     });
@@ -143,25 +143,27 @@ class DatabaseRepository {
   Future<bool> storeDBTicketSeriesNo(String ticketNumber) async {
     if (!isDbInitialized) return false;
 
-    var storedData = await KambasTerminal()
-        .select()
-        .update({
+    var storedData = await KambasTerminal().select().update({
       'ticketNumber': ticketNumber,
     });
 
     return storedData.success;
   }
 
-  Future<bool> storeTransactionData({required DateTime dbCreatedDate, required DBTransactions data}) async {
+  Future<bool> storeTransactionData(
+      {required DateTime dbCreatedDate, required DBTransactions data}) async {
     if (!isDbInitialized) return false;
 
-    await KambasTransaction.withFields(dbCreatedDate, data.userName, data.ticketNo, jsonEncode(data), false).save();
+    await KambasTransaction.withFields(dbCreatedDate, data.userName,
+            data.ticketNo, jsonEncode(data), false)
+        .save();
 
     ///(print results)
     var dataStored = await KambasTransaction().select().toList();
     dataStored.forEach((element) async {
       if (kDebugMode) {
-        print("DATABASE ID : ${element.id!}\nresponse : \n${element.jsonResponse ?? ""}\n--------------\n");
+        print(
+            "DATABASE ID : ${element.id!}\nresponse : \n${element.jsonResponse ?? ""}\n--------------\n");
       }
     });
 
@@ -173,11 +175,8 @@ class DatabaseRepository {
 
     List<DBTransactions> readContents = [];
 
-    var storedModule = await KambasTransaction()
-        .select()
-        .and
-        .orderBy("id")
-        .toList();
+    var storedModule =
+        await KambasTransaction().select().and.orderBy("id").toList();
 
     for (var e in storedModule) {
       var rawData = json.decode(e.jsonResponse!);
@@ -187,7 +186,8 @@ class DatabaseRepository {
     return readContents;
   }
 
-  Future<List<DBTransactions>> getFilteredTransactions(DateTime selectedDatetime) async {
+  Future<List<DBTransactions>> getFilteredTransactions(
+      DateTime selectedDatetime) async {
     if (!isDbInitialized) return [];
 
     List<DBTransactions> readContents = [];
@@ -217,12 +217,11 @@ class DatabaseRepository {
         .equals(ticketNumber)
         .toSingle();
 
-    if(data != null){
+    if (data != null) {
       var rawData = json.decode(data.jsonResponse!);
       return DBTransactions.fromJson(rawData);
     }
 
     return null;
   }
-
 }
