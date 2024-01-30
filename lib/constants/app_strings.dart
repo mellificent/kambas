@@ -64,6 +64,7 @@ class AppStrings {
   static const p_ticketNumber = 'ticket_number';
   static const p_betNumber = 'bet_number';
   static const p_stallName = 'stall_name';
+  static const p_agentName = 'agent_name';
   static const p_drawSchedule = 'draw_sched';
   static const p_betAmount = 'bet_amount';
   static const p_priceAmount = 'price_amount';

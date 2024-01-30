@@ -58,6 +58,7 @@ const tableTerminal = SqfEntityTable(
     fields: [
       SqfEntityField('stallName', DbType.text, defaultValue: ""),
       SqfEntityField('location', DbType.text, defaultValue: ""),
+      SqfEntityField('agent', DbType.text, defaultValue: ""),
       SqfEntityField('ticketNumber', DbType.text, defaultValue: ""),
     ]);
 

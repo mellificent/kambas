@@ -253,6 +253,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     final terminalData = TerminalData(
         stallName: response?.stallName ?? '',
         location: response?.location ?? '',
+        agent: response?.agent ?? "",
         ticketNumber: response?.ticketNumber ?? '');
 
     emit(DisplayTerminalSettings(data: terminalData));
@@ -337,6 +338,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         data: TerminalData(
             stallName: event.stallName,
             location: event.location,
+            agent: event.agentName,
             ticketNumber: ''));
 
     emit(isUpdated
@@ -445,6 +447,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       AppStrings.p_betNumber:
           "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
       AppStrings.p_stallName: terminalData?.stallName ?? "N/A",
+      AppStrings.p_agentName: terminalData?.agent ?? "N/A",
       AppStrings.p_drawSchedule: drawTime,
       AppStrings.p_betAmount: betAmountResponse ?? "N/A",
       AppStrings.p_priceAmount:
@@ -456,6 +459,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
             datePlaced: datePlaced,
             drawTime: drawTime,
             stallName: terminalData?.stallName ?? "N/A",
+            agentName: terminalData?.agent ?? "N/A",
             location: terminalData?.location ?? "N/A",
             ticketNo: terminalData?.ticketNumber ?? "",
             betNumber1: selectedNumberResponse[0].toString(),
@@ -494,6 +498,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         AppStrings.p_ticketNumber: dbData.ticketNo,
         AppStrings.p_betNumber: "${dbData.betNumber1} and ${dbData.betNumber2}",
         AppStrings.p_stallName: dbData.stallName,
+        AppStrings.p_agentName: dbData.agentName,
         AppStrings.p_drawSchedule: dbData.drawTime,
         AppStrings.p_betAmount: dbData.betAmount,
         AppStrings.p_priceAmount: dbData.betPrize,

@@ -9,7 +9,6 @@ import 'package:kambas/mixins/FormMixins.dart';
 import 'package:kambas/widgets/buttons/button_raised.dart';
 import 'package:kambas/widgets/buttons/button_style1.dart';
 import 'package:kambas/widgets/layout/LayoutLoading.dart';
-import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import '../../../../bloc/account/BlocAccount.dart';
 import '../../../../bloc/account/EventAccount.dart';
 import '../../../../bloc/account/StateAccount.dart';
@@ -42,6 +41,7 @@ class MainLayout extends StatelessWidget
 
   final TextEditingController stallNameController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
+  final TextEditingController agentNameController = TextEditingController();
   final TextEditingController ticketNoController = TextEditingController();
 
   final borderStyle = const OutlineInputBorder(
@@ -55,11 +55,12 @@ class MainLayout extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-
     Widget initLayout() {
       context.read<BlocAccount>().add(RequestCurrentDate());
       context.read<BlocAccount>().add(GetTerminalSettings());
-      return const LayoutLoading(progressColor: AppColors.PrimaryColor,);
+      return const LayoutLoading(
+        progressColor: AppColors.PrimaryColor,
+      );
     }
 
     Widget logo = Image.asset(
@@ -70,7 +71,10 @@ class MainLayout extends StatelessWidget
 
     Widget saveBtn = ButtonRaised(
       onPressed: () {
-        context.read<BlocAccount>().add(RequestSaveSettings(stallName: stallNameController.text, location: locationController.text));
+        context.read<BlocAccount>().add(RequestSaveSettings(
+            stallName: stallNameController.text,
+            location: locationController.text,
+            agentName: agentNameController.text,),);
       },
       text: "Save",
       textStyle: const TextStyle(
@@ -80,7 +84,7 @@ class MainLayout extends StatelessWidget
           fontFamily: AppStrings.FONT_POPPINS_BOLD),
       borderRadius: 9,
       height: 45.0,
-      margin: const EdgeInsets.only(top: 13),
+      margin: const EdgeInsets.only(top: 10),
     );
 
     Widget backToHomeBtn = ButtonRaised(
@@ -95,11 +99,11 @@ class MainLayout extends StatelessWidget
           fontFamily: AppStrings.FONT_POPPINS_BOLD),
       borderRadius: 9,
       height: 45.0,
-      margin: const EdgeInsets.only(top: 13),
+      margin: const EdgeInsets.only(top: 10),
     );
 
     Widget formBody = Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(6.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,6 +124,12 @@ class MainLayout extends StatelessWidget
           ),
           _buildTextField(
             context,
+            controller: agentNameController,
+            hint: 'Agent Name',
+            label: "AGENT NAME",
+          ),
+          _buildTextField(
+            context,
             controller: ticketNoController,
             hint: 'Enter Ticket Number',
             label: "NEXT TICKET NO. SERIES",
@@ -134,14 +144,14 @@ class MainLayout extends StatelessWidget
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(
-                left: 41.0, right: 41.0, top: 20.0, bottom: 30.0),
+                left: 41.0, right: 41.0, top: 20.0, bottom: 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 logo,
                 const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 26.0),
+                  padding: EdgeInsets.only(top: 22.0, bottom: 16),
                   child: Text(
                     "General Settings",
                     textAlign: TextAlign.center,
@@ -187,13 +197,15 @@ class MainLayout extends StatelessWidget
           ));
         }
       },
-      buildWhen: (previous, current) => (current is InitStateAccount || current is DisplayTerminalSettings),
+      buildWhen: (previous, current) =>
+          (current is InitStateAccount || current is DisplayTerminalSettings),
       builder: (context, state) {
         if (state is InitStateAccount) return initLayout();
 
         if (state is DisplayTerminalSettings) {
           stallNameController.text = state.data.stallName;
           locationController.text = state.data.location;
+          agentNameController.text = state.data.agent;
           ticketNoController.text = state.data.ticketNumber;
           return mainBody;
         }
@@ -211,7 +223,7 @@ class MainLayout extends StatelessWidget
       TextInputType? keybType,
       bool? isEditable}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
       child: TextField(
         onTapOutside: (event) {
           SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -234,8 +246,7 @@ class MainLayout extends StatelessWidget
           labelStyle: const TextStyle(
               fontSize: 14.0,
               color: AppColors.PrimaryColor,
-            fontWeight: FontWeight.w500
-          ),
+              fontWeight: FontWeight.w500),
           contentPadding: const EdgeInsets.only(
             left: 14,
             top: 16.0,

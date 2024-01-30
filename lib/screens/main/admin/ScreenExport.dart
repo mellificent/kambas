@@ -1,13 +1,15 @@
+import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_routes.dart';
 import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
 import 'package:kambas/widgets/buttons/button_raised.dart';
-import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import '../../../../bloc/account/BlocAccount.dart';
 import '../../../../bloc/account/EventAccount.dart';
 import '../../../../bloc/account/StateAccount.dart';
@@ -60,10 +62,10 @@ class MainLayout extends StatelessWidget
       margin: const EdgeInsets.only(top: 13),
     );
 
-
     Widget backToHomeBtn = ButtonRaised(
       onPressed: () {
-        Navigator.of(context).popUntil(ModalRoute.withName(AppRoutes.of(context).mainScreen));
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(AppRoutes.of(context).mainScreen));
       },
       text: AppStrings.back_to_home,
       textStyle: const TextStyle(
@@ -191,89 +193,153 @@ class MainLayout extends StatelessWidget
       );
 
   _buildDateTimePicker(BuildContext context) => buildWidget(
-    context,
-    id: "dateTimePickerView",
-    buildWhen: (id, previous, current) => (current is DisplayFilterDate),
-    builder: (context, state) {
-      if (state is InitStateAccount) {
-        context.read<BlocAccount>().add(RequestSelectedFilterDate(DateTime.now()));
-      }
+        context,
+        id: "dateTimePickerView",
+        buildWhen: (id, previous, current) => (current is DisplayFilterDate),
+        builder: (context, state) {
+          if (state is InitStateAccount) {
+            context
+                .read<BlocAccount>()
+                .add(RequestSelectedFilterDate(DateTime.now().copyWith(hour: 13)));
+          }
 
-      return Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Choose Date/Cut-Off",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 13.0,
-                  color: AppColors.TextColorBlack56,
-                  fontWeight: FontWeight.w500,
-                  height: 1.2,
-                  fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
-          ButtonRaised(
-            onPressed: () async {
-              DateTime? dateTime = await showOmniDateTimePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                // firstDate: DateTime(1600).subtract(const Duration(days: 3652)),
-                // lastDate: DateTime.now().add(
-                //   const Duration(days: 3652),
-                // ),
-                is24HourMode: false,
-                isShowSeconds: false,
-                minutesInterval: 60,
-                secondsInterval: 1,
-                isForce2Digits: true,
-                borderRadius: const BorderRadius.all(Radius.circular(16)),
-                constraints: const BoxConstraints(
-                  maxWidth: 350,
-                  maxHeight: 650,
-                ),
-                transitionBuilder: (context, anim1, anim2, child) {
-                  return FadeTransition(
-                    opacity: anim1.drive(
-                      Tween(
-                        begin: 0,
-                        end: 1,
-                      ),
-                    ),
-                    child: child,
+          return Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Choose Date/Cut-Off",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 13.0,
+                      color: AppColors.TextColorBlack56,
+                      fontWeight: FontWeight.w500,
+                      height: 1.2,
+                      fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
+              ButtonRaised(
+                onPressed: () async {
+                  DatePicker.showDatePicker(
+                    context,
+                    maxTime: DateTime.now(),
+                    showTitleActions: true,
+                    onConfirm: (date) {
+                      showModalBottomSheet(
+                          context: context,
+                          isDismissible: false,
+                          builder: (modalctxt) {
+                            return _buildCutOffSheet(context,
+                                selectedDatetime: date);
+                          });
+                    },
+                    locale: LocaleType.en,
                   );
                 },
-                transitionDuration: const Duration(milliseconds: 200),
-                barrierDismissible: true,
-                selectableDayPredicate: (dateTime) {
-                  // Disable 25th Feb 2023
-                  if (dateTime == DateTime(2023, 2, 25)) {
-                    return false;
-                  } else {
-                    return true;
-                  }
-                },
-              );
-              if (kDebugMode) {
-                //2024-01-25 21:00:00.000
-                print("dateTime: $dateTime");
-              }
-              if (dateTime != null && context.mounted){
-                context.read<BlocAccount>().add(RequestSelectedFilterDate(dateTime));
-              }
-            },
-            bgColor: AppColors.DisabledPrimaryColor,
-            text: (state is DisplayFilterDate) ? state.text : DateFormat('EEE MMM dd ha').format(DateTime.now()),
-            textStyle: const TextStyle(
-                fontSize: 14.0,
-                color: AppColors.TextColorBlack56,
-                fontWeight: FontWeight.bold,
-                fontFamily: AppStrings.FONT_POPPINS_BOLD),
-            borderRadius: 9,
-            height: 45.0,
-            margin: const EdgeInsets.only(top: 4.0),
-          ),
-        ],
+                bgColor: AppColors.DisabledPrimaryColor,
+                text: (state is DisplayFilterDate)
+                    ? state.text
+                    : DateFormat('EEE MMM dd ha').format(DateTime.now()),
+                textStyle: const TextStyle(
+                    fontSize: 14.0,
+                    color: AppColors.TextColorBlack56,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: AppStrings.FONT_POPPINS_BOLD),
+                borderRadius: 9,
+                height: 45.0,
+                margin: const EdgeInsets.only(top: 4.0),
+              ),
+            ],
+          );
+        },
       );
-    },
-  );
 
+  _buildCutOffSheet(BuildContext context,
+          {required DateTime selectedDatetime}) {
+    int selectedTime = 13;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          height: 44.0,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              SizedBox(
+                height: 44,
+                child: CupertinoButton(
+                  pressedOpacity: 0.3,
+                  padding: const EdgeInsetsDirectional.only(start: 16, top: 0),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.black54, fontSize: 16),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 44,
+                child: CupertinoButton(
+                  pressedOpacity: 0.3,
+                  padding: const EdgeInsetsDirectional.only(end: 16, top: 0),
+                  child: const Text(
+                    'Done',
+                    style: TextStyle(color: Colors.blue, fontSize: 16),
+                  ),
+                  onPressed: () {
+                    if (context.mounted) {
+                      context.read<BlocAccount>().add(
+                          RequestSelectedFilterDate(selectedDatetime.copyWith(
+                              hour: selectedTime)));
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 210,
+          width: 210,
+          child: CustomRadioButton(
+            buttonTextStyle: const ButtonTextStyle(
+              selectedColor: Colors.black,
+              unSelectedColor: AppColors.TextFieldHint_TextColor,
+              textStyle:
+              TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
+              selectedTextStyle: TextStyle(
+                  color: Color(0xFF000046),
+                  fontSize: 17,
+                  fontWeight: FontWeight.normal),
+            ),
+            unSelectedColor: Colors.white,
+            selectedColor: AppColors.TextFieldHint_TextColor.withOpacity(0.1),
+            selectedBorderColor: Colors.transparent,
+            unSelectedBorderColor: Colors.transparent,
+            spacing: 0,
+            defaultSelected: "13",
+            horizontal: true,
+            enableButtonWrap: true,
+            enableShape: true,
+            absoluteZeroSpacing: false,
+            elevation: 0,
+            buttonLables: const [
+              '1 PM Cut-Off',
+              '8 PM Cut-Off',
+            ],
+            buttonValues: const [
+              '13',
+              '20',
+            ],
+            radioButtonValue: (time) {
+              selectedTime = int.parse(time);
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }

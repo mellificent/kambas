@@ -114,6 +114,7 @@ class DatabaseRepository {
       await KambasTerminal.withFields(
               "",
               "",
+              "",
               "T${Random().nextInt(5000)}${const Uuid().v4().substring(0, 4)}",
               false)
           .save();
@@ -124,6 +125,7 @@ class DatabaseRepository {
     final data = TerminalData(
         stallName: storedData?.stallName ?? "",
         location: storedData?.location ?? "",
+        agent: storedData?.agent ?? "",
         ticketNumber: storedData?.ticketNumber ?? "");
 
     return data;
@@ -135,6 +137,7 @@ class DatabaseRepository {
     var storedData = await KambasTerminal().select().update({
       'stallName': data.stallName,
       'location': data.location,
+      'agent': data.agent,
     });
 
     return storedData.success;
@@ -192,13 +195,28 @@ class DatabaseRepository {
 
     List<DBTransactions> readContents = [];
 
+    // var storedModule = await KambasTransaction()
+    //     .select()
+    //     .createdAt
+    //     .between(selectedDatetime, selectedDatetime.subtract(const Duration(hours: 7)))
+    //     .and
+    //     .orderBy("id")
+    //     .toList();
+
+    // print("dbstart val ${selectedDatetime.copyWith(hour: selectedDatetime.hour - 7)} && end = ${selectedDatetime}");
     var storedModule = await KambasTransaction()
         .select()
         .createdAt
-        .equals(selectedDatetime)
-        .and
-        .orderBy("id")
+        .between(selectedDatetime.copyWith(hour: selectedDatetime.hour - 7), selectedDatetime)
         .toList();
+
+    // var storedModule = await KambasTransaction()
+    //     .select()
+    //     .createdAt
+    //     .equals(selectedDatetime)
+    //     .and
+    //     .orderBy("id")
+    //     .toList();
 
     for (var e in storedModule) {
       var rawData = json.decode(e.jsonResponse!);

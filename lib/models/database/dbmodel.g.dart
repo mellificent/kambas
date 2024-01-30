@@ -92,6 +92,7 @@ class TableKambasTerminal extends SqfEntityTableBase {
     fields = [
       SqfEntityFieldBase('stallName', DbType.text, defaultValue: ''),
       SqfEntityFieldBase('location', DbType.text, defaultValue: ''),
+      SqfEntityFieldBase('agent', DbType.text, defaultValue: ''),
       SqfEntityFieldBase('ticketNumber', DbType.text, defaultValue: ''),
     ];
     super.init();
@@ -2127,16 +2128,17 @@ class KambasTerminal extends TableBase {
       {this.id,
       this.stallName,
       this.location,
+      this.agent,
       this.ticketNumber,
       this.isDeleted}) {
     _setDefaultValues();
     softDeleteActivated = true;
   }
-  KambasTerminal.withFields(
-      this.stallName, this.location, this.ticketNumber, this.isDeleted) {
+  KambasTerminal.withFields(this.stallName, this.location, this.agent,
+      this.ticketNumber, this.isDeleted) {
     _setDefaultValues();
   }
-  KambasTerminal.withId(this.id, this.stallName, this.location,
+  KambasTerminal.withId(this.id, this.stallName, this.location, this.agent,
       this.ticketNumber, this.isDeleted) {
     _setDefaultValues();
   }
@@ -2153,6 +2155,9 @@ class KambasTerminal extends TableBase {
     if (o['location'] != null) {
       location = o['location'].toString();
     }
+    if (o['agent'] != null) {
+      agent = o['agent'].toString();
+    }
     if (o['ticketNumber'] != null) {
       ticketNumber = o['ticketNumber'].toString();
     }
@@ -2164,6 +2169,7 @@ class KambasTerminal extends TableBase {
   int? id;
   String? stallName;
   String? location;
+  String? agent;
   String? ticketNumber;
   bool? isDeleted;
 
@@ -2188,6 +2194,9 @@ class KambasTerminal extends TableBase {
     if (location != null || !forView) {
       map['location'] = location;
     }
+    if (agent != null || !forView) {
+      map['agent'] = agent;
+    }
     if (ticketNumber != null || !forView) {
       map['ticketNumber'] = ticketNumber;
     }
@@ -2210,6 +2219,9 @@ class KambasTerminal extends TableBase {
     }
     if (location != null || !forView) {
       map['location'] = location;
+    }
+    if (agent != null || !forView) {
+      map['agent'] = agent;
     }
     if (ticketNumber != null || !forView) {
       map['ticketNumber'] = ticketNumber;
@@ -2235,12 +2247,12 @@ class KambasTerminal extends TableBase {
 
   @override
   List<dynamic> toArgs() {
-    return [stallName, location, ticketNumber, isDeleted];
+    return [stallName, location, agent, ticketNumber, isDeleted];
   }
 
   @override
   List<dynamic> toArgsWithIds() {
-    return [id, stallName, location, ticketNumber, isDeleted];
+    return [id, stallName, location, agent, ticketNumber, isDeleted];
   }
 
   static Future<List<KambasTerminal>?> fromWebUrl(Uri uri,
@@ -2389,8 +2401,8 @@ class KambasTerminal extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnKambasTerminal.rawInsert(
-          'INSERT OR REPLACE INTO kambasTerminal (id, stallName, location, ticketNumber,isDeleted)  VALUES (?,?,?,?,?)',
-          [id, stallName, location, ticketNumber, isDeleted],
+          'INSERT OR REPLACE INTO kambasTerminal (id, stallName, location, agent, ticketNumber,isDeleted)  VALUES (?,?,?,?,?,?)',
+          [id, stallName, location, agent, ticketNumber, isDeleted],
           ignoreBatch);
       if (result! > 0) {
         saveResult = BoolResult(
@@ -2417,7 +2429,7 @@ class KambasTerminal extends TableBase {
   Future<BoolCommitResult> upsertAll(List<KambasTerminal> kambasterminals,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnKambasTerminal.rawInsertAll(
-        'INSERT OR REPLACE INTO kambasTerminal (id, stallName, location, ticketNumber,isDeleted)  VALUES (?,?,?,?,?)',
+        'INSERT OR REPLACE INTO kambasTerminal (id, stallName, location, agent, ticketNumber,isDeleted)  VALUES (?,?,?,?,?,?)',
         kambasterminals,
         exclusive: exclusive,
         noResult: noResult,
@@ -2472,6 +2484,7 @@ class KambasTerminal extends TableBase {
   void _setDefaultValues() {
     stallName = stallName ?? '';
     location = location ?? '';
+    agent = agent ?? '';
     ticketNumber = ticketNumber ?? '';
     isDeleted = isDeleted ?? false;
   }
@@ -2696,6 +2709,11 @@ class KambasTerminalFilterBuilder extends ConjunctionBase {
   KambasTerminalField? _location;
   KambasTerminalField get location {
     return _location = _setField(_location, 'location', DbType.text);
+  }
+
+  KambasTerminalField? _agent;
+  KambasTerminalField get agent {
+    return _agent = _setField(_agent, 'agent', DbType.text);
   }
 
   KambasTerminalField? _ticketNumber;
@@ -2954,6 +2972,12 @@ class KambasTerminalFields {
   static TableField get location {
     return _fLocation =
         _fLocation ?? SqlSyntax.setField(_fLocation, 'location', DbType.text);
+  }
+
+  static TableField? _fAgent;
+  static TableField get agent {
+    return _fAgent =
+        _fAgent ?? SqlSyntax.setField(_fAgent, 'agent', DbType.text);
   }
 
   static TableField? _fTicketNumber;

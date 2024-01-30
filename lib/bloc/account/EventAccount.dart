@@ -238,12 +238,14 @@ class RequestDialog extends EventAccount {
 class RequestSaveSettings extends EventAccount {
   final String stallName;
   final String location;
+  final String agentName;
 
   const RequestSaveSettings({
     required this.stallName,
     required this.location,
+    required this.agentName,
   });
 
   @override
-  List<Object> get props => [stallName, location,];
+  List<Object> get props => [stallName, location, agentName];
 }

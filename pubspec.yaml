@@ -165,7 +165,8 @@ dependencies:
   group_button: ^5.3.3
   timezone: ^0.9.2
   to_csv: ^2.1.0
-  omni_datetime_picker: ^1.0.9
+  custom_radio_grouped_button: any
+  flutter_datetime_picker_plus: ^2.1.0
 
   # DATABASE PLUGINS
   sqfentity: ^2.4.0

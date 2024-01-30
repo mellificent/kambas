@@ -36,6 +36,7 @@ public class MainActivity extends FlutterActivity {
     private static final String p_ticketNumber = "ticket_number";
     private static final String p_betNumber = "bet_number";
     private static final String p_stallName = "stall_name";
+    private static final String p_agentName = "agent_name";
     private static final String p_drawSchedule = "draw_sched";
     private static final String p_betAmount = "bet_amount";
     private static final String p_priceAmount = "price_amount";
@@ -191,12 +192,13 @@ public class MainActivity extends FlutterActivity {
                         String ticketNumber = methodCall.argument(p_ticketNumber);
                         String betNumber = methodCall.argument(p_betNumber);
                         String stallName = methodCall.argument(p_stallName);
+                        String agentName = methodCall.argument(p_agentName);
                         String drawSched = methodCall.argument(p_drawSchedule);
                         String betAmount = methodCall.argument(p_betAmount);
                         String priceAmount = methodCall.argument(p_priceAmount);
 
-                        if (ticketNumber != null && betNumber != null && stallName != null && drawSched != null && betAmount != null && priceAmount != null) {
-                            printReceipt(initialDate, datePlaced, ticketNumber, betNumber, stallName, drawSched, betAmount, priceAmount);
+                        if (ticketNumber != null && betNumber != null && stallName != null && agentName != null && drawSched != null && betAmount != null && priceAmount != null) {
+                            printReceipt(initialDate, datePlaced, ticketNumber, betNumber, stallName, agentName, drawSched, betAmount, priceAmount);
                             result.success("printing");
                         } else {
                             result.error("UNAVAILABLE", "Error fetching data.", null);
@@ -236,7 +238,7 @@ public class MainActivity extends FlutterActivity {
         return stringToSend;
     }
 
-    private void printReceipt(String initialDate,String datePlaced, String ticketNumber, String betNumber, String stallName, String drawSched, String betAmount, String priceAmount){
+    private void printReceipt(String initialDate,String datePlaced, String ticketNumber, String betNumber, String stallName, String agentName, String drawSched, String betAmount, String priceAmount){
         ThreadPoolManager.getInstance().executeTask(() -> {
             Bitmap mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.logo);
             try {
@@ -265,6 +267,8 @@ public class MainActivity extends FlutterActivity {
                 mIPosPrinterService.printSpecifiedTypeText("Processado " + datePlaced, "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
                 mIPosPrinterService.printSpecifiedTypeText("Posto - " + stallName, "ST", 24, callback);
+                mIPosPrinterService.printBlankLines(1, 16, callback);
+                mIPosPrinterService.printSpecifiedTypeText("Agente - " + agentName, "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
                 mIPosPrinterService.printSpecifiedTypeText("Horário do sorteio - " + drawSched, "ST", 24, callback);
 
