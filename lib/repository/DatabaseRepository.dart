@@ -195,19 +195,12 @@ class DatabaseRepository {
 
     List<DBTransactions> readContents = [];
 
-    // var storedModule = await KambasTransaction()
-    //     .select()
-    //     .createdAt
-    //     .between(selectedDatetime, selectedDatetime.subtract(const Duration(hours: 7)))
-    //     .and
-    //     .orderBy("id")
-    //     .toList();
-
-    // print("dbstart val ${selectedDatetime.copyWith(hour: selectedDatetime.hour - 7)} && end = ${selectedDatetime}");
     var storedModule = await KambasTransaction()
         .select()
         .createdAt
-        .between(selectedDatetime.copyWith(hour: selectedDatetime.hour - 7), selectedDatetime)
+        .between(selectedDatetime.copyWith(hour: selectedDatetime.hour - 7, minute: 0), selectedDatetime.copyWith(minute: 0))
+        .and
+        .orderBy("id")
         .toList();
 
     // var storedModule = await KambasTransaction()
