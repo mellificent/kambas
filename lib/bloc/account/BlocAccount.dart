@@ -68,7 +68,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       // final now = await getAfricaDateTime();
       final now = DateTime.now();
       String dateString = DateFormat.yMMMMd('en_US').format(now);
-      String drawTime = DateFormat('h a').format(now);
+      // String drawTime = DateFormat('h a').format(now);
+      String drawTime = (now.hour <= 13 && now.hour < 6) ? "1 PM" : "8 PM";
 
       emit(DisplayCurrentDate(dateString));
       emit(DisplayDrawTime(drawTime));
@@ -426,7 +427,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     final currentDate = DateTime.now();
     String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
     String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
-    String drawTime = DateFormat('h a').format(currentDate);
+    String drawTime = (currentDate.hour <= 13 && currentDate.hour < 6) ? "1 PM" : "8 PM";
 
     final dbCreatedDate = currentDate.copyWith(
       minute: 0,
