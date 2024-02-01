@@ -69,7 +69,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       final now = DateTime.now();
       String dateString = DateFormat.yMMMMd('en_US').format(now);
       // String drawTime = DateFormat('h a').format(now);
-      String drawTime = (now.hour <= 13 && now.hour < 6) ? "1 PM" : "8 PM";
+      String drawTime = (now.hour <= 13 && now.hour < 6) ? "2 PM" : "8 PM";
 
       emit(DisplayCurrentDate(dateString));
       emit(DisplayDrawTime(drawTime));
@@ -427,7 +427,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     final currentDate = DateTime.now();
     String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
     String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
-    String drawTime = (currentDate.hour <= 13 && currentDate.hour < 6) ? "1 PM" : "8 PM";
+    String drawTime = (currentDate.hour <= 13 && currentDate.hour < 6) ? "2 PM" : "8 PM";
+    String drawTimePortuguese = (currentDate.hour <= 13 && currentDate.hour < 6) ? "14 Horas" : "20 Horas";
 
     final dbCreatedDate = currentDate.copyWith(
       minute: 0,
@@ -449,7 +450,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
           "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
       AppStrings.p_stallName: terminalData?.stallName ?? "N/A",
       AppStrings.p_agentName: terminalData?.agent ?? "N/A",
-      AppStrings.p_drawSchedule: drawTime,
+      AppStrings.p_drawSchedule: drawTimePortuguese,
       AppStrings.p_betAmount: betAmountResponse ?? "N/A",
       AppStrings.p_priceAmount:
           ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),

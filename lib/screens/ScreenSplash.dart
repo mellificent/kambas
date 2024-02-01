@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kambas/bloc/splash/BlocSplash.dart';
 import 'package:kambas/bloc/splash/EventSplash.dart';
 import 'package:kambas/bloc/splash/StateSplash.dart';
@@ -55,11 +56,17 @@ class MainLayout extends StatelessWidget {
         }
 
         return Container(
-          color: AppColors.PrimaryColor,
+          decoration: const BoxDecoration(
+            color: AppColors.PrimaryColor,
+          ),
+          alignment: Alignment.center,
+          child: SvgPicture.asset(
+            AppIcons.LOGO_SVG,
+            fit: BoxFit.fill,
+            height: 140,
+            width: 140,
+          ),
         );
-        // return Center(
-        //   child: Image.asset(AppIcons.APP_LOGO_LIGHT),
-        // );
       },
     );
   }

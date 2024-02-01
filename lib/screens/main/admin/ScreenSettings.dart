@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:kambas/constants/app_routes.dart';
 import 'package:kambas/constants/app_strings.dart';
@@ -63,10 +64,19 @@ class MainLayout extends StatelessWidget
       );
     }
 
-    Widget logo = Image.asset(
-      AppIcons.APP_LOGO,
-      fit: BoxFit.fitHeight,
+    Widget logo = Container(
+      width: 140,
       height: 80,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: AppColors.PrimaryColor,
+      ),
+      child: SvgPicture.asset(
+        AppIcons.LOGO_SVG,
+        fit: BoxFit.fill,
+        height: 70,
+        width: 70,
+      ),
     );
 
     Widget saveBtn = ButtonRaised(

@@ -5,6 +5,6 @@ class AppIcons {
   static const String APP_FOOTER = 'assets/images/footer_trapezoid.png';
 
   // svgs
-  static const String MASK_BG_SVG = ''; //'''assets/icons/ic_mask_bg.svg';
+  static const String LOGO_SVG = 'assets/svg/ic_logo.svg';
 
 }

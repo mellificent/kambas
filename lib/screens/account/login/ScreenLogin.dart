@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kambas/constants/app_routes.dart';
 import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
@@ -82,18 +83,22 @@ class MainLayout extends StatelessWidget
     _initControllerListener(context);
 
     Widget loginLogo = Container(
+      width: 150,
+      height: 90,
       margin: const EdgeInsets.only(
         top: 20.0,
         bottom: 50.0,
       ),
-      child: Image.asset(
-        AppIcons.APP_LOGO,
-        fit: BoxFit.fitHeight,
-        height: 90,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: AppColors.PrimaryColor,
       ),
-      // child: Image(
-      //   image: ResizeImage(AssetImage(AppIcons.APP_LOGO), width: 100, height: 90),
-      // ),
+      child: SvgPicture.asset(
+        AppIcons.LOGO_SVG,
+        fit: BoxFit.fill,
+        height: 80,
+        width: 80,
+      ),
     );
 
     Widget loginTitle = const Text(AppStrings.login,
