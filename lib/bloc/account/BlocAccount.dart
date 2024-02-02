@@ -229,6 +229,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
   Future<void> _mapRequestSelectedFilterDate(
       RequestSelectedFilterDate event, Emitter<StateAccount> emit) async {
     selectedFilteredDate = event.selectedDatetime.copyWith(
+      hour: (event.selectedDatetime.hour <= 13 && event.selectedDatetime.hour > 6) ? 14 : 20,
       minute: 0,
       second: 0,
       millisecond: 0,

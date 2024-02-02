@@ -211,7 +211,7 @@ class MainLayout extends StatelessWidget
           if (state is InitStateAccount) {
             context
                 .read<BlocAccount>()
-                .add(RequestSelectedFilterDate(DateTime.now().copyWith(hour: 13)));
+                .add(RequestSelectedFilterDate(DateTime.now()));
           }
 
           return Column(
