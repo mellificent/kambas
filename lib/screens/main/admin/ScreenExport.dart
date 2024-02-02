@@ -338,7 +338,7 @@ class MainLayout extends StatelessWidget
             absoluteZeroSpacing: false,
             elevation: 0,
             buttonLables: const [
-              '1 PM Cut-Off',
+              '2 PM Cut-Off',
               '8 PM Cut-Off',
             ],
             buttonValues: const [
