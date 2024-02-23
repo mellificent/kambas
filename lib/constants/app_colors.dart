@@ -14,4 +14,7 @@ class AppColors {
   static const Color White = Colors.white;
   static const Color disabledWhite = Color.fromRGBO(208, 201, 214, 1);
   static const Color searchBarGray = Color.fromRGBO(239, 239, 240, 1);
+
+  static const Color grayEAEAE4 = Color.fromRGBO(234, 234, 228, 1);
+  static const Color red = Color.fromRGBO(252, 60, 68, 1);
 }

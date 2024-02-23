@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kambas/constants/app_routes.dart';
 import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
+import 'package:kambas/screens/account/login/LoginWebBody.dart';
 import 'package:kambas/screens/main/ScreenMain.dart';
 import 'package:kambas/utils/config/SizeConfig.dart';
 import 'package:kambas/utils/string_extension.dart';
@@ -25,6 +26,8 @@ class ScreenLogin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDesktopPlatform = (!UniversalPlatform.isAndroid);
+
     return Scaffold(
       backgroundColor: AppColors.White,
       appBar: AppBar(
@@ -32,11 +35,12 @@ class ScreenLogin extends StatelessWidget {
         toolbarHeight: 0.0,
       ),
       body: BlocProvider(
-        create: (_) => BlocAccount(
-          providerAccount: RepositoryProvider.of<ProviderAccount>(context),
-        ),
-        child: MainLayout(),
-      ),
+              create: (_) => BlocAccount(
+                providerAccount:
+                    RepositoryProvider.of<ProviderAccount>(context),
+              ),
+              child: isDesktopPlatform ? LoginWebBody() : MainLayout(),
+            ),
     );
   }
 }
@@ -218,8 +222,7 @@ class MainLayout extends StatelessWidget
         if (state is RequestPostLoginSuccess) {
           Navigator.pushNamedAndRemoveUntil(
               context, AppRoutes.of(context).mainScreen, (r) => false,
-              arguments: ScreenMainSettings(
-                  isAdminUser: state.isAdminUser));
+              arguments: ScreenMainSettings(isAdminUser: state.isAdminUser));
         }
       },
       child: mainBody,

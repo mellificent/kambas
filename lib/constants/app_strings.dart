@@ -2,6 +2,12 @@ class AppStrings {
   static const app_name = 'Kambas';
 
   static const login = 'Login';
+  static const web_login_title = 'Sign in to Kambas Web Portal';
+  static const forgot_password = 'Forgot your password?';
+  static const sign_in = 'Sign In';
+  static const register_field_email = 'Email address';
+  static const register_field_password = 'Password';
+  static const processing_text = "Processing, please wait..";
 
   static const password_reset = 'Password Reset';
   static const password_reset_desc = 'Enter your registered email address and we will send you a link to reset your password';

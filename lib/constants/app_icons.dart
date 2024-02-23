@@ -6,5 +6,7 @@ class AppIcons {
 
   // svgs
   static const String LOGO_SVG = 'assets/svg/ic_logo.svg';
+  static const String EMAIL_SVG = 'assets/svg/ic_email.svg';
+  static const String password_SVG = 'assets/svg/ic_password.svg';
 
 }

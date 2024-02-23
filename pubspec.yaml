@@ -118,7 +118,7 @@ dependencies:
   device_info_plus: ^9.0.3
 
   # SVG
-  flutter_svg: ^2.0.5
+  flutter_svg: ^2.0.10+1
 
   # Checkbox
   custom_check_box: ^0.0.4

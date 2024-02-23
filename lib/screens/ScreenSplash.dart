@@ -46,7 +46,7 @@ class MainLayout extends StatelessWidget {
 
         if (state is AuthenticationAuthenticated) {
           Navigator.pushNamedAndRemoveUntil(
-              context, AppRoutes.of(context).loginScreen, (r) => false);
+              context, AppRoutes.of(context).mainScreen, (r) => false);
           return;
         }
       },
