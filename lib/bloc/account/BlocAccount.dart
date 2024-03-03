@@ -10,6 +10,7 @@ import 'package:kambas/models/object/TerminalData.dart';
 import 'package:kambas/models/object/TransactionDetails.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
+import 'package:universal_platform/universal_platform.dart';
 import 'package:uuid/uuid.dart';
 import '../../../providers/ProviderAccount.dart';
 import '../../models/request/RequestOAuth.dart';
@@ -45,7 +46,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<GetUserDetails>(_mapUserDetails);
     on<FormFieldValueOnChange>(_mapFormFieldValueOnChangeState);
     on<FormFieldChangeObscurity>(_mapFormFieldChangeObscurityState);
-    on<PostLoginCredentials>(_mapPostLogin);
+    on<PostLoginCredentials>((UniversalPlatform.isAndroid) ? _mapPostLogin : _mapPostLoginV2);
     on<PostLogoutUser>(_mapPostLogoutUser);
     on<PostBetNumber>(_mapPostBetNumber);
     on<RequestUpdateBetAmount>(_mapRequestUpdateBetAmount);
@@ -134,6 +135,36 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
             formStatus: _formLogin.status));
         break;
     }
+  }
+
+
+  Future<void> _mapPostLoginV2(PostLoginCredentials event, Emitter<StateAccount> emit) async {
+    try {
+      emit(const RequestLoadingAccount("logging in"));
+
+      final bool hasLogoutToken = await providerAccount.hasLogoutToken();
+      if (hasLogoutToken) {
+        await providerAccount.initTokenHeader();
+        providerAccount.logout();
+        providerAccount.setLogoutTag();
+        emit(const RequestAccountFailed('Your email address is not verified.'));
+        return;
+      }
+
+      var response = await providerAccount.postLogin(RequestOAuth.newToken(email: event.username, password: event.password));
+      if (response.error == null) {
+        /**load user details after successful login**/
+        // await providerAccount.getUser();
+        emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
+      } else {
+        providerAccount.logout();
+        emit(RequestAccountFailed(response.error!.errorMsg));
+      }
+    } catch (e) {
+      // if (Foundation.kDebugMode) providerAccount.logout();
+      emit(RequestAccountFailed(e.toString()));
+    }
+
   }
 
   Future<void> _mapPostLogin(

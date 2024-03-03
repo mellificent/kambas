@@ -54,6 +54,11 @@
         }
       });
     });
+    window.fixPasswordCss = () => {
+      let style = document.createElement('style');
+      style.innerHTML = '::-ms-reveal { display: none; }';
+      document.head.appendChild(style);
+    }
   </script>
 </body>
 </html>

@@ -172,6 +172,17 @@ dependencies:
   sqfentity: ^2.4.0
   sqfentity_gen: ^2.4.0
 
+  sqflite_common_ffi_web: ^0.4.2+1
+#  flutter_launcher_icons: ^0.13.1
+#
+#flutter_launcher_icons:
+#  image_path_android: "assets/images/img_logo.png"
+#  android: true # can specify file name here e.g. "ic_launcher"
+#  min_sdk_android: 16 # android min sdk min:16, default 21
+#  web:
+#    generate: true
+#    image_path: "assets/images/img_logo.png"
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

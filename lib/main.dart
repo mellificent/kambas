@@ -21,6 +21,7 @@ import 'package:kambas/screens/main/ScreenMain.dart';
 import 'package:kambas/screens/main/admin/ScreenExport.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 import 'constants/app_routes.dart';
 import 'constants/app_settings.dart';
@@ -39,6 +40,14 @@ void main() async {
 
   initializeDateFormatting();
   await FastCachedImageConfig.init();
+
+  if(kIsWeb){
+    // Use the ffi web factory in web apps (flutter or dart)
+    var factory = databaseFactoryFfiWeb;
+    var db = await factory.openDatabase('Kambas.db');
+    var sqliteVersion = (await db.rawQuery('select sqlite_version()')).first.values.first;
+    print(sqliteVersion);
+  }
 
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   //note: only available for mobile platforms. web not supported

@@ -99,7 +99,7 @@ class LoginWebBody extends StatelessWidget
     );
 
     Widget loginButton = Container(
-      width: (SizeConfig.blockSizeHorizontal! * 15),
+      width: (SizeConfig.blockSizeHorizontal! * 25),
       child: ButtonRaised(
         onPressed: () {
           context.read<BlocAccount>().add(PostLoginCredentials(_emailController.text, _pwController.text));
@@ -237,7 +237,7 @@ class LoginWebBody extends StatelessWidget
           fontSize: 14,
           fontFamily: AppStrings.FONT_POPPINS_BOLD,
           color: AppColors.Black),
-      obscureText: (state is UpdateFormField) ? state.obscure : false,
+      obscureText: (state is UpdateFormField) ? state.obscure : true,
       errorMessage: null,
       prefixIcon: SvgPicture.asset(
         AppIcons.password_SVG,

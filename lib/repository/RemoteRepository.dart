@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_http_cache_fix/dio_http_cache.dart';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:kambas/models/responses/ResponseOAuth.dart';
 import 'package:universal_platform/universal_platform.dart';
 import '../constants/api_settings.dart';
 import '../models/request/RequestOAuth.dart';
@@ -23,6 +24,7 @@ class RemoteRepository {
 
   PreferenceRepository preferenceRepository;
   final GlobalKey<NavigatorState> navigator;//Create a key for navigator
+
 
   RemoteRepository({required this.preferenceRepository, required this.navigator,}) {
     BaseOptions options = BaseOptions(
@@ -51,12 +53,22 @@ class RemoteRepository {
             customHeaders = {
               'accept': 'application/json',
               'authorization': 'Bearer $token',
-              'User-Agent': userAgent
+              'User-Agent': userAgent,
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+              'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Cookie, X-CSRF-TOKEN, Authorization, X-XSRF-TOKEN, Access-Control-Allow-Origin',
+              'Access-Control-Expose-Headers': 'Authorization, authenticated',
+              'Access-Control-Allow-Credentials': 'true'
             };
           } else {
             customHeaders = {
               'accept': 'application/json',
               'User-Agent': userAgent,
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+              'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Cookie, X-CSRF-TOKEN, Authorization, X-XSRF-TOKEN, Access-Control-Allow-Origin',
+              'Access-Control-Expose-Headers': 'Authorization, authenticated',
+              'Access-Control-Allow-Credentials': 'true'
             };
           }
 
@@ -97,9 +109,9 @@ class RemoteRepository {
               var response = await getOauthToken(refreshTokenRequest);
 
               if (response.statusCode == 200) {
-                // ResponseOAuth data = ResponseOAuth.fromJson(response.data);
-                // await preferenceRepository.persistToken(data.accessToken, data.refreshToken ?? data.accessToken);
-                // setToken(data.accessToken);
+                ResponseOAuth data = ResponseOAuth.fromJson(response.data);
+                await preferenceRepository.persistToken(data.accessToken, data.refreshToken ?? data.accessToken);
+                setToken(data.accessToken);
 
                 // Replicate last request
                 final opts = Options(
