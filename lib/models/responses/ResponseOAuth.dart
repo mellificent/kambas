@@ -8,18 +8,21 @@ String responseOAuthToJson(ResponseOAuth data) => json.encode(data.toJson());
 
 class ResponseOAuth {
   ResponseOAuth({
-    required this.message,
+    this.message,
+    required this.status,
     required this.accessToken,
     this.refreshToken,
   });
 
-  String message;
+  String? message;
+  String status;
   String accessToken;
   String? refreshToken;
 
   factory ResponseOAuth.fromJson(Map<String, dynamic> json) => ResponseOAuth(
     message: json["message"],
-    accessToken: json["token"],
+    status: json["Status"],
+    accessToken: json["Token"],
     refreshToken: json["refresh_token"],
   );
 

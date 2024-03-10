@@ -32,7 +32,7 @@ class ProviderAccount extends BaseProvider {
     try {
       final response = await remoteRepository.getOauthToken(request);
       ResponseOAuth data = ResponseOAuth.fromJson(response.data);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         await preferenceRepository.saveUserEmail(request.email ?? ""); //todo: move saving of user data in get user
         await preferenceRepository.persistToken(data.accessToken, data.refreshToken ?? data.accessToken, fromRegister);
         remoteRepository.setToken(data.accessToken);

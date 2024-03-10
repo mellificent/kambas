@@ -28,14 +28,14 @@ class RequestOAuth extends BaseRequest {
   @override
   Map<String, String> getData() => (refresh == null)
       ? {
-    "email": email!,
+    "username": email!,
     "password": password!,
           // "grant_type": _grantTypePassword,
           // "client_id": _clientId,
           // "client_secret": _clientSecret,
         }
       : {
-    "email": email!,
+    "username": email!,
     "refresh_token": refresh ?? '',
           // "grant_type": _grantTypeRefreshToken,
           // "client_id": _clientId,
