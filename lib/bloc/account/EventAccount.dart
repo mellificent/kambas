@@ -249,3 +249,14 @@ class RequestSaveSettings extends EventAccount {
   @override
   List<Object> get props => [stallName, location, agentName];
 }
+
+class RequestConnectivitySync extends EventAccount {
+  final bool isConnected;
+
+  const RequestConnectivitySync({
+    required this.isConnected,
+  });
+
+  @override
+  List<Object> get props => [isConnected];
+}

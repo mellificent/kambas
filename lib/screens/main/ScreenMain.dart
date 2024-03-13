@@ -1,18 +1,14 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kambas/constants/app_routes.dart';
 import 'package:kambas/constants/app_strings.dart';
 import 'package:kambas/mixins/FormMixins.dart';
-import 'package:kambas/utils/config/SizeConfig.dart';
 import 'package:kambas/utils/string_extension.dart';
 import 'package:kambas/widgets/buttons/button_raised.dart';
-import 'package:kambas/widgets/textfield/TextFieldStyle1.dart';
 import 'package:kambas/widgets/textfield/TextFieldStyle2.dart';
-import 'package:universal_platform/universal_platform.dart';
 import '../../../bloc/account/BlocAccount.dart';
 import '../../../bloc/account/EventAccount.dart';
 import '../../../bloc/account/StateAccount.dart';
@@ -219,7 +215,36 @@ class MainLayout extends StatelessWidget
         ] : null,
         elevation: 0,
       ),
-      body: mainBody,
+      body: OfflineBuilder(
+          connectivityBuilder: (
+              BuildContext context,
+              ConnectivityResult connectivity,
+              Widget child,
+              ){
+
+            final bool connected = connectivity != ConnectivityResult.none;
+            context.read<BlocAccount>().add(RequestConnectivitySync(isConnected: connected));
+
+            return mainBody;
+            // return Stack(
+            //   fit: StackFit.expand,
+            //   children: [
+            //     mainBody,
+            //     // Positioned(
+            //     //   height: 24.0,
+            //     //   left: 0.0,
+            //     //   right: 0.0,
+            //     //   child: Container(
+            //     //     color: connected ? Color(0xFF00EE44) : Color(0xFFEE4400),
+            //     //     child: Center(
+            //     //       child: Text(connected ? 'ONLINE' : 'OFFLINE'),
+            //     //     ),
+            //     //   ),
+            //     // ),
+            //   ],
+            // );
+          },
+          child: mainBody),
     );
   }
 

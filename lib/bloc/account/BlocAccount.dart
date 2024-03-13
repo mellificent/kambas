@@ -1,7 +1,6 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
-import 'package:fimber/fimber.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -16,8 +15,6 @@ import '../../../providers/ProviderAccount.dart';
 import '../../models/request/RequestOAuth.dart';
 import '../../utils/validator/BaseInput.dart';
 import '../../utils/validator/Validator.dart';
-import '../../utils/validator/field/FormConfirmPassword.dart';
-import '../../utils/validator/field/FormEmail.dart';
 import '../../utils/validator/field/FormPassword.dart';
 import '../../utils/validator/field/FormRequiredField.dart';
 import 'EventAccount.dart';
@@ -37,6 +34,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
   String betNumber1 = "0";
   String betAmount = "0";
   DateTime selectedFilteredDate = DateTime.now();
+  late StreamSubscription<DateTime> subscription;
+  var streamController = StreamController<DateTime>();
 
   BlocAccount({
     required this.providerAccount,
@@ -46,7 +45,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<GetUserDetails>(_mapUserDetails);
     on<FormFieldValueOnChange>(_mapFormFieldValueOnChangeState);
     on<FormFieldChangeObscurity>(_mapFormFieldChangeObscurityState);
-    on<PostLoginCredentials>((UniversalPlatform.isAndroid) ? _mapPostLogin : _mapPostLoginV2);
+    on<PostLoginCredentials>(
+        (UniversalPlatform.isAndroid) ? _mapPostLogin : _mapPostLoginV2);
     on<PostLogoutUser>(_mapPostLogoutUser);
     on<PostBetNumber>(_mapPostBetNumber);
     on<RequestUpdateBetAmount>(_mapRequestUpdateBetAmount);
@@ -64,6 +64,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     on<GetTerminalSettings>(_mapGetTerminalSettings);
     on<RequestSaveSettings>(_mapRequestSaveSettings);
     on<GetTransactionDetails>(_mapGetTransactionDetails);
+    on<RequestConnectivitySync>(_mapConnectivitySync);
 
     on<RequestCurrentDate>((event, emit) async {
       // final now = await getAfricaDateTime();
@@ -137,8 +138,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-
-  Future<void> _mapPostLoginV2(PostLoginCredentials event, Emitter<StateAccount> emit) async {
+  Future<void> _mapPostLoginV2(
+      PostLoginCredentials event, Emitter<StateAccount> emit) async {
     try {
       emit(const RequestLoadingAccount("logging in"));
 
@@ -151,7 +152,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         return;
       }
 
-      var response = await providerAccount.postLogin(RequestOAuth.newToken(email: event.username, password: event.password));
+      var response = await providerAccount.postLogin(RequestOAuth.newToken(
+          email: event.username, password: event.password));
       if (response.error == null) {
         /**load user details after successful login**/
         // await providerAccount.getUser();
@@ -164,7 +166,6 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       // if (Foundation.kDebugMode) providerAccount.logout();
       emit(RequestAccountFailed(e.toString()));
     }
-
   }
 
   Future<void> _mapPostLogin(
@@ -260,7 +261,10 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
   Future<void> _mapRequestSelectedFilterDate(
       RequestSelectedFilterDate event, Emitter<StateAccount> emit) async {
     selectedFilteredDate = event.selectedDatetime.copyWith(
-      hour: (event.selectedDatetime.hour <= 13 && event.selectedDatetime.hour > 6) ? 14 : 20,
+      hour:
+          (event.selectedDatetime.hour <= 13 && event.selectedDatetime.hour > 6)
+              ? 14
+              : 20,
       minute: 0,
       second: 0,
       millisecond: 0,
@@ -402,6 +406,38 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
+  Future<void> _mapConnectivitySync(
+      RequestConnectivitySync event, Emitter<StateAccount> emit) async {
+    debugPrint(
+        "connectivity stat : ${event.isConnected} connected: ${event.isConnected}");
+
+    final timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (!streamController.isClosed) streamController.add(DateTime.now());
+    });
+
+    if (event.isConnected == false) {
+      debugPrint("timer stream closed");
+      timer.cancel();
+      await streamController.close();
+      await subscription.cancel();
+      return;
+    } else {
+      if (streamController.isClosed) {
+        streamController = StreamController<DateTime>();
+      }
+    }
+
+    if (!streamController.hasListener) {
+      subscription = streamController.stream.listen((e) async {
+        debugPrint('timer stream ${e.minute} ${e.second}');
+      }, onError: (err, stack) {
+        debugPrint('timer stream error ${err.toString()} $stack');
+      }, onDone: () {
+        debugPrint('timer stream is done :)');
+      });
+    }
+  }
+
   Future<void> _mapRequestExportCSV(
       RequestExportCSV event, Emitter<StateAccount> emit) async {
     try {
@@ -459,8 +495,11 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     final currentDate = DateTime.now();
     String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
     String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
-    String drawTime = (currentDate.hour <= 13 && currentDate.hour > 6) ? "2 PM" : "8 PM";
-    String drawTimePortuguese = (currentDate.hour <= 13 && currentDate.hour > 6) ? "14 Horas" : "20 Horas";
+    String drawTime =
+        (currentDate.hour <= 13 && currentDate.hour > 6) ? "2 PM" : "8 PM";
+    String drawTimePortuguese = (currentDate.hour <= 13 && currentDate.hour > 6)
+        ? "14 Horas"
+        : "20 Horas";
 
     final dbCreatedDate = currentDate.copyWith(
       minute: 0,
@@ -523,7 +562,6 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
     final dbData = await providerAccount.getTransactionDetails(event.ticketNo);
     if (dbData != null) {
-
       const platformMethodChannel = MethodChannel('com.methodchannel/test');
       platformMethodChannel.invokeMethod(AppStrings.printMethod, {
         AppStrings.p_initialDate:
