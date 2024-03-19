@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:kambas/models/object/TerminalData.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
+import 'package:kambas/models/request/RequestBets.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
+import 'package:kambas/models/responses/ResponseGeneric.dart';
 import 'package:kambas/models/responses/ResponseOAuth.dart';
 import 'package:kambas/repository/DatabaseRepository.dart';
 
@@ -63,6 +65,31 @@ class ProviderAccount extends BaseProvider {
     }
   }
 
+  Future<ResponseBundle<ResponseGeneric, ResponseErrorMessage>> postBets(RequestBets request,) async {
+    try {
+      final response = await remoteRepository.postBets(request);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ResponseBundle.success(response: ResponseGeneric.fromJson(response.data));
+      } else {
+        return ResponseBundle.failed(error: ResponseErrorMessage(errorMsg: AppStrings.error_general_throwable_msg));
+      }
+    } catch (e) {
+      return ResponseBundle.failed(
+        error: ResponseErrorMessage(
+          errorMsg: getErrorMessage(
+            e,
+            httpErrorHandlers: <HttpErrorHandler>[
+              HttpErrorHandler.message(
+                  403, AppStrings.error_general_throwable_msg),
+              HttpErrorHandler.message(
+                  500, AppStrings.error_general_throwable_msg),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
   Future<bool> initDatabase() async {
     return await databaseRepository.initDatabase();
   }
@@ -85,6 +112,20 @@ class ProviderAccount extends BaseProvider {
   Future<List<DBTransactions>> getFilteredDBTransactions(
       DateTime selectedDatetime) async {
     return await databaseRepository.getFilteredTransactions(selectedDatetime);
+  }
+
+  Future<List<DBTransactions>> getUnsyncDBTransactions() async {
+    return await databaseRepository.getUnsyncDBTransactions();
+  }
+
+  Future<bool> updateDBStoredTransaction(String ticketSeries) async {
+    try {
+      final isUpdated = await databaseRepository.syncStoredTransaction(ticketSeries);
+      return isUpdated;
+    } catch (e) {
+      print("failed updating transaction : $e");
+      return false;
+    }
   }
 
   Future<DBTransactions?> getTransactionDetails(String ticketNo) async {

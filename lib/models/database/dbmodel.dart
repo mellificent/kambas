@@ -47,6 +47,7 @@ const tableTransaction = SqfEntityTable(
       SqfEntityField('createdAt', DbType.datetime),
       SqfEntityField('username', DbType.text),
       SqfEntityField('ticketSeries', DbType.text,),
+      SqfEntityField('hasRead', DbType.bool, defaultValue: false),
       SqfEntityField('jsonResponse', DbType.text),
     ]);
 

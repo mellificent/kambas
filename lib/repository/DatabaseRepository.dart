@@ -154,11 +154,11 @@ class DatabaseRepository {
   }
 
   Future<bool> storeTransactionData(
-      {required DateTime dbCreatedDate, required DBTransactions data}) async {
+      {required DateTime dbCreatedDate, required DBTransactions data,}) async {
     if (!isDbInitialized) return false;
 
     await KambasTransaction.withFields(dbCreatedDate, data.userName,
-            data.ticketNo, jsonEncode(data), false)
+            data.ticketNo, false, jsonEncode(data), false)
         .save();
 
     ///(print results)
@@ -184,9 +184,35 @@ class DatabaseRepository {
     for (var e in storedModule) {
       var rawData = json.decode(e.jsonResponse!);
       readContents.add(DBTransactions.fromJson(rawData));
+      if (kDebugMode) {
+        print(
+            "DATABASE Stored ID : ${e.id!}\nresponse : \n${e.jsonResponse ?? ""}\n--------------\n");
+      }
     }
 
     return readContents;
+  }
+
+  Future<bool> syncStoredTransaction(String ticketSeries,) async {
+    if (!isDbInitialized) return false;
+
+    var storedContents = await KambasTransaction()
+        .select()
+        .ticketSeries
+        .equals(ticketSeries)
+        .and
+        .hasRead
+        .equals(0) // only update if hasRead is false
+        .toList();
+
+    if (storedContents.isNotEmpty) {
+      storedContents.first.hasRead = true;
+      storedContents.first.upsert();
+    } else {
+      print("----- orm db NO UPDATES in storedTransaction -----");
+    }
+
+    return true;
   }
 
   Future<List<DBTransactions>> getFilteredTransactions(
@@ -217,6 +243,30 @@ class DatabaseRepository {
     }
 
     return readContents;
+  }
+
+  Future<List<DBTransactions>> getUnsyncDBTransactions() async {
+    if (!isDbInitialized) return [];
+    List<DBTransactions> unreadContents = [];
+
+    var storedTransactions = await KambasTransaction()
+        .select()
+        .hasRead
+        .equals(0)
+        .and
+        .orderBy("id")
+        .toList();
+
+    for (var e in storedTransactions) {
+      var rawData = json.decode(e.jsonResponse!);
+      unreadContents.add(DBTransactions.fromJson(rawData));
+      if (kDebugMode) {
+        print(
+            "DATABASE Unsync : ${e.id!}\nresponse : \n${e.jsonResponse ?? ""}\n--------------\n");
+      }
+    }
+
+    return unreadContents;
   }
 
   Future<DBTransactions?> getTransactionDetails(String ticketNumber) async {

@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_http_cache_fix/dio_http_cache.dart';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:kambas/models/request/RequestBets.dart';
 import 'package:kambas/models/responses/ResponseOAuth.dart';
 import 'package:universal_platform/universal_platform.dart';
 import '../constants/api_settings.dart';
@@ -192,6 +193,8 @@ class RemoteRepository {
   }
 
   dynamic getOauthToken(RequestOAuth request) => client.post(ApiSettings.API_LOGIN, data: request.getData(),);
+
+  dynamic postBets(RequestBets request) => client.post(ApiSettings.API_BETS, data: request.getData(),);
 
   dynamic getUserDetails() => client.get(ApiSettings.API_GET_USER_DETAILS,); //options: cacheOptions,
 

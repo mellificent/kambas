@@ -68,6 +68,7 @@ class TableKambasTransaction extends SqfEntityTableBase {
           minValue: DateTime.parse('1900-01-01')),
       SqfEntityFieldBase('username', DbType.text),
       SqfEntityFieldBase('ticketSeries', DbType.text),
+      SqfEntityFieldBase('hasRead', DbType.bool, defaultValue: false),
       SqfEntityFieldBase('jsonResponse', DbType.text),
     ];
     super.init();
@@ -1206,17 +1207,18 @@ class KambasTransaction extends TableBase {
       this.createdAt,
       this.username,
       this.ticketSeries,
+      this.hasRead,
       this.jsonResponse,
       this.isDeleted}) {
     _setDefaultValues();
     softDeleteActivated = true;
   }
   KambasTransaction.withFields(this.createdAt, this.username, this.ticketSeries,
-      this.jsonResponse, this.isDeleted) {
+      this.hasRead, this.jsonResponse, this.isDeleted) {
     _setDefaultValues();
   }
   KambasTransaction.withId(this.id, this.createdAt, this.username,
-      this.ticketSeries, this.jsonResponse, this.isDeleted) {
+      this.ticketSeries, this.hasRead, this.jsonResponse, this.isDeleted) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -1238,6 +1240,10 @@ class KambasTransaction extends TableBase {
     if (o['ticketSeries'] != null) {
       ticketSeries = o['ticketSeries'].toString();
     }
+    if (o['hasRead'] != null) {
+      hasRead =
+          o['hasRead'].toString() == '1' || o['hasRead'].toString() == 'true';
+    }
     if (o['jsonResponse'] != null) {
       jsonResponse = o['jsonResponse'].toString();
     }
@@ -1250,6 +1256,7 @@ class KambasTransaction extends TableBase {
   DateTime? createdAt;
   String? username;
   String? ticketSeries;
+  bool? hasRead;
   String? jsonResponse;
   bool? isDeleted;
 
@@ -1284,6 +1291,11 @@ class KambasTransaction extends TableBase {
     if (ticketSeries != null || !forView) {
       map['ticketSeries'] = ticketSeries;
     }
+    if (hasRead != null) {
+      map['hasRead'] = forQuery ? (hasRead! ? 1 : 0) : hasRead;
+    } else if (hasRead != null || !forView) {
+      map['hasRead'] = null;
+    }
     if (jsonResponse != null || !forView) {
       map['jsonResponse'] = jsonResponse;
     }
@@ -1316,6 +1328,11 @@ class KambasTransaction extends TableBase {
     if (ticketSeries != null || !forView) {
       map['ticketSeries'] = ticketSeries;
     }
+    if (hasRead != null) {
+      map['hasRead'] = forQuery ? (hasRead! ? 1 : 0) : hasRead;
+    } else if (hasRead != null || !forView) {
+      map['hasRead'] = null;
+    }
     if (jsonResponse != null || !forView) {
       map['jsonResponse'] = jsonResponse;
     }
@@ -1344,6 +1361,7 @@ class KambasTransaction extends TableBase {
       createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
       username,
       ticketSeries,
+      hasRead,
       jsonResponse,
       isDeleted
     ];
@@ -1356,6 +1374,7 @@ class KambasTransaction extends TableBase {
       createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
       username,
       ticketSeries,
+      hasRead,
       jsonResponse,
       isDeleted
     ];
@@ -1510,12 +1529,13 @@ class KambasTransaction extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnKambasTransaction.rawInsert(
-          'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, ticketSeries, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?)',
+          'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, ticketSeries, hasRead, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?,?)',
           [
             id,
             createdAt != null ? createdAt!.millisecondsSinceEpoch : null,
             username,
             ticketSeries,
+            hasRead,
             jsonResponse,
             isDeleted
           ],
@@ -1546,7 +1566,7 @@ class KambasTransaction extends TableBase {
   Future<BoolCommitResult> upsertAll(List<KambasTransaction> kambastransactions,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnKambasTransaction.rawInsertAll(
-        'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, ticketSeries, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?)',
+        'INSERT OR REPLACE INTO kambasTransactions (id, createdAt, username, ticketSeries, hasRead, jsonResponse,isDeleted)  VALUES (?,?,?,?,?,?,?)',
         kambastransactions,
         exclusive: exclusive,
         noResult: noResult,
@@ -1599,6 +1619,7 @@ class KambasTransaction extends TableBase {
   }
 
   void _setDefaultValues() {
+    hasRead = hasRead ?? false;
     isDeleted = isDeleted ?? false;
   }
 
@@ -1828,6 +1849,11 @@ class KambasTransactionFilterBuilder extends ConjunctionBase {
   KambasTransactionField get ticketSeries {
     return _ticketSeries =
         _setField(_ticketSeries, 'ticketSeries', DbType.text);
+  }
+
+  KambasTransactionField? _hasRead;
+  KambasTransactionField get hasRead {
+    return _hasRead = _setField(_hasRead, 'hasRead', DbType.bool);
   }
 
   KambasTransactionField? _jsonResponse;
@@ -2093,6 +2119,12 @@ class KambasTransactionFields {
   static TableField get ticketSeries {
     return _fTicketSeries = _fTicketSeries ??
         SqlSyntax.setField(_fTicketSeries, 'ticketSeries', DbType.text);
+  }
+
+  static TableField? _fHasRead;
+  static TableField get hasRead {
+    return _fHasRead =
+        _fHasRead ?? SqlSyntax.setField(_fHasRead, 'hasRead', DbType.bool);
   }
 
   static TableField? _fJsonResponse;
