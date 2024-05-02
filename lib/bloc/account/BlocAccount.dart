@@ -548,66 +548,42 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     var selectedNumberResponse = await providerAccount.getBetNumbers();
     var betAmountResponse = await providerAccount.getBetAmount();
 
+    const platformMethodChannel = MethodChannel('com.methodchannel/test');
+    platformMethodChannel.invokeMethod(AppStrings.printMethod, {
+      AppStrings.p_initialDate: initialDate,
+      AppStrings.p_processedDate: datePlaced,
+      AppStrings.p_ticketNumber: terminalData?.ticketNumber ?? "",
+      AppStrings.p_betNumber:
+          "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
+      AppStrings.p_stallName: terminalData?.stallName ?? "N/A",
+      AppStrings.p_agentName: terminalData?.agent ?? "N/A",
+      AppStrings.p_drawSchedule: drawTimePortuguese,
+      AppStrings.p_betAmount: betAmountResponse ?? "N/A",
+      AppStrings.p_priceAmount:
+          ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
+    }).then((value) async {
+      await providerAccount.storeDBTransaction(
+        createdDate: dbCreatedDate,
+        data: DBTransactions(
+            datePlaced: datePlaced,
+            drawTime: drawTime,
+            stallName: terminalData?.stallName ?? "N/A",
+            agentName: terminalData?.agent ?? "N/A",
+            location: terminalData?.location ?? "N/A",
+            ticketNo: terminalData?.ticketNumber ?? "",
+            betNumber1: selectedNumberResponse[0].toString(),
+            betNumber2: selectedNumberResponse[1].toString(),
+            betAmount: betAmountResponse,
+            betPrize: ((int.parse(betAmountResponse) / 100) * 20000)
+                .toStringAsFixed(0),
+            userName: await providerAccount.getCurrentUsername()),
+      );
 
-    /** todo: remove after test**/
-    await providerAccount.storeDBTransaction(
-      createdDate: dbCreatedDate,
-      data: DBTransactions(
-          datePlaced: datePlaced,
-          drawTime: drawTime,
-          stallName: terminalData?.stallName ?? "N/A",
-          agentName: terminalData?.agent ?? "N/A",
-          location: terminalData?.location ?? "N/A",
-          ticketNo: terminalData?.ticketNumber ?? "",
-          betNumber1: selectedNumberResponse![0].toString(),
-          betNumber2: selectedNumberResponse[1].toString(),
-          betAmount: betAmountResponse!,
-          betPrize: ((int.parse(betAmountResponse) / 100) * 20000)
-              .toStringAsFixed(0),
-          userName: await providerAccount.getCurrentUsername()),
-    );
-    final uuid = const Uuid().v4().substring(0, 4);
-    final ticketNumber = "T${Random().nextInt(5000)}$uuid";
-    await providerAccount.setDBTicketSeriesNo(ticketNumber: ticketNumber);
-
-    /** start: uncomment for print**/
-    // const platformMethodChannel = MethodChannel('com.methodchannel/test');
-    // platformMethodChannel.invokeMethod(AppStrings.printMethod, {
-    //   AppStrings.p_initialDate: initialDate,
-    //   AppStrings.p_processedDate: datePlaced,
-    //   AppStrings.p_ticketNumber: terminalData?.ticketNumber ?? "",
-    //   AppStrings.p_betNumber:
-    //       "${selectedNumberResponse![0]} and ${selectedNumberResponse[1]}",
-    //   AppStrings.p_stallName: terminalData?.stallName ?? "N/A",
-    //   AppStrings.p_agentName: terminalData?.agent ?? "N/A",
-    //   AppStrings.p_drawSchedule: drawTimePortuguese,
-    //   AppStrings.p_betAmount: betAmountResponse ?? "N/A",
-    //   AppStrings.p_priceAmount:
-    //       ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
-    // }).then((value) async {
-    //   await providerAccount.storeDBTransaction(
-    //     createdDate: dbCreatedDate,
-    //     data: DBTransactions(
-    //         datePlaced: datePlaced,
-    //         drawTime: drawTime,
-    //         stallName: terminalData?.stallName ?? "N/A",
-    //         agentName: terminalData?.agent ?? "N/A",
-    //         location: terminalData?.location ?? "N/A",
-    //         ticketNo: terminalData?.ticketNumber ?? "",
-    //         betNumber1: selectedNumberResponse[0].toString(),
-    //         betNumber2: selectedNumberResponse[1].toString(),
-    //         betAmount: betAmountResponse,
-    //         betPrize: ((int.parse(betAmountResponse) / 100) * 20000)
-    //             .toStringAsFixed(0),
-    //         userName: await providerAccount.getCurrentUsername()),
-    //   );
-    //
-    //   //sets new ticket series after print success
-    //   final uuid = const Uuid().v4().substring(0, 4);
-    //   final ticketNumber = "T${Random().nextInt(5000)}$uuid";
-    //   await providerAccount.setDBTicketSeriesNo(ticketNumber: ticketNumber);
-    // });
-    /** end: uncomment for print**/
+      //sets new ticket series after print success
+      final uuid = const Uuid().v4().substring(0, 4);
+      final ticketNumber = "T${Random().nextInt(5000)}$uuid";
+      await providerAccount.setDBTicketSeriesNo(ticketNumber: ticketNumber);
+    });
 
     await providerAccount.deleteUserBetInput();
     emit(const RequestGoToHome());
