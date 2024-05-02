@@ -36,7 +36,7 @@ class ProviderAccount extends BaseProvider {
       ResponseOAuth data = ResponseOAuth.fromJson(response.data);
       if (response.statusCode == 200 || response.statusCode == 201) {
         await preferenceRepository.saveUserEmail(request.email ?? ""); //todo: move saving of user data in get user
-        await preferenceRepository.persistToken(data.accessToken, data.refreshToken ?? data.accessToken, fromRegister);
+        await preferenceRepository.persistToken(data.accessToken, data.token ?? data.accessToken, fromRegister);
         remoteRepository.setToken(data.accessToken);
         return ResponseBundle.success(response: ResponseOAuth.fromJson(response.data));
       } else {

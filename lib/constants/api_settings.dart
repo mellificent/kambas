@@ -6,14 +6,16 @@ class ApiSettings {
 
   static const ENDPOINT_REGISTER = '/';
   static const ENDPOINT_LOGIN = '/auth/authenticate';
-  static const ENDPOINT_BETS = '/bets';
+  static const ENDPOINT_REFRESH = '/auth/refresh-token';
+  static const ENDPOINT_ADD_BETS = '/bets/addbet';
   static const ENDPOINT_GET_USER_DETAILS = '/';
 
   static const HOST = HOST_DEBUG + EXTENSION_DEV;
 
   static const API_REGISTER = HOST + ENDPOINT_REGISTER;
   static const API_LOGIN = HOST + ENDPOINT_LOGIN;
-  static const API_BETS = HOST + ENDPOINT_BETS;
+  static const API_REFRESH_LOGIN = HOST + ENDPOINT_REFRESH;
+  static const API_ADD_BETS = HOST + ENDPOINT_ADD_BETS;
 
   static const API_GET_USER_DETAILS = HOST + ENDPOINT_GET_USER_DETAILS;
 

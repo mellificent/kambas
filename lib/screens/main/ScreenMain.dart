@@ -82,6 +82,7 @@ class MainLayout extends StatelessWidget
     );
 
     Widget checkoutButton = ButtonRaised(
+      enabled: !(args.isAdminUser ?? false),
       onPressed: () {
         Navigator.pushNamed(
           context,

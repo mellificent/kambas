@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'BaseRequest.dart';
 
 class RequestBetData extends BaseRequest {
-  static const KEY_NAME_BET_ID = 'betId';
   static const KEY_NAME_TICKET_NO = 'ticketNumber';
   static const KEY_NAME_CUT_OFF = 'cutOff';
   static const KEY_NAME_STALLNAME = 'stallName';
@@ -15,7 +14,6 @@ class RequestBetData extends BaseRequest {
   static const KEY_NAME_PRIZE = 'betPrize';
   static const KEY_NAME_USERNAME = 'encodedByUserName';
 
-  final int betID;
   final String ticketNumber;
   final String cutOff;
   final String stallName;
@@ -28,7 +26,6 @@ class RequestBetData extends BaseRequest {
   final String encodedByUserName;
 
   const RequestBetData({
-    required this.betID,
     required this.ticketNumber,
     required this.cutOff,
     required this.stallName,
@@ -43,7 +40,6 @@ class RequestBetData extends BaseRequest {
 
   @override
   Map<String, String> getData() => {
-        KEY_NAME_BET_ID: betID.toString(),
         KEY_NAME_TICKET_NO: ticketNumber,
         KEY_NAME_CUT_OFF: cutOff,
         KEY_NAME_STALLNAME: stallName,

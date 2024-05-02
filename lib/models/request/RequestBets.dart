@@ -3,7 +3,8 @@ import 'package:kambas/models/request/BaseRequest.dart';
 import 'package:kambas/models/request/RequestBetData.dart';
 
 class RequestBets extends BaseRequest {
-  final List<RequestBetData> list;
+  static const KEY_NAME_BETS = "bets";
+  final List<Map<String, String>> list;
 
   const RequestBets(this.list,);
 
@@ -11,4 +12,5 @@ class RequestBets extends BaseRequest {
   Map<String, dynamic> getData() => {
     "bets": list,
   };
+
 }

@@ -166,7 +166,7 @@ class DatabaseRepository {
     dataStored.forEach((element) async {
       if (kDebugMode) {
         print(
-            "DATABASE ID : ${element.id!}\nresponse : \n${element.jsonResponse ?? ""}\n--------------\n");
+            "DATABASE ID : ${element.id!}\nDBresponse : \n${element.jsonResponse ?? ""}\n--------------\n");
       }
     });
 
@@ -186,7 +186,7 @@ class DatabaseRepository {
       readContents.add(DBTransactions.fromJson(rawData));
       if (kDebugMode) {
         print(
-            "DATABASE Stored ID : ${e.id!}\nresponse : \n${e.jsonResponse ?? ""}\n--------------\n");
+            "DATABASE Stored ID : ${e.id!}\nDBresponse : \n${e.jsonResponse ?? ""}\n--------------\n");
       }
     }
 
@@ -262,7 +262,7 @@ class DatabaseRepository {
       unreadContents.add(DBTransactions.fromJson(rawData));
       if (kDebugMode) {
         print(
-            "DATABASE Unsync : ${e.id!}\nresponse : \n${e.jsonResponse ?? ""}\n--------------\n");
+            "DATABASE Unsync : ${e.id!}\nDBresponse : \n${e.jsonResponse ?? ""}\n--------------\n");
       }
     }
 

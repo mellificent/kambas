@@ -74,7 +74,7 @@ class RemoteRepository {
           }
 
           options.headers.addAll(customHeaders);
-          options.contentType = "application/x-www-form-urlencoded";
+          // options.contentType = "application/x-www-form-urlencoded";
 
           Fimber.d('path: ${options.path}');
           Fimber.d('data: ${options.headers}');
@@ -91,30 +91,21 @@ class RemoteRepository {
           return handler.next(response);
         },
         onError: (DioException e, handler) async {
-          Fimber.d("DioException occured: ------- "
-              "\nresponse: ${e.response}"
-              "\ntype: ${e.type}"
-              "\nmessage: ${e.message}"
-              "\nerror: ${e.error}"
-              "\nstackTrace: ${e.stackTrace}");
 
-          if (e.response?.statusCode == 401 &&
-              !(e.requestOptions.path.contains(ApiSettings.ENDPOINT_LOGIN))) {
+          if (e.response?.statusCode == 401 && !(e.requestOptions.path.contains(ApiSettings.ENDPOINT_LOGIN))) {
 
-            String userEmail = await preferenceRepository.getUserEmail();
             String refreshToken = await preferenceRepository.getRefreshToken();
 
             // Request OAuth via Refresh Token
             try {
-              var refreshTokenRequest = RequestOAuth.refresh(refresh: refreshToken, email: userEmail);
-              var response = await getOauthToken(refreshTokenRequest);
+              var refreshTokenRequest = RequestOAuth.refresh(token: refreshToken,);
+              var response = await getRefreshToken(refreshTokenRequest);
 
               if (response.statusCode == 200) {
                 ResponseOAuth data = ResponseOAuth.fromJson(response.data);
-                await preferenceRepository.persistToken(data.accessToken, data.refreshToken ?? data.accessToken);
+                await preferenceRepository.persistToken(data.accessToken, data.token ?? "");
                 setToken(data.accessToken);
 
-                // Replicate last request
                 final opts = Options(
                     method: e.requestOptions.method,
                     headers: e.requestOptions.headers);
@@ -194,7 +185,9 @@ class RemoteRepository {
 
   dynamic getOauthToken(RequestOAuth request) => client.post(ApiSettings.API_LOGIN, data: request.getData(),);
 
-  dynamic postBets(RequestBets request) => client.post(ApiSettings.API_BETS, data: request.getData(),);
+  dynamic getRefreshToken(RequestOAuth request) => client.post(ApiSettings.API_REFRESH_LOGIN, data: request.getData(),);
+
+  dynamic postBets(RequestBets request) => client.post(ApiSettings.API_ADD_BETS, data: request.getData(),);
 
   dynamic getUserDetails() => client.get(ApiSettings.API_GET_USER_DETAILS,); //options: cacheOptions,
 
