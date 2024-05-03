@@ -184,7 +184,16 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
       if (list.isNotEmpty) {
         await providerAccount.storeUsername(event.username);
-        emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
+        emit(RequestPostLoginSuccess(isAdminUser: false));
+      } else if (event.username == "admin"){
+        var response = await providerAccount.postLogin(RequestOAuth.newToken(
+            email: event.username, password: event.password));
+        if (response.error == null) {
+          emit(RequestPostLoginSuccess(isAdminUser: true));
+        } else {
+          providerAccount.logout();
+          emit(RequestAccountFailed(response.error!.errorMsg));
+        }
       } else {
         emit(const RequestFailed(AppStrings.error_login_invalidfields_msg));
       }
