@@ -20,6 +20,7 @@ class AppRoutes extends InheritedWidget {
   final String updateUserScreen = '/updateUserScreen';
   final String generalSettingsScreen = '/generalSettingsScreen';
   final String reprintScreen = '/reprintScreen';
+  final String dashboardScreen = '/dashboardScreen';
 
   @override
   bool updateShouldNotify(AppRoutes oldWidget) => false;

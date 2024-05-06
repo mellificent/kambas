@@ -9,6 +9,8 @@ class AppColors {
   static const Color TextColorBlack56 = Color.fromRGBO(56, 59, 62, 1);
 
   static const Color scaffoldBGColor = Color.fromRGBO(249, 250, 251, 1);
+  static const Color SideMenuTextColor = Color.fromRGBO(99, 115, 129, 1);
+  static const Color SideMenuLBLTextColor = Color.fromRGBO(145, 158, 171, 1);
 
   static const Color Black = Colors.black;
   static const Color White = Colors.white;

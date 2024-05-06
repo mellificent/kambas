@@ -76,4 +76,14 @@ class AppStrings {
   static const p_priceAmount = 'price_amount';
   static const p_initialDate = 'initial_date';
   static const p_processedDate = 'processed_date';
+
+  static const ticket_number = 'Ticket#';
+  static const stall_name = 'Stall Name';
+  static const location = 'Location';
+  static const datetime_placed = 'Date / Time Placed';
+  static const cut_off = 'Cut - Off';
+  static const bet1 = 'Bet 1';
+  static const bet2 = 'Bet 2';
+  static const betAmount = 'Bet Amount';
+  static const encodedBy = 'User';
 }

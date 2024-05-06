@@ -191,4 +191,6 @@ class RemoteRepository {
 
   dynamic getUserDetails() => client.get(ApiSettings.API_GET_USER_DETAILS,); //options: cacheOptions,
 
+  dynamic getBetList() => client.get(ApiSettings.API_GET_BETS,); //options: cacheOptions,
+
 }

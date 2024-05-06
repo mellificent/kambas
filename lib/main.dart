@@ -28,6 +28,7 @@ import 'constants/app_settings.dart';
 
 import 'package:timezone/data/latest_all.dart' as tz;
 
+import 'screens/dashboard/ScreenDashboard.dart';
 import 'screens/main/admin/ScreenAddUser.dart';
 import 'screens/main/admin/ScreenSettings.dart';
 import 'screens/main/admin/ScreenUpdateUser.dart';
@@ -165,6 +166,7 @@ class App extends StatelessWidget {
           AppRoutes.of(context).updateUserScreen: (context) => const ScreenUpdateUser(),
           AppRoutes.of(context).generalSettingsScreen: (context) => const ScreenSettings(),
           AppRoutes.of(context).reprintScreen: (context) => const ScreenReprint(),
+          AppRoutes.of(context).dashboardScreen: (context) => const ScreenDashboard(),
         },
       ),
     );

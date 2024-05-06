@@ -21,7 +21,6 @@ import '../../../widgets/textfield/TextFieldStyle1.dart';
 import '../../../utils/string_extension.dart';
 import '../../../widgets/textfield/WebTextFieldStyle1.dart';
 
-// todo: setup constant values for both desktop / tablet
 class LoginWebBody extends StatelessWidget
     with FormMixins<BlocAccount, StateAccount> {
 
@@ -153,7 +152,7 @@ class LoginWebBody extends StatelessWidget
         }
 
         if (state is RequestPostLoginSuccess) {
-          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.of(context).mainScreen, (r) => false);
+          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.of(context).dashboardScreen, (r) => false);
         }
       },
       child: CustomScrollView(

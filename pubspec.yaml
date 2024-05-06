@@ -148,9 +148,6 @@ dependencies:
   sidebarx: ^0.15.0
   persistent_bottom_nav_bar: ^5.0.2
 
-  fl_chart: ^0.61.0
-  dotted_border: ^2.0.0+3
-
   infinite_scroll_pagination: ^3.2.0
 
   dropdown_button2: ^2.0.0

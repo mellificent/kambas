@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'BaseRequest.dart';
 
 class RequestBetData extends BaseRequest {

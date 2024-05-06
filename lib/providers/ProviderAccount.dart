@@ -5,6 +5,7 @@ import 'package:kambas/models/object/TerminalData.dart';
 import 'package:kambas/models/object/UserDataItem.dart';
 import 'package:kambas/models/request/RequestBets.dart';
 import 'package:kambas/models/request/database/DbTransactions.dart';
+import 'package:kambas/models/responses/ResponseGetBetList.dart';
 import 'package:kambas/models/responses/ResponseGeneric.dart';
 import 'package:kambas/models/responses/ResponseOAuth.dart';
 import 'package:kambas/repository/DatabaseRepository.dart';
@@ -83,6 +84,32 @@ class ProviderAccount extends BaseProvider {
                   403, AppStrings.error_general_throwable_msg),
               HttpErrorHandler.message(
                   500, AppStrings.error_general_throwable_msg),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<ResponseBundle<ResponseGetBetList, ResponseErrorMessage>> getBetList() async {
+    try {
+      final response = await remoteRepository.getBetList();
+      if (response.statusCode == 200) {
+        return ResponseBundle.success(response: ResponseGetBetList.fromJson(response.data));
+      } else {
+        return ResponseBundle.failed(
+            error: ResponseErrorMessage(
+                errorMsg: AppStrings.error_general_throwable_msg));
+      }
+    } catch (e) {
+      return ResponseBundle.failed(
+        error: ResponseErrorMessage(
+          errorMsg: getErrorMessage(
+            e,
+            httpErrorHandlers: <HttpErrorHandler>[
+              HttpErrorHandler.message(401, AppStrings.error_relogin_user_msg),
+              HttpErrorHandler.message(422, AppStrings.error_general_throwable_msg),
+              HttpErrorHandler.message(500, AppStrings.error_general_throwable_msg),
             ],
           ),
         ),
