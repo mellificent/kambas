@@ -133,7 +133,7 @@ dependencies:
   local_auth: ^2.1.2
 
   # RSA
-  fast_rsa: ^3.6.2
+#  fast_rsa: ^3.6.2
 
   # Path Provider
   path_provider: ^2.0.11
