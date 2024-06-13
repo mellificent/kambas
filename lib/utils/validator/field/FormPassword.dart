@@ -1,5 +1,5 @@
 
-import 'package:easy_localization/easy_localization.dart';
+// import 'package:easy_localization/easy_localization.dart';
 import 'package:kambas/constants/app_strings.dart';
 
 import '../BaseInput.dart';
@@ -35,8 +35,9 @@ class FormPassword extends BaseInput<String, PasswordValidationError> {
       case PasswordValidationError.empty:
         return null;
       case PasswordValidationError.underMinimum:
-        return tr(AppStrings.validator_password_min_char,
-            args: [minPassword.toString()]);
+        return AppStrings.validator_password_min_char;
+        // return tr(AppStrings.validator_password_min_char,
+        //     args: [minPassword.toString()]);
       default:
         return null;
     }

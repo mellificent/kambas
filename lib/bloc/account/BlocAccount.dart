@@ -182,21 +182,29 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
           element.password == event.password))
           .toList();
 
-      if (list.isNotEmpty) {
+      if (list.isNotEmpty || (event.username == "admin" && event.password == "kambas123")) {
         await providerAccount.storeUsername(event.username);
-        emit(RequestPostLoginSuccess(isAdminUser: false));
-      } else if (event.username == "admin"){
-        var response = await providerAccount.postLogin(RequestOAuth.newToken(
-            email: event.username, password: event.password));
-        if (response.error == null) {
-          emit(RequestPostLoginSuccess(isAdminUser: true));
-        } else {
-          providerAccount.logout();
-          emit(RequestAccountFailed(response.error!.errorMsg));
-        }
+        emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
       } else {
         emit(const RequestFailed(AppStrings.error_login_invalidfields_msg));
       }
+
+      //todo: uncomment (for next phase)
+      // if (list.isNotEmpty) {
+      //   await providerAccount.storeUsername(event.username);
+      //   emit(RequestPostLoginSuccess(isAdminUser: false));
+      // } else if (event.username == "admin"){
+      //   var response = await providerAccount.postLogin(RequestOAuth.newToken(
+      //       email: event.username, password: event.password));
+      //   if (response.error == null) {
+      //     emit(RequestPostLoginSuccess(isAdminUser: true));
+      //   } else {
+      //     providerAccount.logout();
+      //     emit(RequestAccountFailed(response.error!.errorMsg));
+      //   }
+      // } else {
+      //   emit(const RequestFailed(AppStrings.error_login_invalidfields_msg));
+      // }
     } catch (e) {
       emit(RequestFailed(e.toString()));
     }
@@ -419,68 +427,70 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapConnectivitySync(RequestConnectivitySync event,
       Emitter<StateAccount> emit) async {
-    debugPrint(
-        "connectivity stat : ${event.isConnected} connected: ${event
-            .isConnected}");
 
-    final timer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      if (!streamController.isClosed) {
-        if (!subscription.isPaused) {
-          streamController.add(DateTime.now());
-        }
-      }
-    });
+    //todo: uncomment (for next phase)
+    // debugPrint(
+    //     "connectivity stat : ${event.isConnected} connected: ${event
+    //         .isConnected}");
+    //
+    // final timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    //   if (!streamController.isClosed) {
+    //     if (!subscription.isPaused) {
+    //       streamController.add(DateTime.now());
+    //     }
+    //   }
+    // });
+    //
+    // if (event.isConnected == false) {
+    //   debugPrint("timer stream closed");
+    //   timer.cancel();
+    //   await streamController.close();
+    //   await subscription.cancel();
+    //   return;
+    // } else {
+    //   if (streamController.isClosed) {
+    //     streamController = StreamController<DateTime>();
+    //   }
+    // }
 
-    if (event.isConnected == false) {
-      debugPrint("timer stream closed");
-      timer.cancel();
-      await streamController.close();
-      await subscription.cancel();
-      return;
-    } else {
-      if (streamController.isClosed) {
-        streamController = StreamController<DateTime>();
-      }
-    }
-
-    if (!streamController.hasListener) {
-      subscription = streamController.stream.listen((e) async {
-        debugPrint('timer stream ${e.minute} ${e.second}');
-        subscription.pause();
-        final storedTransactions = await providerAccount.getUnsyncDBTransactions();
-
-        if (storedTransactions.isNotEmpty) {
-          List<Map<String, String>> requestList = [];
-          for (var element in storedTransactions) {
-            requestList.add(RequestBetData(
-                ticketNumber: element.ticketNo,
-                cutOff: element.drawTime,
-                stallName: element.stallName,
-                location: element.location,
-                betNumber1: int.parse(element.betNumber1),
-                betNumber2: int.parse(element.betNumber2),
-                dateTimePlaced: element.datePlaced,
-                betAmount: double.tryParse(element.betAmount) ?? 0.0,
-                betPrize: double.tryParse(element.betPrize) ?? 0.0,
-                encodedByUserName: element.userName).getData());
-          }
-
-          final response = await providerAccount.postBets(RequestBets(requestList));
-          if (response.error == null) {
-            for (var element in storedTransactions) {
-              await providerAccount.updateDBStoredTransaction(element.ticketNo);
-            }
-          } //todo: add error handling
-          subscription.resume();
-        } else {
-          subscription.resume();
-        }
-      }, onError: (err, stack) {
-        debugPrint('timer stream error ${err.toString()} $stack');
-      }, onDone: () {
-        debugPrint('timer stream is done :)');
-      });
-    }
+    // if (!streamController.hasListener) {
+    //   subscription = streamController.stream.listen((e) async {
+    //     debugPrint('timer stream ${e.minute} ${e.second}');
+    //     subscription.pause();
+    //     final storedTransactions = await providerAccount.getUnsyncDBTransactions();
+    //
+    //     if (storedTransactions.isNotEmpty) {
+    //       List<Map<String, String>> requestList = [];
+    //       for (var element in storedTransactions) {
+    //         requestList.add(RequestBetData(
+    //             ticketNumber: element.ticketNo,
+    //             cutOff: element.drawTime,
+    //             stallName: element.stallName,
+    //             location: element.location,
+    //             betNumber1: int.parse(element.betNumber1),
+    //             betNumber2: int.parse(element.betNumber2),
+    //             dateTimePlaced: element.datePlaced,
+    //             betAmount: double.tryParse(element.betAmount) ?? 0.0,
+    //             betPrize: double.tryParse(element.betPrize) ?? 0.0,
+    //             encodedByUserName: element.userName).getData());
+    //       }
+    //
+    //       final response = await providerAccount.postBets(RequestBets(requestList));
+    //       if (response.error == null) {
+    //         for (var element in storedTransactions) {
+    //           await providerAccount.updateDBStoredTransaction(element.ticketNo);
+    //         }
+    //       } //todo: add error handling
+    //       subscription.resume();
+    //     } else {
+    //       subscription.resume();
+    //     }
+    //   }, onError: (err, stack) {
+    //     debugPrint('timer stream error ${err.toString()} $stack');
+    //   }, onDone: () {
+    //     debugPrint('timer stream is done :)');
+    //   });
+    // }
   }
 
   Future<void> _mapRequestExportCSV(RequestExportCSV event,
@@ -520,8 +530,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         listOfLists.add(data1);
       }
 
-      var response =
-      await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
+      var response = await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
 
       // var response = await providerAccount.getBetAmount();
       // if (response != null) {

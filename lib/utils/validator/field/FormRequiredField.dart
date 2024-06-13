@@ -1,6 +1,6 @@
 
 
-import 'package:easy_localization/easy_localization.dart';
+// import 'package:easy_localization/easy_localization.dart';
 
 import '../../../constants/app_strings.dart';
 import '../BaseInput.dart';
@@ -39,8 +39,9 @@ class FormRequiredField
   String? getErrorMessage(RequiredFieldValidationError? e) {
     switch (e) {
       case RequiredFieldValidationError.minimum:
-        return tr(AppStrings.validator_min_length,
-            args: [minimum.toString()]);
+        return AppStrings.validator_min_length;
+        // return tr(AppStrings.validator_min_length,
+        //     args: [minimum.toString()]);
       case RequiredFieldValidationError.invalid:
         return AppStrings.validator_alphanumeric;
       case RequiredFieldValidationError.empty:

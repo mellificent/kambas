@@ -54,8 +54,10 @@ class AppStrings {
   static const validator_invalid_date = "Invalid date.";
   static const validator_email_format = "Invalid email format.";
   static const validator_alphanumeric = "This field must contain letters, numbers, dashes and underscores.";
-  static const validator_min_length = "Minimum length for this field is {}";
-  static const validator_password_min_char = "The password must be {} characters or more.";
+  // static const validator_min_length = "Minimum length for this field is {}";
+  // static const validator_password_min_char = "The password must be {} characters or more.";
+  static const validator_min_length = "Minimum length for this field is 2";
+  static const validator_password_min_char = "The password must be 8 characters or more.";
   static const validator_invalid_contact_number = "Please enter valid mobile number";
 
   //FONTS
