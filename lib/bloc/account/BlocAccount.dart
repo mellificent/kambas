@@ -552,7 +552,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     String drawTime =
     (currentDate.hour <= 13 && currentDate.hour > 6) ? "2 PM" : "8 PM";
     String drawTimePortuguese = (currentDate.hour <= 13 && currentDate.hour > 6)
-        ? "14 Horas"
+        ? "13 Horas"
         : "20 Horas";
 
     final dbCreatedDate = currentDate.copyWith(
