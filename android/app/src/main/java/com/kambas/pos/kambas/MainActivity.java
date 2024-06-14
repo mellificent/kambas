@@ -281,13 +281,13 @@ public class MainActivity extends FlutterActivity {
                 mIPosPrinterService.printBlankLines(1, 16, callback);
                 mIPosPrinterService.printSpecifiedTypeText("--------------------------", "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
-                mIPosPrinterService.printSpecifiedTypeText("Válido 7 dias após o ganho", "ST", 32, callback);
+                mIPosPrinterService.printSpecifiedTypeText("Válido 7 dias após o ganho", "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
-                mIPosPrinterService.printSpecifiedTypeText("KAMBAS BET", "ST", 32, callback);
+                mIPosPrinterService.printSpecifiedTypeText("KAMBAS BET", "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
-                mIPosPrinterService.printSpecifiedTypeText("Lei 15/23, Prêmios > 200 000 kz o excedente -> taxa 20%", "ST", 32, callback);
+                mIPosPrinterService.printSpecifiedTypeText("Lei 15/23, Prêmios > 200 000 kz o excedente -> taxa 20%", "ST", 24, callback);
                 mIPosPrinterService.printBlankLines(1, 16, callback);
-                mIPosPrinterService.printSpecifiedTypeText("Contacto kambasdeangola@gmail.com", "ST", 24, callback);
+                mIPosPrinterService.printSpecifiedTypeText("Contacto kambasdeangola@gmail.com", "ST", 16, callback);
 
                 mIPosPrinterService.printerPerformPrint(160,  callback);
             }catch (RemoteException e){
