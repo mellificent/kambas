@@ -553,7 +553,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     (currentDate.hour <= 13 && currentDate.hour > 6) ? "2 PM" : "8 PM";
     String drawTimePortuguese = (currentDate.hour <= 13 && currentDate.hour > 6)
         ? "13 Horas"
-        : "20 Horas";
+        : "19 Horas";
 
     final dbCreatedDate = currentDate.copyWith(
       minute: 0,
@@ -625,7 +625,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         AppStrings.p_betNumber: "${dbData.betNumber1} and ${dbData.betNumber2}",
         AppStrings.p_stallName: dbData.stallName,
         AppStrings.p_agentName: dbData.agentName,
-        AppStrings.p_drawSchedule: (dbData.drawTime == "2 PM") ? "13 Horas" : "20 Horas",
+        AppStrings.p_drawSchedule: (dbData.drawTime == "2 PM") ? "13 Horas" : "19 Horas",
         AppStrings.p_betAmount: dbData.betAmount,
         AppStrings.p_priceAmount: dbData.betPrize,
       });
