@@ -338,12 +338,12 @@ class MainLayout extends StatelessWidget
             absoluteZeroSpacing: false,
             elevation: 0,
             buttonLables: const [
-              '2 PM Cut-Off',
-              '8 PM Cut-Off',
+              '1 PM Cut-Off',
+              '7 PM Cut-Off',
             ],
             buttonValues: const [
               '13',
-              '20',
+              '19',
             ],
             radioButtonValue: (time) {
               selectedTime = int.parse(time);
