@@ -282,8 +282,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     selectedFilteredDate = event.selectedDatetime.copyWith(
       hour:
       (event.selectedDatetime.hour <= 13 && event.selectedDatetime.hour > 6)
-          ? 14
-          : 20,
+          ? 13
+          : 19,
       minute: 0,
       second: 0,
       millisecond: 0,
