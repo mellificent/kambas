@@ -66,6 +66,7 @@ class MainLayout extends StatelessWidget
           ).then((value) {
             if (value == 'RequestBetNumbersDone') {
               context.read<BlocAccount>().add(RequestDisplayBetNumber());
+              context.read<BlocAccount>().add(RequestCurrentDate());
             }
           });
         },
@@ -92,6 +93,7 @@ class MainLayout extends StatelessWidget
             context.read<BlocAccount>().add(RequestDisplayBetNumber());
             context.read<BlocAccount>().add(RequestDisplayBetAmount());
             context.read<BlocAccount>().add(GetTerminalSettings());
+            context.read<BlocAccount>().add(RequestCurrentDate());
           }
         });
       },
@@ -156,6 +158,7 @@ class MainLayout extends StatelessWidget
                           context
                               .read<BlocAccount>()
                               .add(RequestDisplayBetAmount());
+                          context.read<BlocAccount>().add(RequestCurrentDate());
                         }
                       });
                     },

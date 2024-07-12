@@ -73,7 +73,10 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       final now = DateTime.now();
       String dateString = DateFormat.yMMMMd('en_US').format(now);
       // String drawTime = DateFormat('h a').format(now);
-      String drawTime = (now.hour <= 13 && now.hour > 6) ? "1 PM" : "7 PM";
+      // String drawTime = (now.hour <= 13 && now.hour > 6) ? "1 PM" : "7 PM";
+      var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
+      var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
+      String drawTime = (now.isBefore(firstDrawtime) || now.isAfter(lastDrawtime)) ? "1 PM" : "7 PM";
 
       emit(DisplayCurrentDate(dateString));
       emit(DisplayDrawTime(drawTime));
@@ -279,9 +282,14 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapRequestSelectedFilterDate(RequestSelectedFilterDate event,
       Emitter<StateAccount> emit) async {
+
+    var now = event.selectedDatetime;
+    var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
+    var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
+
     selectedFilteredDate = event.selectedDatetime.copyWith(
       hour:
-      (event.selectedDatetime.hour <= 13 && event.selectedDatetime.hour > 6)
+      (now.isBefore(firstDrawtime) || now.isAtSameMomentAs(firstDrawtime) || now.isAfter(lastDrawtime))
           ? 13
           : 19,
       minute: 0,
@@ -549,9 +557,12 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     final currentDate = DateTime.now();
     String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
     String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
-    String drawTime =
-    (currentDate.hour <= 13 && currentDate.hour > 6) ? "1 PM" : "7 PM";
-    String drawTimePortuguese = (currentDate.hour <= 13 && currentDate.hour > 6)
+
+    // (currentDate.hour <= 13 && currentDate.hour > 6)
+    var firstDrawtime = DateTime(currentDate.year, currentDate.month, currentDate.day, 13, 1);
+    var lastDrawtime = DateTime(currentDate.year, currentDate.month, currentDate.day, 19, 1);
+    String drawTime = (currentDate.isBefore(firstDrawtime) || currentDate.isAtSameMomentAs(firstDrawtime) || currentDate.isAfter(lastDrawtime)) ? "1 PM" : "7 PM";
+    String drawTimePortuguese = (currentDate.isBefore(firstDrawtime) || currentDate.isAtSameMomentAs(firstDrawtime) || currentDate.isAfter(lastDrawtime))
         ? "13 Horas"
         : "19 Horas";
 
