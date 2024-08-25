@@ -76,7 +76,12 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       // String drawTime = (now.hour <= 13 && now.hour > 6) ? "1 PM" : "7 PM";
       var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
       var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
-      String drawTime = (now.isBefore(firstDrawtime) || now.isAfter(lastDrawtime)) ? "1 PM" : "7 PM";
+      String drawTime = (now.isBefore(firstDrawtime) ||
+              (now.hour == firstDrawtime.hour &&
+                  now.minute == firstDrawtime.minute) ||
+              now.isAfter(lastDrawtime))
+          ? "1 PM"
+          : "7 PM";
 
       emit(DisplayCurrentDate(dateString));
       emit(DisplayDrawTime(drawTime));
@@ -97,8 +102,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
   //   return now;
   // }
 
-  Future<void> _mapUserDetails(GetUserDetails event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapUserDetails(
+      GetUserDetails event, Emitter<StateAccount> emit) async {
     try {
       var response = await providerAccount.getStoredDBUserData(event.userID);
       if (response != null) {
@@ -111,8 +116,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapFormFieldValueOnChangeState(FormFieldValueOnChange event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapFormFieldValueOnChangeState(
+      FormFieldValueOnChange event, Emitter<StateAccount> emit) async {
     if (event.fieldName == FormLogin.ID_USERNAME ||
         event.fieldName == FormLogin.ID_PASSWORD) return;
 
@@ -127,8 +132,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     // emit(UpdateFormField(fieldName: "Sign Up Button", value: (_formRegister1.status == ValidationStatus.valid && ((_formRegister1.isEULASigned.value ?? "false") == "true")) ? "true" : "false"));
   }
 
-  Future<void> _mapFormFieldChangeObscurityState(FormFieldChangeObscurity event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapFormFieldChangeObscurityState(
+      FormFieldChangeObscurity event, Emitter<StateAccount> emit) async {
     FormInput formInput;
     switch (event.fieldName) {
       case FormLogin.ID_PASSWORD:
@@ -143,8 +148,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapPostLoginV2(PostLoginCredentials event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapPostLoginV2(
+      PostLoginCredentials event, Emitter<StateAccount> emit) async {
     try {
       emit(const RequestLoadingAccount("logging in"));
 
@@ -173,19 +178,19 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapPostLogin(PostLoginCredentials event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapPostLogin(
+      PostLoginCredentials event, Emitter<StateAccount> emit) async {
     try {
       emit(const RequestLoadingAccount("logging in"));
 
       final storedList = await providerAccount.getStoredDBUsers();
       final list = storedList
-          .where((element) =>
-      (element.userName == event.username &&
-          element.password == event.password))
+          .where((element) => (element.userName == event.username &&
+              element.password == event.password))
           .toList();
 
-      if (list.isNotEmpty || (event.username == "admin" && event.password == "kambas123")) {
+      if (list.isNotEmpty ||
+          (event.username == "admin" && event.password == "kambas123")) {
         await providerAccount.storeUsername(event.username);
         emit(RequestPostLoginSuccess(isAdminUser: event.username == "admin"));
       } else {
@@ -213,15 +218,15 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapPostLogoutUser(PostLogoutUser event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapPostLogoutUser(
+      PostLogoutUser event, Emitter<StateAccount> emit) async {
     providerAccount.logout();
     providerAccount.setLogoutTag();
     emit(const RequestFailed(''));
   }
 
-  Future<void> _mapPostBetNumber(PostBetNumber event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapPostBetNumber(
+      PostBetNumber event, Emitter<StateAccount> emit) async {
     if (betNumber1 == "0") {
       betNumber1 = event.selectedNumber;
       debugPrint(" betNumber1 $betNumber1");
@@ -234,24 +239,24 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapPostBetAmount(RequestPostBetAmount event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapPostBetAmount(
+      RequestPostBetAmount event, Emitter<StateAccount> emit) async {
     if (betAmount != "0") {
       await providerAccount.saveBetAmount(betAmount);
     }
     emit(const RequestBetNumbersDone());
   }
 
-  Future<void> _mapRequestUpdateBetAmount(RequestUpdateBetAmount event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestUpdateBetAmount(
+      RequestUpdateBetAmount event, Emitter<StateAccount> emit) async {
     if (event.amount != "0") {
       betAmount = event.amount;
       emit(DisplayBetAmount(betAmount));
     }
   }
 
-  Future<void> _mapDisplayBetNumber(RequestDisplayBetNumber event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapDisplayBetNumber(
+      RequestDisplayBetNumber event, Emitter<StateAccount> emit) async {
     try {
       var response = await providerAccount.getBetNumbers();
       if (response != null && response.length == 2) {
@@ -265,8 +270,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapRequestDisplayBetAmount(RequestDisplayBetAmount event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestDisplayBetAmount(
+      RequestDisplayBetAmount event, Emitter<StateAccount> emit) async {
     try {
       var response = await providerAccount.getBetAmount();
       if (response != null) {
@@ -280,16 +285,17 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapRequestSelectedFilterDate(RequestSelectedFilterDate event,
-      Emitter<StateAccount> emit) async {
-
+  Future<void> _mapRequestSelectedFilterDate(
+      RequestSelectedFilterDate event, Emitter<StateAccount> emit) async {
     var now = event.selectedDatetime;
     var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
     var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
 
     selectedFilteredDate = event.selectedDatetime.copyWith(
-      hour:
-      (now.isBefore(firstDrawtime) || now.isAtSameMomentAs(firstDrawtime) || now.isAfter(lastDrawtime))
+      hour: (now.isBefore(firstDrawtime) ||
+              (now.hour == firstDrawtime.hour &&
+                  now.minute == firstDrawtime.minute) ||
+              now.isAfter(lastDrawtime))
           ? 13
           : 19,
       minute: 0,
@@ -302,8 +308,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     emit(DisplayFilterDate(label));
   }
 
-  Future<void> _mapRequestDbUserList(GetDbUserList event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestDbUserList(
+      GetDbUserList event, Emitter<StateAccount> emit) async {
     // selectedFilteredDate = event.selectedDatetime;
     // final label = DateFormat('EEE MMM dd ha').format(selectedFilteredDate);
 
@@ -311,8 +317,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     emit(DisplayUserList(list));
   }
 
-  Future<void> _mapGetTerminalSettings(GetTerminalSettings event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapGetTerminalSettings(
+      GetTerminalSettings event, Emitter<StateAccount> emit) async {
     final response = await providerAccount.getDBTerminalData();
     final terminalData = TerminalData(
         stallName: response?.stallName ?? '',
@@ -323,8 +329,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     emit(DisplayTerminalSettings(data: terminalData));
   }
 
-  Future<void> _mapRequestAddUser(RequestAddUser event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestAddUser(
+      RequestAddUser event, Emitter<StateAccount> emit) async {
     if (event.userName.isEmpty ||
         event.fullName.isEmpty ||
         event.email.isEmpty ||
@@ -348,8 +354,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         isStored ? RequestSuccess() : const RequestFailed("error adding user"));
   }
 
-  Future<void> _mapRequestUpdateUser(RequestUpdateUser event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestUpdateUser(
+      RequestUpdateUser event, Emitter<StateAccount> emit) async {
     if (event.userID == -1) {
       emit(const RequestFailed(AppStrings.error_general_throwable_msg));
       return;
@@ -375,8 +381,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         : const RequestFailed("error updating user"));
   }
 
-  Future<void> _mapRequestDeleteUser(RequestDeleteUser event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestDeleteUser(
+      RequestDeleteUser event, Emitter<StateAccount> emit) async {
     if (event.userID == -1) {
       emit(const RequestFailed(AppStrings.error_general_throwable_msg));
       return;
@@ -391,8 +397,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         : const RequestFailed("error deleting user"));
   }
 
-  Future<void> _mapRequestSaveSettings(RequestSaveSettings event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestSaveSettings(
+      RequestSaveSettings event, Emitter<StateAccount> emit) async {
     if (event.stallName.isEmpty || event.location.isEmpty) {
       emit(const RequestFailed(AppStrings.error_register_inputfields_msg));
       return;
@@ -410,8 +416,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         : const RequestFailed("error saving changes"));
   }
 
-  Future<void> _mapGetTransactionDetails(GetTransactionDetails event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapGetTransactionDetails(
+      GetTransactionDetails event, Emitter<StateAccount> emit) async {
     if (event.ticket.isEmpty) {
       emit(const RequestFailed("Please Enter Ticket Number."));
       return;
@@ -433,9 +439,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapConnectivitySync(RequestConnectivitySync event,
-      Emitter<StateAccount> emit) async {
-
+  Future<void> _mapConnectivitySync(
+      RequestConnectivitySync event, Emitter<StateAccount> emit) async {
     //todo: uncomment (for next phase)
     // debugPrint(
     //     "connectivity stat : ${event.isConnected} connected: ${event
@@ -501,8 +506,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     // }
   }
 
-  Future<void> _mapRequestExportCSV(RequestExportCSV event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestExportCSV(
+      RequestExportCSV event, Emitter<StateAccount> emit) async {
     try {
       List<String> header = [
         "stall_name",
@@ -518,7 +523,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       ];
 
       final storedData =
-      await providerAccount.getFilteredDBTransactions(selectedFilteredDate);
+          await providerAccount.getFilteredDBTransactions(selectedFilteredDate);
       List<List<String>> listOfLists = [];
 
       for (var element in storedData) {
@@ -538,7 +543,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         listOfLists.add(data1);
       }
 
-      var response = await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
+      var response =
+          await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
 
       // var response = await providerAccount.getBetAmount();
       // if (response != null) {
@@ -551,18 +557,26 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     }
   }
 
-  Future<void> _mapRequestPrintTicket(RequestPrintTicket event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestPrintTicket(
+      RequestPrintTicket event, Emitter<StateAccount> emit) async {
     // final currentDate = await getAfricaDateTime();
     final currentDate = DateTime.now();
     String initialDate = DateFormat('MMMM dd, yyyy').format(currentDate);
     String datePlaced = DateFormat('MMM dd, yyyy hh:mm a').format(currentDate);
 
     // (currentDate.hour <= 13 && currentDate.hour > 6)
-    var firstDrawtime = DateTime(currentDate.year, currentDate.month, currentDate.day, 13, 1);
-    var lastDrawtime = DateTime(currentDate.year, currentDate.month, currentDate.day, 19, 1);
-    String drawTime = (currentDate.isBefore(firstDrawtime) || currentDate.isAtSameMomentAs(firstDrawtime) || currentDate.isAfter(lastDrawtime)) ? "1 PM" : "7 PM";
-    String drawTimePortuguese = (currentDate.isBefore(firstDrawtime) || currentDate.isAtSameMomentAs(firstDrawtime) || currentDate.isAfter(lastDrawtime))
+    var firstDrawtime =
+        DateTime(currentDate.year, currentDate.month, currentDate.day, 13, 1);
+    var lastDrawtime =
+        DateTime(currentDate.year, currentDate.month, currentDate.day, 19, 1);
+    String drawTime = (currentDate.isBefore(firstDrawtime) ||
+        (currentDate.hour == firstDrawtime.hour && currentDate.minute == firstDrawtime.minute) ||
+            currentDate.isAfter(lastDrawtime))
+        ? "1 PM"
+        : "7 PM";
+    String drawTimePortuguese = (currentDate.isBefore(firstDrawtime) ||
+        (currentDate.hour == firstDrawtime.hour && currentDate.minute == firstDrawtime.minute) ||
+            currentDate.isAfter(lastDrawtime))
         ? "13 Horas"
         : "19 Horas";
 
@@ -618,8 +632,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
     emit(const RequestGoToHome());
   }
 
-  Future<void> _mapRequestReprintTicket(RequestReprintTicket event,
-      Emitter<StateAccount> emit) async {
+  Future<void> _mapRequestReprintTicket(
+      RequestReprintTicket event, Emitter<StateAccount> emit) async {
     if (event.ticketNo.isEmpty) {
       emit(const RequestFailed("Please Enter Ticket Number."));
       return;
@@ -630,13 +644,14 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       const platformMethodChannel = MethodChannel('com.methodchannel/test');
       platformMethodChannel.invokeMethod(AppStrings.printMethod, {
         AppStrings.p_initialDate:
-        DateFormat('MMMM dd, yyyy').format(DateTime.now()),
+            DateFormat('MMMM dd, yyyy').format(DateTime.now()),
         AppStrings.p_processedDate: dbData.datePlaced,
         AppStrings.p_ticketNumber: dbData.ticketNo,
         AppStrings.p_betNumber: "${dbData.betNumber1} and ${dbData.betNumber2}",
         AppStrings.p_stallName: dbData.stallName,
         AppStrings.p_agentName: dbData.agentName,
-        AppStrings.p_drawSchedule: (dbData.drawTime == "1 PM") ? "13 Horas" : "19 Horas",
+        AppStrings.p_drawSchedule:
+            (dbData.drawTime == "1 PM") ? "13 Horas" : "19 Horas",
         AppStrings.p_betAmount: dbData.betAmount,
         AppStrings.p_priceAmount: dbData.betPrize,
       });
@@ -652,10 +667,11 @@ class FormInput {
   final BaseInput error;
   final bool obscure;
 
-  const FormInput({this.fieldName = "",
-    this.value,
-    required this.error,
-    this.obscure = false});
+  const FormInput(
+      {this.fieldName = "",
+      this.value,
+      required this.error,
+      this.obscure = false});
 }
 
 class FormLogin with ValidatorMixins {
@@ -671,8 +687,7 @@ class FormLogin with ValidatorMixins {
   });
 
   @override
-  List<BaseInput> get inputs =>
-      [
+  List<BaseInput> get inputs => [
         username,
         password,
       ];
