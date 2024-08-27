@@ -22,11 +22,11 @@ class ScreenMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (_) => BlocAccount(
-          providerAccount: RepositoryProvider.of<ProviderAccount>(context),
-        ),
-        child: MainLayout(),
-      );
+      create: (_) => BlocAccount(
+        providerAccount: RepositoryProvider.of<ProviderAccount>(context),
+      ),
+      child: MainLayout(),
+    );
   }
 }
 
@@ -36,7 +36,6 @@ class MainLayout extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-
     ScreenMainSettings args = const ScreenMainSettings();
     var settings = ModalRoute.of(context)?.settings.arguments;
     if (settings != null) args = settings as ScreenMainSettings;
@@ -56,64 +55,13 @@ class MainLayout extends StatelessWidget
       ),
     );
 
-    Widget placeBetButton = Container(
-      margin: const EdgeInsets.only(top: 20.0, bottom: 4.0),
-      child: ButtonRaised(
-        onPressed: () {
-          Navigator.pushNamed(
-            context,
-            AppRoutes.of(context).betPageScreen,
-          ).then((value) {
-            if (value == 'RequestBetNumbersDone') {
-              context.read<BlocAccount>().add(RequestDisplayBetNumber());
-              context.read<BlocAccount>().add(RequestCurrentDate());
-            }
-          });
-        },
-        text: AppStrings.place_bet,
-        textStyle: const TextStyle(
-            fontSize: 14.0,
-            color: AppColors.TextColorBlack56,
-            fontWeight: FontWeight.bold,
-            fontFamily: AppStrings.FONT_POPPINS_BOLD),
-        borderRadius: 9,
-        height: 45.0,
-        margin: EdgeInsets.zero,
-      ),
-    );
-
-    Widget checkoutButton = ButtonRaised(
-      enabled: !(args.isAdminUser ?? false),
-      onPressed: () {
-        Navigator.pushNamed(
-          context,
-          AppRoutes.of(context).checkoutScreen,
-        ).then((value) {
-          if (value == "betComplete") {
-            context.read<BlocAccount>().add(RequestDisplayBetNumber());
-            context.read<BlocAccount>().add(RequestDisplayBetAmount());
-            context.read<BlocAccount>().add(GetTerminalSettings());
-            context.read<BlocAccount>().add(RequestCurrentDate());
-          }
-        });
-      },
-      text: AppStrings.check_out,
-      textStyle: const TextStyle(
-          fontSize: 14.0,
-          color: AppColors.TextColorBlack56,
-          fontWeight: FontWeight.bold,
-          fontFamily: AppStrings.FONT_POPPINS_BOLD),
-      borderRadius: 9,
-      height: 45.0,
-      margin: const EdgeInsets.only(bottom: 8.0, top: 13.0),
-    );
-
     Widget reprintButton = ButtonRaised(
       onPressed: () {
         Navigator.pushNamed(
           context,
           AppRoutes.of(context).reprintScreen,
-        );
+        ).then((value) =>
+            context.read<BlocAccount>().add(RequestCurrentDate()));
       },
       text: AppStrings.reprint_ticket,
       textStyle: const TextStyle(
@@ -144,27 +92,7 @@ class MainLayout extends StatelessWidget
                   _buildTitle(context),
                   _buildTerminalSettingView(context),
                   _buildDrawSchedule(context),
-                  placeBetButton,
-                  buildLabel(AppStrings.bet_placed.allInCaps()),
-                  _buildBetField(context),
-                  buildLabel(AppStrings.enter_amount.allInCaps()),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.of(context).amountPageScreen,
-                      ).then((value) {
-                        if (value == 'RequestBetAmountDone') {
-                          context
-                              .read<BlocAccount>()
-                              .add(RequestDisplayBetAmount());
-                          context.read<BlocAccount>().add(RequestCurrentDate());
-                        }
-                      });
-                    },
-                    child: _buildBetAmountField(context),
-                  ),
-                  checkoutButton,
+                  _buildBetColumn(context, args.isAdminUser),
                   reprintButton,
                 ],
               ),
@@ -188,6 +116,7 @@ class MainLayout extends StatelessWidget
       backgroundColor: AppColors.White,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        scrolledUnderElevation: 0.0,
         leading: IconButton(
           onPressed: () {
             Navigator.pushNamedAndRemoveUntil(
@@ -199,35 +128,39 @@ class MainLayout extends StatelessWidget
             color: Colors.grey,
           ),
         ),
-        actions: (args.isAdminUser ?? false) ? [
-          InkWell(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.of(context).mainAdminScreen,
-              ).then((value) => context.read<BlocAccount>().add(GetTerminalSettings()));
-            },
-            child: const Icon(
-              Icons.settings,
-              size: 40.0,
-              color: AppColors.PrimaryColor,
-            ),
-          ),
-          const SizedBox(
-            width: 8.0,
-          ),
-        ] : null,
+        actions: (args.isAdminUser ?? false)
+            ? [
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.of(context).mainAdminScreen,
+                    ).then((value) =>
+                        context.read<BlocAccount>().add(GetTerminalSettings()));
+                  },
+                  child: const Icon(
+                    Icons.settings,
+                    size: 40.0,
+                    color: AppColors.PrimaryColor,
+                  ),
+                ),
+                const SizedBox(
+                  width: 8.0,
+                ),
+              ]
+            : null,
         elevation: 0,
       ),
       body: OfflineBuilder(
           connectivityBuilder: (
-              BuildContext context,
-              ConnectivityResult connectivity,
-              Widget child,
-              ){
-
+            BuildContext context,
+            ConnectivityResult connectivity,
+            Widget child,
+          ) {
             final bool connected = connectivity != ConnectivityResult.none;
-            context.read<BlocAccount>().add(RequestConnectivitySync(isConnected: connected));
+            context
+                .read<BlocAccount>()
+                .add(RequestConnectivitySync(isConnected: connected));
 
             return mainBody;
             // return Stack(
@@ -251,6 +184,113 @@ class MainLayout extends StatelessWidget
           child: mainBody),
     );
   }
+
+  _buildBetColumn(BuildContext context, bool? isAdminUser) => buildWidget(
+        context,
+        id: "betColumn",
+        buildWhen: (id, previous, current) => (current is SetBetRestriction),
+        builder: (context, state) {
+          return ((state is SetBetRestriction)
+                  ? (state.isBetRestricted || (isAdminUser ?? false))
+                  : (isAdminUser ?? false))
+              ? Container(
+                  padding: const EdgeInsets.all(14.0),
+                  alignment: Alignment.center,
+                  child: !(isAdminUser ?? false)
+                      ? buildLabel("Please wait for next cut-off to place bet.")
+                      : null,
+                )
+          : Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 20.0, bottom: 4.0),
+                child: ButtonRaised(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.of(context).betPageScreen,
+                    ).then((value) {
+                      if (value == 'RequestBetNumbersDone') {
+                        context
+                            .read<BlocAccount>()
+                            .add(RequestDisplayBetNumber());
+                        context
+                            .read<BlocAccount>()
+                            .add(RequestCurrentDate());
+                      }
+                    });
+                  },
+                  text: AppStrings.place_bet,
+                  textStyle: const TextStyle(
+                      fontSize: 14.0,
+                      color: AppColors.TextColorBlack56,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: AppStrings.FONT_POPPINS_BOLD),
+                  borderRadius: 9,
+                  height: 45.0,
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+              buildLabel(AppStrings.bet_placed.allInCaps()),
+              _buildBetField(context),
+              buildLabel(AppStrings.enter_amount.allInCaps()),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.of(context).amountPageScreen,
+                  ).then((value) {
+                    if (value == 'RequestBetAmountDone') {
+                      context
+                          .read<BlocAccount>()
+                          .add(RequestDisplayBetAmount());
+                      context
+                          .read<BlocAccount>()
+                          .add(RequestCurrentDate());
+                    }
+                  });
+                },
+                child: _buildBetAmountField(context),
+              ),
+              ButtonRaised(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.of(context).checkoutScreen,
+                  ).then((value) {
+                    if (value == "betComplete") {
+                      context
+                          .read<BlocAccount>()
+                          .add(RequestDisplayBetNumber());
+                      context
+                          .read<BlocAccount>()
+                          .add(RequestDisplayBetAmount());
+                      context
+                          .read<BlocAccount>()
+                          .add(GetTerminalSettings());
+                      context
+                          .read<BlocAccount>()
+                          .add(RequestCurrentDate());
+                    }
+                  });
+                },
+                text: AppStrings.check_out,
+                textStyle: const TextStyle(
+                    fontSize: 14.0,
+                    color: AppColors.TextColorBlack56,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: AppStrings.FONT_POPPINS_BOLD),
+                borderRadius: 9,
+                height: 45.0,
+                margin: const EdgeInsets.only(bottom: 8.0, top: 13.0),
+              ),
+            ],
+          );
+        },
+      );
 
   Widget buildLabel(String text) {
     return Container(
@@ -289,40 +329,43 @@ class MainLayout extends StatelessWidget
       );
 
   _buildTerminalSettingView(BuildContext context) => buildWidget(
-    context,
-    id: "terminalSettingView",
-    buildWhen: (id, previous, current) => (current is DisplayTerminalSettings),
-    builder: (context, state) {
-      if (state is InitStateAccount) {
-        context.read<BlocAccount>().add(GetTerminalSettings());
-      }
+        context,
+        id: "terminalSettingView",
+        buildWhen: (id, previous, current) =>
+            (current is DisplayTerminalSettings),
+        builder: (context, state) {
+          if (state is InitStateAccount) {
+            context.read<BlocAccount>().add(GetTerminalSettings());
+          }
 
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text("Ticket No. ${(state is DisplayTerminalSettings) ? state.data.ticketNumber : ""}",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 14.0,
-                  color: AppColors.TextColorBlack56,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.3,
-                  height: 1.5,
-                  fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
-          Text("Stall Name - ${(state is DisplayTerminalSettings) ? state.data.stallName : "N/A"}",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 14.0,
-                  color: AppColors.TextColorBlack56,
-                  fontWeight: FontWeight.normal,
-                  letterSpacing: 1.6,
-                  height: 1.5,
-                  fontFamily: AppStrings.FONT_POPPINS_REGULAR))
-        ],
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                  "Ticket No. ${(state is DisplayTerminalSettings) ? state.data.ticketNumber : ""}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 14.0,
+                      color: AppColors.TextColorBlack56,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.3,
+                      height: 1.5,
+                      fontFamily: AppStrings.FONT_POPPINS_REGULAR)),
+              Text(
+                  "Stall Name - ${(state is DisplayTerminalSettings) ? state.data.stallName : "N/A"}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 14.0,
+                      color: AppColors.TextColorBlack56,
+                      fontWeight: FontWeight.normal,
+                      letterSpacing: 1.6,
+                      height: 1.5,
+                      fontFamily: AppStrings.FONT_POPPINS_REGULAR))
+            ],
+          );
+        },
       );
-    },
-  );
 
   _buildDrawSchedule(BuildContext context) => buildWidget(
         context,

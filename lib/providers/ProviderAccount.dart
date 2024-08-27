@@ -274,4 +274,16 @@ class ProviderAccount extends BaseProvider {
   Future<void> deleteUserBetInput() async {
     await preferenceRepository.deleteUserInputData();
   }
+
+  Future<void> saveBetRestrictData({required bool isRestricted, required String timeExported}) async {
+    await preferenceRepository.saveBetRestrictionStat(isRestricted);
+    await preferenceRepository.saveLastExportedTime(timeExported);
+  }
+
+  Future<bool> getBetRestrictStatus() async {
+    return await preferenceRepository.getBetRestrictionStat();
+  }
+  Future<String?> getLastExportedTime() async {
+    return await preferenceRepository.getLastExportedTime();
+  }
 }

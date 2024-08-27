@@ -65,6 +65,18 @@ class RequestAccountFailed extends StateAccount {
   String toString() => 'RequestGetUserFailed { error: $error }';
 }
 
+class SetBetRestriction extends StateAccount {
+  final bool isBetRestricted;
+
+  const SetBetRestriction(this.isBetRestricted,);
+
+  @override
+  List<Object> get props => [isBetRestricted];
+
+  @override
+  String toString() => 'SetBetRestriction { isBetRestricted: $isBetRestricted }';
+}
+
 class UpdateFormField extends StateAccount {
   final String fieldName;
   final dynamic value;

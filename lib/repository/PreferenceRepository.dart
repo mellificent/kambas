@@ -134,4 +134,33 @@ class PreferenceRepository {
     return;
   }
 
+  Future<void> saveBetRestrictionStat(bool isResticted) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isBetRestricted', isResticted);
+    return;
+  }
+
+  Future<bool> getBetRestrictionStat() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isBetRestricted') ?? false;
+  }
+
+  Future<void> saveLastExportedTime(String time) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastExportedTime', time);
+    return;
+  }
+
+  Future<String> getLastExportedTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('lastExportedTime') ?? '';
+  }
+
+  Future<void> deleteBetRestrictionStat() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isBetRestricted', false);
+    await prefs.setString('lastExportedTime', '');
+    return;
+  }
+
 }

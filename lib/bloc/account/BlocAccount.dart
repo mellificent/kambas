@@ -83,6 +83,16 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
           ? "1 PM"
           : "7 PM";
 
+      var isBetRestricted = await providerAccount.getBetRestrictStatus();
+      if(isBetRestricted){
+        var lastExportedTime = await providerAccount.getLastExportedTime();
+        if(lastExportedTime != drawTime){
+          await providerAccount.saveBetRestrictData(isRestricted: false, timeExported: '');
+          isBetRestricted = false;
+        }
+      }
+
+      emit(SetBetRestriction(isBetRestricted));
       emit(DisplayCurrentDate(dateString));
       emit(DisplayDrawTime(drawTime));
     });
@@ -543,15 +553,23 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         listOfLists.add(data1);
       }
 
-      var response =
-          await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
+      var response = await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
 
-      // var response = await providerAccount.getBetAmount();
-      // if (response != null) {
-      //   // emit(DisplayBetAmount(response));
-      // } else {
-      //   // emit(const DisplayBetAmount(''));
-      // }
+      final now = DateTime.now();
+      if ((selectedFilteredDate.day == now.day) && (selectedFilteredDate.month == now.month)){
+        var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
+        var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
+        String drawTime = (now.isBefore(firstDrawtime) ||
+            (now.hour == firstDrawtime.hour &&
+                now.minute == firstDrawtime.minute) ||
+            now.isAfter(lastDrawtime))
+            ? "1 PM"
+            : "7 PM";
+
+        await providerAccount.saveBetRestrictData(isRestricted: true, timeExported: drawTime);
+      }
+
+
     } catch (e) {
       // emit(const DisplayBetAmount(''));
     }
