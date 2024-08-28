@@ -321,9 +321,6 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
   Future<void> _mapRequestDbUserList(
       GetDbUserList event, Emitter<StateAccount> emit) async {
-    // selectedFilteredDate = event.selectedDatetime;
-    // final label = DateFormat('EEE MMM dd ha').format(selectedFilteredDate);
-
     final list = await providerAccount.getStoredDBUsers();
     emit(DisplayUserList(list));
   }
@@ -603,6 +600,7 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         : "19 Horas";
 
     final dbCreatedDate = currentDate.copyWith(
+      hour: (drawTime == "1 PM") ? 13 : 19,
       minute: 0,
       second: 0,
       millisecond: 0,

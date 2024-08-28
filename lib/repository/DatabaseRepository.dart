@@ -229,14 +229,6 @@ class DatabaseRepository {
         .orderBy("id")
         .toList();
 
-    // var storedModule = await KambasTransaction()
-    //     .select()
-    //     .createdAt
-    //     .equals(selectedDatetime)
-    //     .and
-    //     .orderBy("id")
-    //     .toList();
-
     for (var e in storedModule) {
       var rawData = json.decode(e.jsonResponse!);
       readContents.add(DBTransactions.fromJson(rawData));
