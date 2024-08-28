@@ -74,8 +74,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
       String dateString = DateFormat.yMMMMd('en_US').format(now);
       // String drawTime = DateFormat('h a').format(now);
       // String drawTime = (now.hour <= 13 && now.hour > 6) ? "1 PM" : "7 PM";
-      var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
-      var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
+      var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 0);
+      var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 0);
       String drawTime = (now.isBefore(firstDrawtime) ||
               (now.hour == firstDrawtime.hour &&
                   now.minute == firstDrawtime.minute) ||
@@ -84,10 +84,11 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
           : "7 PM";
 
       var isBetRestricted = await providerAccount.getBetRestrictStatus();
-      if(isBetRestricted){
+      if (isBetRestricted) {
         var lastExportedTime = await providerAccount.getLastExportedTime();
-        if(lastExportedTime != drawTime){
-          await providerAccount.saveBetRestrictData(isRestricted: false, timeExported: '');
+        if (lastExportedTime != drawTime) {
+          await providerAccount.saveBetRestrictData(
+              isRestricted: false, timeExported: '');
           isBetRestricted = false;
         }
       }
@@ -298,8 +299,8 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
   Future<void> _mapRequestSelectedFilterDate(
       RequestSelectedFilterDate event, Emitter<StateAccount> emit) async {
     var now = event.selectedDatetime;
-    var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
-    var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
+    var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 0);
+    var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 0);
 
     selectedFilteredDate = event.selectedDatetime.copyWith(
       hour: (now.isBefore(firstDrawtime) ||
@@ -553,23 +554,24 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
         listOfLists.add(data1);
       }
 
-      var response = await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
+      var response =
+          await exportCSV.myCSV(header, listOfLists, fileName: "kambas");
 
       final now = DateTime.now();
-      if ((selectedFilteredDate.day == now.day) && (selectedFilteredDate.month == now.month)){
-        var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 1);
-        var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 1);
+      if ((selectedFilteredDate.day == now.day) &&
+          (selectedFilteredDate.month == now.month)) {
+        var firstDrawtime = DateTime(now.year, now.month, now.day, 13, 0);
+        var lastDrawtime = DateTime(now.year, now.month, now.day, 19, 0);
         String drawTime = (now.isBefore(firstDrawtime) ||
-            (now.hour == firstDrawtime.hour &&
-                now.minute == firstDrawtime.minute) ||
-            now.isAfter(lastDrawtime))
+                (now.hour == firstDrawtime.hour &&
+                    now.minute == firstDrawtime.minute) ||
+                now.isAfter(lastDrawtime))
             ? "1 PM"
             : "7 PM";
 
-        await providerAccount.saveBetRestrictData(isRestricted: true, timeExported: drawTime);
+        await providerAccount.saveBetRestrictData(
+            isRestricted: true, timeExported: drawTime);
       }
-
-
     } catch (e) {
       // emit(const DisplayBetAmount(''));
     }
@@ -584,16 +586,18 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
 
     // (currentDate.hour <= 13 && currentDate.hour > 6)
     var firstDrawtime =
-        DateTime(currentDate.year, currentDate.month, currentDate.day, 13, 1);
+        DateTime(currentDate.year, currentDate.month, currentDate.day, 13, 0);
     var lastDrawtime =
-        DateTime(currentDate.year, currentDate.month, currentDate.day, 19, 1);
+        DateTime(currentDate.year, currentDate.month, currentDate.day, 19, 0);
     String drawTime = (currentDate.isBefore(firstDrawtime) ||
-        (currentDate.hour == firstDrawtime.hour && currentDate.minute == firstDrawtime.minute) ||
+            (currentDate.hour == firstDrawtime.hour &&
+                currentDate.minute == firstDrawtime.minute) ||
             currentDate.isAfter(lastDrawtime))
         ? "1 PM"
         : "7 PM";
     String drawTimePortuguese = (currentDate.isBefore(firstDrawtime) ||
-        (currentDate.hour == firstDrawtime.hour && currentDate.minute == firstDrawtime.minute) ||
+            (currentDate.hour == firstDrawtime.hour &&
+                currentDate.minute == firstDrawtime.minute) ||
             currentDate.isAfter(lastDrawtime))
         ? "13 Horas"
         : "19 Horas";
@@ -624,7 +628,10 @@ class BlocAccount extends Bloc<EventAccount, StateAccount> {
           ((int.parse(betAmountResponse!) / 100) * 20000).toStringAsFixed(0),
     }).then((value) async {
       await providerAccount.storeDBTransaction(
-        createdDate: dbCreatedDate,
+        createdDate: (drawTime == "1 PM" && currentDate.isAfter(lastDrawtime))
+            ? DateTime(
+                currentDate.year, currentDate.month, currentDate.day + 1, 8)
+            : dbCreatedDate,
         data: DBTransactions(
             datePlaced: datePlaced,
             drawTime: drawTime,

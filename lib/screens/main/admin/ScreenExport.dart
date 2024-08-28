@@ -303,7 +303,7 @@ class MainLayout extends StatelessWidget
                     if (context.mounted) {
                       context.read<BlocAccount>().add(
                           RequestSelectedFilterDate(selectedDatetime.copyWith(
-                              hour: selectedTime)));
+                              hour: selectedTime, minute: 0)));
                       Navigator.pop(context);
                     }
                   },
