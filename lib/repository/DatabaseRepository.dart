@@ -224,7 +224,7 @@ class DatabaseRepository {
     var storedModule = await KambasTransaction()
         .select()
         .createdAt
-        .between(selectedDatetime.copyWith(hour: selectedDatetime.hour - 6, minute: 0), selectedDatetime.copyWith(minute: 0))
+        .between(selectedDatetime.copyWith(hour: selectedDatetime.hour - 6, minute: (selectedDatetime.hour == 19) ? 1 : 0), selectedDatetime.copyWith(minute: 0))
         .and
         .orderBy("id")
         .toList();
